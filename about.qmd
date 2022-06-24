@@ -1,0 +1,19 @@
+---
+title: "About"
+image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: twitter
+      text: Twitter
+      href: https://twitter.com/bgautijonsson
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com/bgautijonsson
+    - icon: github
+      text: Github
+      href: https://github.com/bgautijonsson
+
+---
+
+About this blog
