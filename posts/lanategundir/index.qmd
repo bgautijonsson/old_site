@@ -6,7 +6,7 @@ author:
         url: "https://twitter.com/bgautijonsson"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
-date: today
+date: "2022/06/23"
 format: 
     html:
         code-fold: true
@@ -14,18 +14,27 @@ format:
         smooth-scroll: true
         link-external-newwindow: true
 editor: source
-theme: flatly
 title-block-banner: true
-standalone: true
-self-contained: true
 execute:
     echo: true
     warning: false
-project:
-    type: website
-    output-dir: docs
+categories:
+    - efnahagur
+    - R
+image: "dreifing.png"
+twitter-card:
+    image: "dreifing.png"
 ---
 
+
+
+
+Í nýjustu útgáfu af [Fjármálastöðugleika](https://www.sedlabanki.is/utgefid-efni/rit-og-skyrslur/rit/2022/03/16/Fjarmalastodugleiki-2022-1/) birti Seðlabankinn tölur yfir hlutfall lánategunda hjá íslenskum heimilum. Ég hafði verið að spjalla við Ingva og Arnar hjá [Pyngjunni](https://podtail.com/en/podcast/pyngjan/) um þessi gögn þ.a. ég útbjó snöggvast gagnvirka HTML skýrslu með Quarto í RStudio og sendi á kauðana.
+
+Myndirnar hér eru teiknaðar með blöndu af `ggplot2` og `plotly`. Hreyfið músina yfir stöplana til að sjá merkingar *(hlutföll, tegund lána eða tegund vaxta)*. Þið getið smellt á `code` flipana til að sjá undirliggjandi kóðann á bakvið skýrsluna. Kóðann í heild sinni má svo finna á [githubinu mínu](https://github.com/bgautijonsson/lanategundir.git).
+
+
+Svo er lítið mál að uppfæra slíkar skýrslur sjálfkrafa ef slóðin að gögnum sem eru notuð og uppsetning þeirra helst óbreytt.
 
 ```{r}
 #| include = FALSE
@@ -54,13 +63,6 @@ d <- read_excel(temp, sheet = "I-33", skip = 11) |>
     pivot_longer(c(-dags)) |> 
     separate(name, into = c("tegund1", "tegund2"), sep = " og ")
 ```
-
-Í nýjustu útgáfu af [Fjármálastöðugleika](https://www.sedlabanki.is/utgefid-efni/rit-og-skyrslur/rit/2022/03/16/Fjarmalastodugleiki-2022-1/) birti Seðlabankinn tölur yfir hlutfall lánategunda hjá íslenskum heimilum. Ég hafði verið að spjalla við Ingva og Arnar hjá [Pyngjunni](https://podtail.com/en/podcast/pyngjan/) um þessi gögn þ.a. ég útbjó snöggvast gagnvirka HTML skýrslu með Quarto í RStudio og sendi á kauðana.
-
-Myndirnar hér eru teiknaðar með blöndu af `ggplot2` og `plotly`. Hreyfið músina yfir stöplana til að sjá merkingar *(hlutföll, tegund lána eða tegund vaxta)*. Þið getið smellt á `code` flipana til að sjá undirliggjandi kóðann á bakvið skýrsluna. Kóðann í heild sinni má svo finna á [githubinu mínu](https://github.com/bgautijonsson/lanategundir.git).
-
-
-Svo er lítið mál að uppfæra slíkar skýrslur sjálfkrafa ef slóðin að gögnum sem eru notuð og uppsetning þeirra helst óbreytt.
 
 ::: {.panel-tabset}
 

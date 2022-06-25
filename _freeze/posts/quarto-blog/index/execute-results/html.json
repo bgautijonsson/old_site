@@ -1,0 +1,16 @@
+{
+  "hash": "bef66fe35af8cc8e0475e964496050cc",
+  "result": {
+    "markdown": "---\ntitle: \"Þetta er Quarto blogg\"\nauthor: \"Brynjólfur Gauti Guðrúnar Jónsson\"\ndate: \"2022/06/24\"\neditor: source\ntitle-block-banner: true\nexecute:\n    echo: true\n    warning: false\ncategories:\n    - tilkynning\n    - R\n    - Python\n    \n---\n\n\nÞetta er Quarto bloggsíða. Hér get ég keyrt Python kóða!\n\n\n\n\nOg ég get líka keyrt R kóða!\n\n\n::: {.cell}\n\n```{.r .cell-code}\ndata(mtcars)\nplot(mpg ~ wt, data = mtcars)\n```\n\n::: {.cell-output-display}\n![](index_files/figure-html/unnamed-chunk-1-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

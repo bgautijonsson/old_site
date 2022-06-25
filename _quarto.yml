@@ -4,18 +4,25 @@ project:
 
 website:
   title: "bgautijonsson.github.io"
+  site-url: https://www.bgautijonsson.github.io
+  description: Blogg um tölfræði og gögn
+  twitter-card: 
+    creator: "@bgautijonsson"
   navbar:
     background: "#08306b"
     foreground: "#ffffff"
     right:
-      - about.qmd
+      - href: about.qmd
+        text: Um mig
       - icon: github
-        href: https://github.com/
+        href: https://github.com/bgautijonsson
       - icon: twitter
-        href: https://twitter.com
+        href: https://twitter.com/bgautijonsson
+      - icon: rss
+        href: index.xml
 format:
   html:
-    theme: cosmo
+    theme: flatly
     css: styles.css
 
 
