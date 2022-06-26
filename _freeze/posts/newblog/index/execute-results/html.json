@@ -1,0 +1,11 @@
+{
+  "hash": "3219845d5deff06c95c0de0bca455e69",
+  "result": {
+    "markdown": "---\ntitle: \"Þetta er Quarto blogg\"\nauthor: \"Brynjólfur Gauti Guðrúnar Jónsson\"\ndate: \"2022/06/24\"\neditor: source\ntitle-block-banner: true\nexecute:\n    echo: true\n    warning: false\ncategories:\n    - tilkynning\n    - R\n    - Python\n# draft: true\n---\n\nÞetta er Quarto bloggsíða. Hér get ég keyrt Python kóða!\n\n::: {.cell execution_count=1}\n``` {.python .cell-code}\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nr = np.arange(0, 2, 0.01)\ntheta = 2 * np.pi * r\nfig, ax = plt.subplots(\n  subplot_kw = {'projection': 'polar'} \n)\nax.plot(theta, r)\nax.set_rticks([0.5, 1, 1.5, 2])\nax.grid(True)\nplt.show()\n```\n\n::: {.cell-output .cell-output-display}\n![](index_files/figure-html/cell-2-output-1.png){width=442 height=432}\n:::\n:::\n\n\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
