@@ -11,7 +11,7 @@ about:
     - icon: github
       href: https://github.com/bgautijonsson
     - icon: file-earmark-person-fill
-      href: images/Resume.pdf
+      href: https://bgautijonsson.github.io/resume
 
 ---
 
