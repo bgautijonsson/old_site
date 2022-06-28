@@ -400,8 +400,9 @@ p
 ## Þróun
 
 ```{r}
-#| fig.width: 10
+#| fig.width: 12
 #| fig.asp: 0.621
+#| out-width: "100%"
 
 
 countries <- c("Denmark", "Finland",
