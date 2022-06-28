@@ -21,6 +21,7 @@ execute:
 categories:
     - efnahagur
     - R
+    - íslenska
 image: "dreifing.png"
 twitter-card:
     image: "dreifing.png"

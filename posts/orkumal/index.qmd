@@ -8,7 +8,7 @@ author:
         url: "https://twitter.com/bgautijonsson"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
-date: today
+date: "2022/06/28"
 format: 
     html:
         code-fold: true
@@ -27,6 +27,7 @@ self-contained: true
 categories:
     - orkumál
     - R
+    - íslenska
 image: "throun_fossil.png"
 twitter-card:
     image: "throun_fossil.png"

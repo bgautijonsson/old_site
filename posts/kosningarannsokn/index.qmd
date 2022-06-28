@@ -29,6 +29,7 @@ twitter-card:
 categories:
     - R
     - kosningar
+    - íslenska
 ---
 
 # Hvert fara atkvæðin?
