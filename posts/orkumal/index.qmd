@@ -17,6 +17,7 @@ format:
         toc-location: right
         toc-title: Efnisyfirlit
         page-layout: full
+        max-width: "1000px"
 execute: 
   echo: true
   warning: false
@@ -79,6 +80,8 @@ d <- read_csv("https://raw.githubusercontent.com/owid/energy-data/master/owid-en
 ```
 
 # Efnahagsþróun
+
+
 
 :::{.panel-tabset}
 
@@ -263,7 +266,7 @@ plot_dat |>
 
 :::
 
-# Orkuframleiðsla
+# Orkunotkun
 
 :::{.panel-tabset}
 
@@ -330,7 +333,7 @@ plot_dat |>
     scale_y_log10(breaks = c(3e4, 1e5, range(plot_dat$energy_per_capita)),
                   # limits = c(1e4, NA),
                   labels = label_number(suffix = " kWh", big.mark = ".", decimal.mark = ",")
-                  ) +
+    ) +
     scale_colour_manual(values = c("#a50f15",
                                    "#a6bddb",
                                    "#045a8d",
@@ -349,7 +352,7 @@ plot_dat |>
     coord_cartesian() +
     labs(x = NULL,
          y = NULL,
-         title = "Þróun orkuframleiðslu á mann árin 1980 - 2018",
+         title = "Þróun orkunotkunar á mann árin 1980 - 2018",
          caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
 ```
 
@@ -421,7 +424,7 @@ plot_dat |>
     scale_y_log10(breaks = c(3e4, 1e5, range(plot_dat$fossil_per_capita)),
                   # limits = c(1e4, NA),
                   labels = label_number(suffix = " kWh", big.mark = ".", decimal.mark = ",")
-                  ) +
+    ) +
     scale_colour_manual(values = c("#a50f15",
                                    "#a6bddb",
                                    "#045a8d",
@@ -445,7 +448,7 @@ plot_dat |>
 ```
 
 
-## Hlutfall jarðefnaeldsneytis
+## Hlutfall orku frá jarðefnaeldsneyti
 
 ```{r}
 #| fig.width: 10
@@ -507,10 +510,10 @@ plot_dat |>
                        limits = c(1990, 2023.5),
                        breaks = c(1990,  1995, 2000, 2005, 2010, 2015, 2020)) +
     scale_y_continuous(breaks = c(range(plot_dat$fossil_share_energy),
-                             seq(0.1, 0.9, by = 0.1)),
-                  # limits = c(1e4, NA),
-                  labels = label_percent()
-                  ) +
+                                  seq(0.1, 0.9, by = 0.1)),
+                       # limits = c(1e4, NA),
+                       labels = label_percent()
+    ) +
     scale_colour_manual(values = c("#a50f15",
                                    "#a6bddb",
                                    "#045a8d",
@@ -529,13 +532,19 @@ plot_dat |>
     coord_cartesian() +
     labs(x = NULL,
          y = NULL,
-         title = "Hlutfall orku frá jarðefnaeldsneytum árin 1990 - 2018",
+         title = "Hlutfall orku frá jarðefnaeldsneyti árin 1990 - 2018",
          caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
 ```
 
 :::
 
 # Orka og hagvöxtur
+
+Til að vernda jörðina viljum við draga úr notkun jarðefnaeldsneytis, en einnig vilja þjóðir heims vaxa efnahagslega. 
+
+Við getum skoðað hvað þjóðir nota margar kílówattstundir (kWh) af jarðefnaeldsneytis eða orku almennt per $ af landsframleiðslu.
+
+Hér sjáum við þróun þessa hlutfalls frá 1990 fyrir alla orku og fyrir jarðefnaeldsneyti, auk þess sem við skoðum hlutfall jarðefnaeldsneytis af allri orkunotkun.
 
 :::{.panel-tabset}
 
@@ -601,10 +610,10 @@ plot_dat |>
                        limits = c(1990, 2025),
                        breaks = c(1990,  1995, 2000, 2005, 2010, 2015, 2018)) +
     scale_y_continuous(breaks = c(range(plot_dat$energy_per_gdp), 1, 2, 3, 4, 5),
-                  # limits = c(1e4, NA),
-                  labels = label_number(suffix = " kWh", big.mark = ".", decimal.mark = ",",
-                                        accuracy = 0.1)
-                  ) +
+                       # limits = c(1e4, NA),
+                       labels = label_number(suffix = " kWh", big.mark = ".", decimal.mark = ",",
+                                             accuracy = 0.1)
+    ) +
     scale_colour_manual(values = c("#a50f15",
                                    "#a6bddb",
                                    "#045a8d",
@@ -716,7 +725,96 @@ p
 
 :::
 
-# Orka og landsframleiðsla
+# Löndum raðað eftir hlutfalli jarðefnaeldsneytis og landsframleiðslu
+
+Við sáum að á Íslandi hækkaði þessi tala frá 2010 til 2018, nánar tiltekið um 14%, þ.a. dollari af landsframleiðslu kostaði 14% meira jarðefnaeldsneyti árið 2018 (0.94 kWh) en 2010 (0.83 kWh).
+
+:::{.panel-tabset}
+
+## 2018
+
+```{r}
+#| fig.width: 12
+#| fig.asp: 1.2
+
+
+p <- d |> 
+    filter(year == 2018) |> 
+    select(country, fossil_fuel_consumption, gdp) |> 
+    drop_na() |> 
+    mutate(fossil_per_gdp = fossil_fuel_consumption / gdp,
+           country = fct_reorder(country, fossil_per_gdp)) |> 
+    ggplot(aes(fossil_per_gdp, country,
+               fill = country == "Iceland")) +
+    geom_col() +
+    scale_fill_manual(values = c("#969696", "#4292c6")) +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    coord_cartesian(expand = FALSE) +
+    labs(x = "Notkun jarðefnaeldsneytis (kWh) deilt með landsframleiðslu ($)",
+         y = NULL,
+         title = "Röðun landa eftir jarðefnaeldsneyti (kWh) per $ af landsframleiðslu árið 2018",
+         subtitle = "Árið 2018 kostaði1$ af landsframleiðslu 0.94 kWh af jarðefnaeldsneyti",
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+
+ggsave(plot = p, filename = "ordered_fossil.png",
+       width = 8, height = 8, scale = 1.7, bg = "white")
+
+p
+```
+
+## Breyting 2010 - 2018
+
+
+```{r}
+#| fig.width: 12
+#| fig.asp: 1.2
+
+
+p <- d |> 
+    filter(year %in% c(2010, 2018)) |> 
+    select(year, country, fossil_fuel_consumption, gdp) |> 
+    drop_na() |> 
+    mutate(fossil_per_gdp = fossil_fuel_consumption / gdp,
+           country = fct_reorder(country, fossil_per_gdp),
+           year = ifelse(year == max(year), "eftir", "fyrir")) |> 
+    select(year, country, fossil_per_gdp) |> 
+    pivot_wider(names_from = year, values_from = fossil_per_gdp) |> 
+    mutate(breyting = eftir / fyrir - 1) |> 
+    mutate(country = fct_reorder(country, breyting)) |> 
+    ggplot(aes(breyting, country,
+               fill = country == "Iceland")) +
+    geom_col() +
+    scale_x_continuous(labels = label_percent()) +
+    scale_fill_manual(values = c("#969696", "#4292c6")) +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    coord_cartesian(expand = FALSE) +
+    labs(x = "Notkun jarðefnaeldsneytis (kWh) deilt með landsframleiðslu ($) (% breyting frá 2010 til 2018)",
+         y = NULL,
+         title = "Breyting í notkun jarðefnaeldsneytis (kWh) per $ af landsframleiðslu frá 2010 til 2018",
+         subtitle = "Árið 2018 kostaði dollari af landsframleiðslu á Íslandi 14% meira jarðefnaeldsneyti en 2010",
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+
+p
+```
+
+
+:::
+
+# Tengsl orkunotkunar, útblásturs og landsframleiðslu
+
+Lítum á þessi tengsl með þremur myndböndum:
+
+1. Tengsl orkunotkunar almennt og landsframleiðslu
+2. Tengsl notkunar jarðefnaeldsneytis og landsframleiðslu
+3. Tengsl útblásturs gróðurhúsalofttegundar við framleiðslurafnmagns og landsframleiðslu
+
+Heilar línur eru viðmið fyrir hlutföllin sem við reiknuðum að ofan. Við viljum sjá punktana færast upp (efnahagsvöxtur) og til vinstri (draga úr jarðefnaeldsneyti/útblæstri). Punktar sem eru nær norðvestur horni myndarinnar gætu kallast *"skilvirkari"*, þ.e. dollari af landsframleiðslu kostar minni orku/jarðefnaeldsneyti/útblástur.
+
+:::{.panel-tabset}
+
+## Orka og landsframleiðsla
 
 ```{r}
 #| cache: true
@@ -801,109 +899,10 @@ p_vid
 ```
 
 
-# Gróðurhúsalofttegundir og framleiðsla
-
-```{r}
-#| cache: true
-#| fig.width: 10
-#| fig.asp: 0.5
-#| out-width: "100%"
-
-start <- d |> 
-    filter(year >= 2000, greenhouse_per_capita > 0) |> 
-    pull(greenhouse_per_capita) |>
-    min(na.rm = T)
-end <- d |>
-    filter(year >= 2000, greenhouse_per_capita > 0) |> 
-    pull(greenhouse_per_capita) |> 
-    max(na.rm = T)
-
-min_gdp <- d |> 
-    filter(year >= 2000) |> 
-    pull(gdp_per_capita) |> 
-    min(na.rm = T)
-max_gdp <- d |> 
-    filter(year >= 2000) |> 
-    pull(gdp_per_capita) |>
-    max(na.rm = T)
-
-plot_dat <- crossing(greenhouse_per_capita = seq(log(start),
-                                                 log(end), 
-                                                 length = 500) |> exp(),
-                     ratio = c(1/16, 1/8, 1/4, 1/2, 1, 2, 4)) |> 
-    mutate(gdp_per_capita = ratio * greenhouse_per_capita) |> 
-    filter(gdp_per_capita <= max_gdp * 1.1,
-           gdp_per_capita >= min_gdp)
-
-add_preds <- function(data, ...) {
-    m <- lm(log(gdp_per_capita) ~ log(greenhouse_per_capita), data = data)
-    data$pred <- exp(predict(m))
-    
-    data
-}
 
 
-p <- d |> 
-    select(gdp_per_capita, greenhouse_per_capita, country, year) |> 
-    drop_na() |> 
-    filter(year >= 2000, country != "World") |> 
-    group_by(country) |>
-    filter(greenhouse_per_capita > 0, gdp_per_capita > 0) |>
-    ungroup() |> 
-    group_by(year) |> 
-    group_modify(add_preds) |> 
-    ungroup() |> 
-    ggplot(aes(greenhouse_per_capita, gdp_per_capita,
-               colour = (country == "Iceland"),
-               size = (country == "Iceland"),
-               alpha = (country == "Iceland"))) +
-    geom_line(
-        data = plot_dat,
-        aes(greenhouse_per_capita, gdp_per_capita, group = ratio),
-        inherit.aes = FALSE
-    ) +
-    geom_text(data = plot_dat |> 
-                  group_by(ratio) |> 
-                  filter(greenhouse_per_capita == max(greenhouse_per_capita)) |> 
-                  ungroup(),
-              aes(x = greenhouse_per_capita,
-                  y = gdp_per_capita,
-                  label = 1 / ratio),
-              inherit.aes = FALSE, hjust = 0, vjust = 0, 
-              nudge_x = 0.03,
-              nudge_y = 0.03) +
-    geom_line(aes(y = pred), lty = 2, col = "black", size = 1) +
-    geom_point(aes(group = country)) +
-    # geom_rangeframe() +
-    scale_x_log10(labels = label_number(big.mark = ".", decimal.mark = ",")) +
-    scale_y_log10(labels = label_number(suffix = "$", big.mark = ".", decimal.mark = ",")) +
-    scale_colour_manual(values = c("#969696", "#4292c6")) +
-    scale_size_manual(values = c(2.5, 4)) +
-    scale_alpha_manual(values = c(0.7, 1)) +
-    theme_half_open(font_size = 12) +
-    theme(legend.position = "none",
-          plot.title = element_markdown(face = "plain")) +
-    labs(x = "Útblástur gróðurhúsalofttegunda (tonn á 100.000 íbúa) við framleiðslu rafmagns",
-         y = "Landsframleiðsla á mann",
-         title = "Þróun útblásturs gróðurhúsalofttegunda og landsframleiðslu á <b style='color:#4292c6'>Íslandi</b> samanborið við <b style='color:#969696'>heiminn</b>",
-         subtitle = str_c("Heilar línur sýna mismunandi hlutföll gróðushúsalofttegunda / landsframleiðslu",
-                          "\n",
-                          "Brotin lína sýnir fylgni stærðanna á heimsvísu",
-                          "\n",
-                          "Ár: {frame_time}"),
-         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal") +
-    transition_time(as.integer(year)) +
-    ease_aes("cubic-in-out")
 
-p_vid <- animate(p, width = 12, height = 0.5 * 12, unit = "in", res = 150, 
-                 fps = 25, duration = 10,
-                 renderer = ffmpeg_renderer(format = "mp4"))
-
-p_vid
-```
-
-
-# Jarðefnaeldsneyti og framleiðsla
+## Jarðefnaeldsneyti og framleiðsla
 
 ```{r}
 #| cache: true
@@ -1006,77 +1005,105 @@ p_vid
 ```
 
 
-# Löndum raðað eftir hlutfalli jarðefnaeldsneytis og landsframleiðslu
-
-:::{.panel-tabset}
-
-## 2018
+## Gróðurhúsalofttegundir og framleiðsla
 
 ```{r}
-#| fig.width: 12
-#| fig.asp: 1.2
+#| cache: true
+#| fig.width: 10
+#| fig.asp: 0.5
+#| out-width: "100%"
+
+start <- d |> 
+    filter(year >= 2000, greenhouse_per_capita > 0) |> 
+    pull(greenhouse_per_capita) |>
+    min(na.rm = T)
+end <- d |>
+    filter(year >= 2000, greenhouse_per_capita > 0) |> 
+    pull(greenhouse_per_capita) |> 
+    max(na.rm = T)
+
+min_gdp <- d |> 
+    filter(year >= 2000) |> 
+    pull(gdp_per_capita) |> 
+    min(na.rm = T)
+max_gdp <- d |> 
+    filter(year >= 2000) |> 
+    pull(gdp_per_capita) |>
+    max(na.rm = T)
+
+plot_dat <- crossing(greenhouse_per_capita = seq(log(start),
+                                                 log(end), 
+                                                 length = 500) |> exp(),
+                     ratio = c(1/16, 1/8, 1/4, 1/2, 1, 2, 4)) |> 
+    mutate(gdp_per_capita = ratio * greenhouse_per_capita) |> 
+    filter(gdp_per_capita <= max_gdp * 1.1,
+           gdp_per_capita >= min_gdp)
+
+add_preds <- function(data, ...) {
+    m <- lm(log(gdp_per_capita) ~ log(greenhouse_per_capita), data = data)
+    data$pred <- exp(predict(m))
+    
+    data
+}
 
 
 p <- d |> 
-    filter(year == 2018) |> 
-    select(country, fossil_fuel_consumption, gdp) |> 
+    select(gdp_per_capita, greenhouse_per_capita, country, year) |> 
     drop_na() |> 
-    mutate(fossil_per_gdp = fossil_fuel_consumption / gdp,
-           country = fct_reorder(country, fossil_per_gdp)) |> 
-    ggplot(aes(fossil_per_gdp, country,
-               fill = country == "Iceland")) +
-    geom_col() +
-    scale_fill_manual(values = c("#969696", "#4292c6")) +
-    theme_half_open() +
-    theme(legend.position = "none") +
-    coord_cartesian(expand = FALSE) +
-    labs(x = "Notkun jarðefnaeldsneytis (kWh) deilt með landsframleiðslu ($)",
-         y = NULL,
-         title = "Röðun landa eftir jarðefnaeldsneyti (kWh) per $ af landsframleiðslu árið 2018",
-         subtitle = "Árið 2018 kostaði1$ af landsframleiðslu 0.94 kWh af jarðefnaeldsneyti",
-         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+    filter(year >= 2000, country != "World") |> 
+    group_by(country) |>
+    filter(greenhouse_per_capita > 0, gdp_per_capita > 0) |>
+    ungroup() |> 
+    group_by(year) |> 
+    group_modify(add_preds) |> 
+    ungroup() |> 
+    ggplot(aes(greenhouse_per_capita, gdp_per_capita,
+               colour = (country == "Iceland"),
+               size = (country == "Iceland"),
+               alpha = (country == "Iceland"))) +
+    geom_line(
+        data = plot_dat,
+        aes(greenhouse_per_capita, gdp_per_capita, group = ratio),
+        inherit.aes = FALSE
+    ) +
+    geom_text(data = plot_dat |> 
+                  group_by(ratio) |> 
+                  filter(greenhouse_per_capita == max(greenhouse_per_capita)) |> 
+                  ungroup(),
+              aes(x = greenhouse_per_capita,
+                  y = gdp_per_capita,
+                  label = 1 / ratio),
+              inherit.aes = FALSE, hjust = 0, vjust = 0, 
+              nudge_x = 0.03,
+              nudge_y = 0.03) +
+    geom_line(aes(y = pred), lty = 2, col = "black", size = 1) +
+    geom_point(aes(group = country)) +
+    # geom_rangeframe() +
+    scale_x_log10(labels = label_number(big.mark = ".", decimal.mark = ",")) +
+    scale_y_log10(labels = label_number(suffix = "$", big.mark = ".", decimal.mark = ",")) +
+    scale_colour_manual(values = c("#969696", "#4292c6")) +
+    scale_size_manual(values = c(2.5, 4)) +
+    scale_alpha_manual(values = c(0.7, 1)) +
+    theme_half_open(font_size = 12) +
+    theme(legend.position = "none",
+          plot.title = element_markdown(face = "plain")) +
+    labs(x = "Útblástur gróðurhúsalofttegunda (tonn á 100.000 íbúa) við framleiðslu rafmagns",
+         y = "Landsframleiðsla á mann",
+         title = "Þróun útblásturs gróðurhúsalofttegunda og landsframleiðslu á <b style='color:#4292c6'>Íslandi</b> samanborið við <b style='color:#969696'>heiminn</b>",
+         subtitle = str_c("Heilar línur sýna mismunandi hlutföll gróðushúsalofttegunda / landsframleiðslu",
+                          "\n",
+                          "Brotin lína sýnir fylgni stærðanna á heimsvísu",
+                          "\n",
+                          "Ár: {frame_time}"),
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal") +
+    transition_time(as.integer(year)) +
+    ease_aes("cubic-in-out")
 
-ggsave(plot = p, filename = "ordered_fossil.png",
-       width = 8, height = 8, scale = 1.7, bg = "white")
+p_vid <- animate(p, width = 12, height = 0.5 * 12, unit = "in", res = 150, 
+                 fps = 25, duration = 10,
+                 renderer = ffmpeg_renderer(format = "mp4"))
 
-p
+p_vid
 ```
-
-## Breyting 2010 - 2018
-
-
-```{r}
-#| fig.width: 12
-#| fig.asp: 1.2
-
-
-p <- d |> 
-    filter(year %in% c(2010, 2018)) |> 
-    select(year, country, fossil_fuel_consumption, gdp) |> 
-    drop_na() |> 
-    mutate(fossil_per_gdp = fossil_fuel_consumption / gdp,
-           country = fct_reorder(country, fossil_per_gdp),
-           year = ifelse(year == max(year), "eftir", "fyrir")) |> 
-    select(year, country, fossil_per_gdp) |> 
-    pivot_wider(names_from = year, values_from = fossil_per_gdp) |> 
-    mutate(breyting = eftir / fyrir - 1) |> 
-    mutate(country = fct_reorder(country, breyting)) |> 
-    ggplot(aes(breyting, country,
-               fill = country == "Iceland")) +
-    geom_col() +
-    scale_x_continuous(labels = label_percent()) +
-    scale_fill_manual(values = c("#969696", "#4292c6")) +
-    theme_half_open() +
-    theme(legend.position = "none") +
-    coord_cartesian(expand = FALSE) +
-    labs(x = "Notkun jarðefnaeldsneytis (kWh) deilt með landsframleiðslu ($) (% breyting frá 2010 til 2018)",
-         y = NULL,
-         title = "Breyting í notkun jarðefnaeldsneytis (kWh) per $ af landsframleiðslu frá 2010 til 2018",
-         subtitle = "Árið 2018 kostaði dollari af landsframleiðslu á Íslandi 14% meira jarðefnaeldsneyti en 2010",
-         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
-
-p
-```
-
 
 :::
