@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "bggj.is"
+  title: "Brynjólfur Gauti Guðrúnar Jónsson"
   site-url: https://www.bggj.is
   description: Blogg um tölfræði og gögn
   twitter-card: 
@@ -18,8 +18,10 @@ website:
         menu:
             - text: Mælaborð Sveitarfélaga
               href: https://bggj.shinyapps.io/sveitarfelog_maelabord/
-            - text: covid.hi.is
-              href: https://covid.hi.is
+            - text: Mælaborð COVID-19
+              href: http://covid.rhi.hi.is/shiny/dashboard/
+            - text: Spálíkan COVID-19
+              href: covid_spalikan.qmd
       - icon: github
         href: https://github.com/bgautijonsson
       - icon: twitter
