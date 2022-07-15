@@ -3,8 +3,8 @@ project:
   output-dir: docs
 
 website:
-  title: "bgautijonsson.github.io"
-  site-url: https://www.bgautijonsson.github.io
+  title: "bggj.is"
+  site-url: https://www.bggj.is
   description: Blogg um tölfræði og gögn
   twitter-card: 
     creator: "@bgautijonsson"
