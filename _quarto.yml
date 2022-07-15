@@ -11,6 +11,7 @@ website:
   navbar:
     background: "#08306b"
     foreground: "#ffffff"
+    pinned: true
     right:
       - href: about.qmd
         text: Um mig
