@@ -14,6 +14,12 @@ website:
     right:
       - href: about.qmd
         text: Um mig
+      - text: Verkefni
+        menu:
+            - text: Mælaborð Sveitarfélaga
+              href: https://bggj.shinyapps.io/sveitarfelog_maelabord/
+            - text: covid.hi.is
+              href: https://covid.hi.is
       - icon: github
         href: https://github.com/bgautijonsson
       - icon: twitter
