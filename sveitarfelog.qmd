@@ -1,0 +1,16 @@
+
+
+<iframe
+  src="https://bggj.shinyapps.io/sveitarfelog_maelabord/"
+  style="
+    position: fixed;
+    top: 80px;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+    border: none;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  ">
+</iframe>

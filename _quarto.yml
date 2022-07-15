@@ -17,7 +17,7 @@ website:
       - text: Verkefni
         menu:
             - text: Mælaborð Sveitarfélaga
-              href: https://bggj.shinyapps.io/sveitarfelog_maelabord/
+              href: sveitarfelog.qmd
             - text: Mælaborð COVID-19
               href: http://covid.rhi.hi.is/shiny/dashboard/
             - text: Spálíkan COVID-19
