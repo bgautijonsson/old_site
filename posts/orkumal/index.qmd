@@ -13,12 +13,14 @@ format:
     html:
         code-fold: true
         toc: true
-        toc-location: body
+        toc-depth: 2
+        toc-location: right
         toc-title: Efnisyfirlit
         page-layout: full
 execute: 
   echo: true
   warning: false
+  cache: true
 editor: source
 theme: flatly
 title-block-banner: true
@@ -54,6 +56,8 @@ library(janitor)
 
 # Gögn
 
+Hér nota ég [gögn frá Our World in Data](https://github.com/owid/energy-data) sem taka saman upplýsingar um alls kyns orkunotkun, orkuframleiðslu og útblæstri, ásamt fólksfjölda og landsframleiðslu.
+
 ```{r}
 d <- read_csv("https://raw.githubusercontent.com/owid/energy-data/master/owid-energy-data.csv",
               col_types = cols()) |> 
@@ -74,7 +78,645 @@ d <- read_csv("https://raw.githubusercontent.com/owid/energy-data/master/owid-en
            fossil_fuel_consumption = fossil_fuel_consumption * 1e9)
 ```
 
-# Orka og framleiðsla
+# Efnahagsþróun
+
+:::{.panel-tabset}
+
+## Landsframleiðsla
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out-width: "100%"
+#| 
+
+countries <- c("Denmark", "Finland",
+               "Iceland", "New Zealand",
+               "Norway", "Qatar", 
+               "Sweden", "United States",
+               "Venezuela")
+icelandic <- c(
+    "Denmark" = "Danmörk",
+    "Finland" = "Finnland",
+    "Germany" = "Þýskaland", 
+    "Iceland" = "Ísland", 
+    "New Zealand" = "Nýja Sjáland",
+    "Norway" = "Noregur",
+    "Qatar" = "Katar",
+    "Sweden" = "Svíþjóð",
+    "United States" = "Bandaríkin",
+    "Venezuela" = "Venesúela")
+
+plot_dat <- d |> 
+    select(year, country, gdp_per_capita) |> 
+    drop_na() |> 
+    mutate(alpha = country %in% countries,
+           colour = fct_other(country,
+                              keep = countries,
+                              other_level = "Other"),
+           y = gdp_per_capita,
+           y = case_when(country == "Iceland" ~ y * 0.95,
+                         country == "Denmark" ~ y * 1.05,
+                         country == "Germany" ~ y * 1.02,
+                         country == "Sweden" ~ y * 0.98,
+                         country == "Norway" ~ y - 0.02,
+                         TRUE ~ y)) |> 
+    filter(year >= 1990) |> 
+    group_by(country) |> 
+    filter(all(gdp_per_capita >= 1e4)) |> 
+    ungroup()
+
+
+plot_dat |> 
+    ggplot(aes(year, gdp_per_capita,
+               colour = colour,
+               alpha = alpha)) +
+    geom_line(aes(group = country, colour = colour, alpha = alpha, size = alpha)) +
+    geom_text(data = plot_dat |> 
+                  filter(country %in% countries,
+                         year == max(year)) |> 
+                  mutate(country = icelandic[country]),
+              aes(y = y, label = country),
+              hjust = 0, nudge_x = 0.1, size = 4) +
+    geom_rangeframe(alpha = 1, colour = "black") +
+    scale_x_continuous(expand = expansion(),
+                       limits = c(1990, 2021.5),
+                       breaks = c(1990,  1995, 2000, 2005, 2010, 2015, 2018)) +
+    scale_y_log10(breaks = c(3e4, 1e5, range(plot_dat$gdp_per_capita)),
+                  limits = c(1e4, NA),
+                  labels = label_number(suffix = "$", big.mark = ".", decimal.mark = ",")) +
+    scale_colour_manual(values = c("#a50f15",
+                                   "#a6bddb",
+                                   "#045a8d",
+                                   "black", 
+                                   "#e41a1c", 
+                                   "#980043",
+                                   "#fed976",
+                                   "#0868ac",
+                                   "#fed976",
+                                   "grey")) +
+    scale_alpha_manual(values = c(0.3, 1)) +
+    scale_size_manual(values = c(0.5, 1)) +
+    theme_tufte() +
+    theme(legend.position = "none",
+          plot.title = element_text(face = "bold")) +
+    coord_cartesian() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Þróun landsframleiðslu á mann (verðlag 2011) árin 1980 - 2018",
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+
+
+
+
+```
+
+## Hagvöxtur
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out-width: "100%"
+#| 
+
+countries <- c("Denmark", "Finland",
+               "Iceland", 
+               "Norway", 
+               "Sweden")
+icelandic <- c(
+    "Denmark" = "Danmörk",
+    "Finland" = "Finnland",
+    "Germany" = "Þýskaland", 
+    "Iceland" = "Ísland", 
+    "New Zealand" = "Nýja Sjáland",
+    "Norway" = "Noregur",
+    "Qatar" = "Katar",
+    "Sweden" = "Svíþjóð",
+    "United States" = "Bandaríkin",
+    "Venezuela" = "Venesúela")
+
+plot_dat <- d |> 
+    select(year, country, gdp_per_capita) |> 
+    drop_na() |> 
+    filter(year >= 1989) |> 
+    group_by(country) |> 
+    filter(all(gdp_per_capita >= 1e4)) |> 
+    mutate(growth = c(1, exp(diff(log(gdp_per_capita))))) |> 
+    ungroup() |> 
+    filter(year >= 1990) |> 
+    mutate(alpha = country %in% countries,
+           colour = fct_other(country,
+                              keep = countries,
+                              other_level = "Other"),
+           y = growth,
+           y = case_when(country == "Iceland" ~ y * 1,
+                         country == "Denmark" ~ y * 1,
+                         country == "Finland" ~ y + 0.002,
+                         country == "Sweden" ~ y -0.003,
+                         country == "Norway" ~ y - 0.002,
+                         TRUE ~ y))
+
+
+
+plot_dat |> 
+    ggplot(aes(year, growth,
+               colour = colour,
+               alpha = alpha)) +
+    geom_hline(yintercept = 1, lty = 2, alpha = 0.5) +
+    geom_line(aes(group = country, colour = colour, alpha = alpha, size = alpha)) +
+    geom_text(data = plot_dat |> 
+                  filter(country %in% countries,
+                         year == max(year)) |> 
+                  mutate(country = icelandic[country]),
+              aes(y = y, label = country),
+              hjust = 0, nudge_x = 0.1, size = 4) +
+    geom_rangeframe(alpha = 1, colour = "black") +
+    scale_x_continuous(expand = expansion(),
+                       limits = c(1990, 2018.5),
+                       breaks = c(1990,  1995, 2000, 2005, 2010, 2015, 2018)) +
+    scale_y_log10(breaks = c(range(plot_dat$growth),
+                             1, 0.9, 1.1, 1.2),
+                  labels = function(x) percent(x - 1, accuracy = 1),
+                  limits = c(1/1.4, 1.4)
+    ) +
+    scale_colour_manual(values = c("#a50f15",
+                                   "#a6bddb",
+                                   "#045a8d",
+                                   "#e41a1c", 
+                                   "#fed976",
+                                   "grey")) +
+    scale_alpha_manual(values = c(0.223, 1)) +
+    scale_size_manual(values = c(0.5, 1)) +
+    theme_tufte() +
+    theme(legend.position = "none",
+          plot.title = element_text(face = "bold")) +
+    coord_cartesian(ylim = c(1/1.11, 1.11),
+                    xlim = c(NA, 2021.5)) +
+    labs(x = NULL,
+         y = NULL,
+         title = "Þróun hagvaxtar árin 1980 - 2018",
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+
+
+
+```
+
+:::
+
+# Orkuframleiðsla
+
+:::{.panel-tabset}
+
+## Öll orka
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out-width: "100%"
+#| 
+
+countries <- c("Denmark", "Finland",
+               "Iceland", "New Zealand",
+               "Norway", "Qatar", 
+               "Sweden", "United States",
+               "Venezuela")
+icelandic <- c(
+    "Denmark" = "Danmörk",
+    "Finland" = "Finnland",
+    "Germany" = "Þýskaland", 
+    "Iceland" = "Ísland", 
+    "New Zealand" = "Nýja Sjáland",
+    "Norway" = "Noregur",
+    "Qatar" = "Katar",
+    "Sweden" = "Svíþjóð",
+    "United States" = "Bandaríkin",
+    "Venezuela" = "Venesúela")
+
+plot_dat <- d |> 
+    select(year, country, energy_per_capita) |> 
+    drop_na() |> 
+    mutate(alpha = country %in% countries,
+           colour = fct_other(country,
+                              keep = countries,
+                              other_level = "Other"),
+           y = energy_per_capita,
+           y = case_when(country == "Iceland" ~ y * 0.95,
+                         country == "Qatar" ~ y * 1.05,
+                         country == "Denmark" ~ y * 1,
+                         country == "Germany" ~ y,
+                         country == "Sweden" ~ y * 1.03,
+                         country == "Norway" ~ y * 1,
+                         TRUE ~ y)) |> 
+    filter(year >= 1990, country != "United States Virgin Islands") |> 
+    group_by(country) |> 
+    filter(all(energy_per_capita >= 1e4)) |> 
+    ungroup()
+
+plot_dat |> 
+    ggplot(aes(year, energy_per_capita,
+               colour = colour,
+               alpha = alpha)) +
+    geom_line(aes(group = country, colour = colour, alpha = alpha, size = alpha)) +
+    geom_text(data = plot_dat |> 
+                  filter(country %in% countries,
+                         year == max(year)) |> 
+                  mutate(country = icelandic[country]),
+              aes(y = y, label = country),
+              hjust = 0, nudge_x = 0.1, size = 4) +
+    geom_rangeframe(alpha = 1, colour = "black") +
+    scale_x_continuous(expand = expansion(),
+                       limits = c(1990, 2023.3),
+                       breaks = c(1990,  1995, 2000, 2005, 2010, 2015, 2020)) +
+    scale_y_log10(breaks = c(3e4, 1e5, range(plot_dat$energy_per_capita)),
+                  # limits = c(1e4, NA),
+                  labels = label_number(suffix = " kWh", big.mark = ".", decimal.mark = ",")
+                  ) +
+    scale_colour_manual(values = c("#a50f15",
+                                   "#a6bddb",
+                                   "#045a8d",
+                                   "black", 
+                                   "#e41a1c", 
+                                   "#980043",
+                                   "#fed976",
+                                   "#0868ac",
+                                   "#fed976",
+                                   "grey")) +
+    scale_alpha_manual(values = c(0.3, 1)) +
+    scale_size_manual(values = c(0.5, 1)) +
+    theme_tufte() +
+    theme(legend.position = "none",
+          plot.title = element_text(face = "bold")) +
+    coord_cartesian() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Þróun orkuframleiðslu á mann árin 1980 - 2018",
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+```
+
+
+## Jarðefnaeldsneyti
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out-width: "100%"
+#| 
+
+countries <- c("Denmark", "Finland",
+               "Iceland", "New Zealand",
+               "Norway", "Qatar", 
+               "Sweden", "United States",
+               "Venezuela")
+
+icelandic <- c(
+    "Denmark" = "Danmörk",
+    "Finland" = "Finnland",
+    "Germany" = "Þýskaland", 
+    "Iceland" = "Ísland", 
+    "New Zealand" = "Nýja Sjáland",
+    "Norway" = "Noregur",
+    "Qatar" = "Katar",
+    "Sweden" = "Svíþjóð",
+    "United States" = "Bandaríkin",
+    "Venezuela" = "Venesúela")
+
+plot_dat <- d |> 
+    select(year, country, fossil_fuel_consumption, population) |> 
+    mutate(fossil_per_capita = fossil_fuel_consumption / population) |> 
+    drop_na() |> 
+    mutate(alpha = country %in% countries,
+           colour = fct_other(country,
+                              keep = countries,
+                              other_level = "Other"),
+           y = fossil_per_capita,
+           y = case_when(country == "Iceland" ~ y * 0.97,
+                         country == "Finland" ~ y * 0.91,
+                         country == "Qatar" ~ y * 1.05,
+                         country == "Denmark" ~ y * 1.05,
+                         country == "New Zealand" ~ y * 1.08,
+                         country == "Germany" ~ y,
+                         country == "Sweden" ~ y * 0.97,
+                         country == "Norway" ~ y * 1.04,
+                         TRUE ~ y)) |> 
+    filter(year >= 1990, country != "United States Virgin Islands") |> 
+    group_by(country) |> 
+    filter(all(fossil_per_capita >= 1e4)) |> 
+    ungroup()
+
+plot_dat |> 
+    ggplot(aes(year, fossil_per_capita,
+               colour = colour,
+               alpha = alpha)) +
+    geom_line(aes(group = country, colour = colour, alpha = alpha, size = alpha)) +
+    geom_text(data = plot_dat |> 
+                  filter(country %in% countries,
+                         year == max(year)) |> 
+                  mutate(country = icelandic[country]),
+              aes(y = y, label = country),
+              hjust = 0, nudge_x = 0.1, size = 4) +
+    geom_rangeframe(alpha = 1, colour = "black") +
+    scale_x_continuous(expand = expansion(),
+                       limits = c(1990, 2023.3),
+                       breaks = c(1990,  1995, 2000, 2005, 2010, 2015, 2020)) +
+    scale_y_log10(breaks = c(3e4, 1e5, range(plot_dat$fossil_per_capita)),
+                  # limits = c(1e4, NA),
+                  labels = label_number(suffix = " kWh", big.mark = ".", decimal.mark = ",")
+                  ) +
+    scale_colour_manual(values = c("#a50f15",
+                                   "#a6bddb",
+                                   "#045a8d",
+                                   "black", 
+                                   "#e41a1c", 
+                                   "#980043",
+                                   "#fed976",
+                                   "#0868ac",
+                                   "#fed976",
+                                   "grey")) +
+    scale_alpha_manual(values = c(0.3, 1)) +
+    scale_size_manual(values = c(0.5, 1)) +
+    theme_tufte() +
+    theme(legend.position = "none",
+          plot.title = element_text(face = "bold")) +
+    coord_cartesian() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Þróun notkunar jarðefnaeldsneytis á mann árin 1980 - 2018",
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+```
+
+
+## Hlutfall jarðefnaeldsneytis
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out-width: "100%"
+
+countries <- c("Denmark", "Finland",
+               "Iceland", "New Zealand",
+               "Norway", "Qatar", 
+               "Sweden", "United States",
+               "Venezuela")
+icelandic <- c(
+    "Denmark" = "Danmörk",
+    "Finland" = "Finnland",
+    "Germany" = "Þýskaland", 
+    "Iceland" = "Ísland", 
+    "New Zealand" = "Nýja Sjáland",
+    "Norway" = "Noregur",
+    "Qatar" = "Katar",
+    "Sweden" = "Svíþjóð",
+    "United States" = "Bandaríkin",
+    "Venezuela" = "Venesúela")
+
+plot_dat <- d |> 
+    select(year, country, fossil_share_energy) |> 
+    drop_na() |> 
+    mutate(fossil_share_energy = fossil_share_energy / 100,
+           alpha = country %in% countries,
+           colour = fct_other(country,
+                              keep = countries,
+                              other_level = "Other"),
+           y = fossil_share_energy,
+           y = case_when(country == "Iceland" ~ y * 1,
+                         country == "Finland" ~ y * 1,
+                         country == "Qatar" ~ y * 1,
+                         country == "Denmark" ~ y * 1.01,
+                         country == "New Zealand" ~ y * 0.99,
+                         country == "United States" ~ y * 1.01,
+                         country == "Venezuela" ~ y * 0.99,
+                         country == "Germany" ~ y,
+                         country == "Sweden" ~ y * 1.02,
+                         country == "Norway" ~ y * 0.98,
+                         TRUE ~ y)) |> 
+    filter(year >= 1990)
+
+plot_dat |> 
+    ggplot(aes(year, fossil_share_energy,
+               colour = colour,
+               alpha = alpha)) +
+    geom_line(aes(group = country, colour = colour, alpha = alpha, size = alpha)) +
+    geom_text(data = plot_dat |> 
+                  filter(country %in% countries,
+                         year == max(year)) |> 
+                  mutate(country = icelandic[country]),
+              aes(y = y, label = country),
+              hjust = 0, nudge_x = 0.1, size = 4) +
+    geom_rangeframe(alpha = 1, colour = "black") +
+    scale_x_continuous(expand = expansion(),
+                       limits = c(1990, 2023.5),
+                       breaks = c(1990,  1995, 2000, 2005, 2010, 2015, 2020)) +
+    scale_y_continuous(breaks = c(range(plot_dat$fossil_share_energy),
+                             seq(0.1, 0.9, by = 0.1)),
+                  # limits = c(1e4, NA),
+                  labels = label_percent()
+                  ) +
+    scale_colour_manual(values = c("#a50f15",
+                                   "#a6bddb",
+                                   "#045a8d",
+                                   "black", 
+                                   "#e41a1c", 
+                                   "#980043",
+                                   "#fed976",
+                                   "#0868ac",
+                                   "#fed976",
+                                   "grey")) +
+    scale_alpha_manual(values = c(0.3, 1)) +
+    scale_size_manual(values = c(0.5, 1)) +
+    theme_tufte() +
+    theme(legend.position = "none",
+          plot.title = element_text(face = "bold")) +
+    coord_cartesian() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Hlutfall orku frá jarðefnaeldsneytum árin 1990 - 2018",
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+```
+
+:::
+
+# Orka og hagvöxtur
+
+:::{.panel-tabset}
+
+## Öll orka
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out-width: "100%"
+
+countries <- c("Denmark", "Finland",
+               "Iceland", "New Zealand",
+               "Norway", "Qatar", 
+               "Sweden", "Trinidad and Tobago",
+               "United States", "Venezuela")
+icelandic <- c(
+    "Denmark" = "Danmörk",
+    "Finland" = "Finnland",
+    "Germany" = "Þýskaland", 
+    "Iceland" = "Ísland", 
+    "New Zealand" = "Nýja Sjáland",
+    "Norway" = "Noregur",
+    "Qatar" = "Katar",
+    "Sweden" = "Svíþjóð",
+    "Trinidad and Tobago" = "Trínidad og Tóbagó",
+    "United States" = "Bandaríkin",
+    "Venezuela" = "Venesúela")
+
+plot_dat <- d |> 
+    select(year, country, energy_per_gdp) |> 
+    drop_na() |> 
+    mutate(alpha = country %in% countries,
+           colour = fct_other(country,
+                              keep = countries,
+                              other_level = "Other"),
+           y = energy_per_gdp,
+           y = case_when(country == "Iceland" ~ y * 1,
+                         country == "Finland" ~ y * 1,
+                         country == "Qatar" ~ y * 0.92,
+                         country == "Denmark" ~ y * 1.01,
+                         country == "New Zealand" ~ y * 1.13,
+                         country == "United States" ~ y * 0.94,
+                         country == "Venezuela" ~ y * 1,
+                         country == "Germany" ~ y,
+                         country == "Sweden" ~ y * 0.97,
+                         country == "Norway" ~ y * 0.85,
+                         TRUE ~ y)) |> 
+    filter(year >= 1990, energy_per_gdp <= 6)
+
+plot_dat |> 
+    ggplot(aes(year, energy_per_gdp,
+               colour = colour,
+               alpha = alpha)) +
+    geom_line(aes(group = country, colour = colour, alpha = alpha, size = alpha)) +
+    geom_text(data = plot_dat |> 
+                  filter(country %in% countries,
+                         year == max(year)) |> 
+                  mutate(country = icelandic[country]),
+              aes(y = y, label = country),
+              hjust = 0, nudge_x = 0.1, size = 4) +
+    geom_rangeframe(alpha = 1, colour = "black") +
+    scale_x_continuous(expand = expansion(),
+                       limits = c(1990, 2025),
+                       breaks = c(1990,  1995, 2000, 2005, 2010, 2015, 2018)) +
+    scale_y_continuous(breaks = c(range(plot_dat$energy_per_gdp), 1, 2, 3, 4, 5),
+                  # limits = c(1e4, NA),
+                  labels = label_number(suffix = " kWh", big.mark = ".", decimal.mark = ",",
+                                        accuracy = 0.1)
+                  ) +
+    scale_colour_manual(values = c("#a50f15",
+                                   "#a6bddb",
+                                   "#045a8d",
+                                   "black", 
+                                   "#e41a1c", 
+                                   "#980043",
+                                   "#fed976",
+                                   "#67000d",
+                                   "#0868ac",
+                                   "#fed976",
+                                   "grey")) +
+    scale_alpha_manual(values = c(0.3, 1)) +
+    scale_size_manual(values = c(0.5, 1)) +
+    theme_tufte() +
+    theme(legend.position = "none",
+          plot.title = element_text(face = "bold")) +
+    coord_cartesian(ylim = c(0, 6),
+                    xlim = c(1990, 2023.1),
+                    expand = T) +
+    labs(x = NULL,
+         y = "Orkunotkun (kWh) deilt með landsframleiðslu ($)",
+         title = "Þróun orkunotkunar (kWh) per $ af landsframleiðslu árin 1980 - 2018",
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+```
+
+
+## Jarðefnaeldsneyti
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out-width: "100%"
+
+
+countries <- c("Denmark", "Finland",
+               "Germany", "Iceland", "India", "New Zealand", "Norway", "Sweden")
+icelandic <- c(
+    "Denmark" = "Danmörk",
+    "Finland" = "Finnland",
+    "Germany" = "Þýskaland", 
+    "Iceland" = "Ísland", 
+    "India" = "Indland", 
+    "New Zealand" = "Nýja Sjáland",
+    "Norway" = "Noregur",
+    "Sweden" = "Svíþjóð")
+
+
+plot_dat <- d |> 
+    select(year, country, fossil_fuel_consumption, gdp) |> 
+    drop_na() |> 
+    mutate(fossil_per_gdp = fossil_fuel_consumption / gdp) |> 
+    filter(year >= 1980) |> 
+    mutate(alpha = country %in% countries,
+           colour = fct_other(country,
+                              keep = countries,
+                              other_level = "Other"),
+           y = fossil_per_gdp,
+           y = case_when(country == "Iceland" ~ y + 0,
+                         country == "New Zealand" ~ y - 0.05,
+                         country == "India" ~ y + 0.05,
+                         country == "Finland" ~ y - 0.02,
+                         country == "Sweden" ~ y + 0.02,
+                         country == "Norway" ~ y - 0.02,
+                         TRUE ~ y))
+
+p <- plot_dat |> 
+    ggplot(aes(year, fossil_per_gdp,
+               colour = colour,
+               alpha = alpha)) +
+    geom_line(aes(group = country, size = alpha)) +
+    geom_text(data = plot_dat |> 
+                  filter(country %in% countries,
+                         year == max(year)) |> 
+                  mutate(country = icelandic[country]),
+              aes(y = y, label = country),
+              hjust = 0, nudge_x = 0.1, size = 4) +
+    geom_rangeframe(colour = "black", alpha = 1) +
+    scale_x_continuous(expand = expansion(),
+                       limits = c(1980, 2018.5),
+                       breaks = c(1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2018)) +
+    scale_y_continuous() +
+    scale_colour_manual(values = c("#a50f15",
+                                   "#a6bddb",
+                                   "#ff7f00", 
+                                   "#045a8d",
+                                   "#4daf4a",
+                                   "black", 
+                                   "#e41a1c", 
+                                   "#fed976",
+                                   "grey")) +
+    scale_alpha_manual(values = c(0.3, 1)) +
+    scale_size_manual(values = c(0.5, 1)) +
+    theme_tufte() +
+    theme(legend.position = "none",
+          plot.title = element_text(face = "bold")) +
+    coord_cartesian(ylim = c(0, 2),
+                    xlim = c(1980, 2022.3),
+                    expand = F) +
+    labs(x = NULL,
+         y = "Notkun jarðefnaeldsneytis (kWh) deilt með landsframleiðslu ($)",
+         title = "Þróun jarðefnaeldsneytis (kWh) per $ af landsframleiðslu árin 1980 - 2018",
+         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
+
+ggsave(plot = p, filename = "throun_fossil.png",
+       width = 8, height = 0.621 * 8, scale = 1.5, bg = "white")
+
+p
+```
+
+:::
+
+# Orka og landsframleiðsla
 
 ```{r}
 #| cache: true
@@ -157,6 +799,7 @@ p_vid <- animate(p, width = 12, height = 0.5 * 12, unit = "in", res = 150, fps =
 
 p_vid
 ```
+
 
 # Gróðurhúsalofttegundir og framleiðsla
 
@@ -287,8 +930,8 @@ max_gdp <- d |>
     max(na.rm = T)
 
 plot_dat <- crossing(fossil_energy_per_capita = seq(log(start),
-                                                 log(end), 
-                                                 length = 500) |> exp(),
+                                                    log(end), 
+                                                    length = 500) |> exp(),
                      ratio = c(1/4, 1/2, 1, 2, 4)) |> 
     mutate(gdp_per_capita = ratio * fossil_energy_per_capita) |> 
     filter(gdp_per_capita <= max_gdp * 1.1,
@@ -363,7 +1006,9 @@ p_vid
 ```
 
 
-# Raða eftir jarðefnaeldsneyti og gdp
+# Löndum raðað eftir hlutfalli jarðefnaeldsneytis og landsframleiðslu
+
+:::{.panel-tabset}
 
 ## 2018
 
@@ -393,89 +1038,6 @@ p <- d |>
 
 ggsave(plot = p, filename = "ordered_fossil.png",
        width = 8, height = 8, scale = 1.7, bg = "white")
-
-p
-```
-
-## Þróun
-
-```{r}
-#| fig.width: 12
-#| fig.asp: 0.621
-#| out-width: "100%"
-
-
-countries <- c("Denmark", "Finland",
-               "Germany", "Iceland", "India", "New Zealand", "Norway", "Sweden")
-icelandic <- c(
-    "Denmark" = "Danmörk",
-    "Finland" = "Finnland",
-    "Germany" = "Þýskaland", 
-    "Iceland" = "Ísland", 
-    "India" = "Indland", 
-    "New Zealand" = "Nýja Sjáland",
-    "Norway" = "Noregur",
-    "Sweden" = "Svíþjóð")
-
-
-plot_dat <- d |> 
-    select(year, country, fossil_fuel_consumption, gdp) |> 
-    drop_na() |> 
-    mutate(fossil_per_gdp = fossil_fuel_consumption / gdp) |> 
-    filter(year >= 1980) |> 
-    mutate(alpha = country %in% countries,
-           colour = fct_other(country,
-                              keep = countries,
-                              other_level = "Other"),
-           y = fossil_per_gdp,
-           y = case_when(country == "Iceland" ~ y + 0,
-                         country == "New Zealand" ~ y - 0.05,
-                         country == "India" ~ y + 0.05,
-                         country == "Finland" ~ y - 0.02,
-                         country == "Sweden" ~ y + 0.02,
-                         country == "Norway" ~ y - 0.02,
-                         TRUE ~ y))
-
-p <- plot_dat |> 
-    ggplot(aes(year, fossil_per_gdp,
-               colour = colour,
-               alpha = alpha)) +
-    geom_line(aes(group = country, size = alpha)) +
-    geom_text(data = plot_dat |> 
-                  filter(country %in% countries,
-                         year == max(year)) |> 
-                  mutate(country = icelandic[country]),
-              aes(y = y, label = country),
-              hjust = 0, nudge_x = 0.1, size = 4) +
-    geom_rangeframe(colour = "black", alpha = 1) +
-    scale_x_continuous(expand = expansion(),
-                       limits = c(1980, 2018.5),
-                       breaks = c(1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2018)) +
-    scale_y_continuous() +
-    scale_colour_manual(values = c("#a50f15",
-                                   "#a6bddb",
-                                   "#ff7f00", 
-                                   "#045a8d",
-                                   "#4daf4a",
-                                   "black", 
-                                   "#e41a1c", 
-                                   "#fed976",
-                                   "grey")) +
-    scale_alpha_manual(values = c(0.3, 1)) +
-    scale_size_manual(values = c(0.5, 1)) +
-    theme_tufte() +
-    theme(legend.position = "none",
-          plot.title = element_text(face = "bold")) +
-    coord_cartesian(ylim = c(0, 2),
-                    xlim = c(1980, 2021.9),
-                    expand = F) +
-    labs(x = NULL,
-         y = "Notkun jarðefnaeldsneytis (kWh) deilt með landsframleiðslu ($)",
-         title = "Þróun jarðefnaeldsneytis (kWh) per $ af landsframleiðslu árin 1980 - 2018",
-         caption = "Kóði og gögn: https://github.com/bgautijonsson/orkumal")
-
-ggsave(plot = p, filename = "throun_fossil.png",
-       width = 8, height = 0.621 * 8, scale = 1.5, bg = "white")
 
 p
 ```
@@ -517,3 +1079,4 @@ p
 ```
 
 
+:::
