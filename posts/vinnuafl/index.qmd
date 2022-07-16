@@ -214,6 +214,179 @@ p
 ```
 :::
 
+# Fjöldi miðað við fyrri ár
+
+:::{.panel-tabset}
+
+## Almennur
+
+:::{.panel-tabset}
+
+### 2017
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |>  
+    filter(year(dags) >= 2017) |>  
+    mutate(manudur = month(dags)) |>  
+    group_by(manudur) |>  
+    mutate(breyting = Annad - Annad[year(dags) == min(year(dags))]) |> 
+    ungroup()
+
+p <- plot_dat |> 
+    ggplot(aes(dags, breyting)) +  
+    geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
+    geom_hline(yintercept = 0, lty = 2) +  
+    geom_line() +  
+    geom_rangeframe() +  
+    scale_y_continuous(breaks = c(range(plot_dat$breyting), -1e4, -5e3, 0, 5e3),
+                       labels = label_number(),
+                       limits = c(-1.8e4, 1e4)) +  
+    scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
+                 guide = guide_axis(n.dodge = 2),  
+                 expand = expansion()) +  
+    labs(x = NULL, y = NULL,  
+         title = "Fjöldi starfandi á almennum vinnumarkaði miðað við sama mánuð 2017",
+         subtitle = "Janúar 2022 er fyrsti mánuður þar sem fleiri unnu á almennum markaði en sama mánuð 2017") +  
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5))
+
+p
+```
+
+### 2019
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |>  
+    filter(year(dags) >= 2019) |>  
+    mutate(manudur = month(dags)) |>  
+    group_by(manudur) |>  
+    mutate(breyting = Annad - Annad[year(dags) == min(year(dags))]) |> 
+    ungroup()
+
+p <- plot_dat |> 
+    ggplot(aes(dags, breyting)) +  
+    geom_vline(xintercept = ymd(c("2020-01-01", "2021-01-01", "2022-01-01")), lty = 1, alpha = 0.1) +
+    geom_hline(yintercept = 0, lty = 2) +  
+    geom_line() +  
+    geom_rangeframe() +  
+    scale_y_continuous(breaks = c(range(plot_dat$breyting), -1.5e4, -1e4, -5e3, 0, 5e3),
+                       labels = label_number(big.mark = ".", decimal.mark = ","),
+                       limits = c(-1.8e4, 2e3)) +  
+    scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
+                 guide = guide_axis(n.dodge = 1),  
+                 expand = expansion()) +  
+    labs(x = NULL, y = NULL,  
+         title = "Fjöldi starfandi á almennum vinnumarkaði miðað við sama mánuð 2019",
+         subtitle = "Mars 2022 er annar mánuður frá 2020 þar sem fleiri unnu á almennum markaði en sama mánuð 2019") +  
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
+          plot.title = element_text(face = "bold"))
+
+p
+```
+
+:::
+
+## Hlutfall Opinbert
+
+:::{.panel-tabset}
+
+### 2017
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |>  
+    filter(year(dags) >= 2017) |>  
+    mutate(manudur = month(dags),
+           hlutf = Opinbert / (Annad + Opinbert)) |> 
+    ungroup() |> 
+    group_by(manudur) |>  
+    mutate(breyting = hlutf - hlutf[year(dags) == min(year(dags))]) |> 
+    ungroup()
+
+p <- plot_dat |> 
+    ggplot(aes(dags, breyting)) +  
+    geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
+    geom_line() +  
+    geom_rangeframe() +  
+    scale_y_continuous(breaks = c(range(plot_dat$breyting), 0.05, 0.04, 0.03, 0.02, 0.01),
+                       labels = label_percent(accuracy = 0.1)) +  
+    scale_x_date(date_breaks = "3 months", date_labels = "%b\n%y",  
+                 guide = guide_axis(n.dodge = 1),  
+                 expand = expansion()) +  
+    labs(x = NULL, y = NULL,  
+         title = "Munur á hlutfalli opinbers starfsfólks frá sama mánuði 2017") +  
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5))
+
+p
+```
+
+### 2019
+
+```{r}
+#| fig.widt: 12
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |>  
+    filter(year(dags) >= 2019) |>  
+    mutate(manudur = month(dags),
+           hlutf = Opinbert / (Annad + Opinbert)) |> 
+    ungroup() |> 
+    group_by(manudur) |>  
+    mutate(breyting = hlutf - hlutf[year(dags) == min(year(dags))]) |> 
+    ungroup()
+
+p <- plot_dat |> 
+    ggplot(aes(dags, breyting)) +  
+    geom_vline(xintercept = ymd(c("2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
+    geom_line() +  
+    geom_rangeframe() +  
+    scale_y_continuous(breaks = c(range(plot_dat$breyting), 0.05, 0.04, 0.03, 0.02, 0.01),
+                       labels = label_percent(accuracy = 0.1)) +  
+    scale_x_date(date_breaks = "3 months", date_labels = "%b\n%y",  
+                 guide = guide_axis(n.dodge = 1),  
+                 expand = expansion()) +  
+    labs(x = NULL, y = NULL,  
+         title = "Munur á hlutfalli opinbers starfsfólks frá sama mánuði 2019") +  
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5))
+
+p
+```
+
+:::
+
+:::
+
 # Árstíðaleiðrétt hlutfall opinbers starfsfólks
 
 :::{.panel-tabset}
