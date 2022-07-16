@@ -1,0 +1,584 @@
+---
+title: "Vinnumarkaður"
+subtitle: "Hver er fjöldi starfandi einstaklinga og hvernig skiptast þeir á vinnumarkaði?"
+description: |
+    Reglulega sjást fyrirsagnir þar sem talað er um að opinbert starfsfólk sé allt of margt og að hlutfall þess af heildarfjölda vinnandi fólks sé of hátt. Hér kryf ég reglulega nýjustu gögnin til að geta vitað hvort slíkar fullyrðingar séu teknar úr samhengi eða endurspegli raunveruleikann.
+author: 
+    -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
+        url: "https://twitter.com/bgautijonsson"
+        affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
+        affiliation-url: "https://www.hi.is/tolfraedi_0"
+date: "2022/07/16"
+format: 
+    html:
+        code-fold: true
+        toc: true
+        toc-depth: 2
+        toc-location: right
+        toc-title: Efnisyfirlit
+        page-layout: full
+        max-width: "1000px"
+execute: 
+  echo: true
+  warning: false
+  cache: true
+editor: source
+theme: flatly
+title-block-banner: true
+standalone: true
+self-contained: true
+categories:
+    - orkumál
+    - R
+    - íslenska
+image: hlutf_opinbert.png
+twitter-card: 
+    image: hlutf_opinbert.png
+---
+
+
+```{r}
+#| include: false
+
+library(cowplot)
+library(tidyverse)
+library(scales)
+library(pxweb)
+library(ggthemes)
+library(kableExtra)
+library(gganimate)
+library(lubridate)
+library(geomtextpath)
+library(ggtext)
+library(here)
+library(readxl)
+library(janitor)
+library(mgcv)
+library(emmeans)
+library(broom)
+```
+
+# Gögn
+
+Hér notum við gögn frá Hagstofunni um [Fjölda starfandi í rekstrarformum samkvæmt skrám eftir mánuðum, kyni, aldri og bakgrunni 2008-2022](https://px.hagstofa.is/pxis/pxweb/is/Samfelag/Samfelag__vinnumarkadur__vinnuaflskraargogn/VIN10052.px).
+
+```{r}
+url <- "https://px.hagstofa.is:443/pxis/api/v1/is/Samfelag/vinnumarkadur/vinnuaflskraargogn/VIN10052.px"
+
+px_vars <- pxweb_get(url)
+
+query_list <- list(  
+    "Mánuður" = c("*"),  
+    "Aldur" = c("0"),  
+    "Rekstrarform" = c("*"),  
+    "Kyn" = c("0"),  
+    "Bakgrunnur" = c("*"),  
+    "Lögheimili" = c("0")
+    
+)
+
+d <- pxweb_get(url, query = pxweb_query(query_list), verbose = FALSE) |>  
+    as.data.frame() |>  
+    as_tibble() |>  
+    janitor::clean_names() |>  
+    separate(manudur, into = c("ar", "manudur"), sep = "M") |>  
+    mutate(dags = str_c(ar, "-", manudur, "-01") |> ymd()) |>  
+    select(dags, kyn, rekstrarform, starfandi, bakgrunnur) |>  
+    drop_na() |>  
+    mutate(tegund = case_when(str_detect(rekstrarform, "^B2") ~ "Opinbert",
+                              str_detect(rekstrarform, "^K1") ~ "Opinbert",  
+                              str_detect(rekstrarform, "^K2") ~ "Opinbert",  
+                              TRUE ~ "Annad")) |> 
+    select(-kyn)
+```
+
+
+# Fjöldi starfandi
+
+:::{.panel-tabset}
+
+## Almennur vinnumarkaður
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <-  d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |>  
+    filter(year(dags) >= 2017)
+
+p <- plot_dat |> 
+    ggplot(aes(dags, Annad)) +  
+    geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
+    geom_line() +  
+    geom_rangeframe() +  
+    scale_y_continuous(breaks = c(range(plot_dat$Annad), 1.2e5, 1.3e5, 1.4e5),
+                       limits = c(1.1e5, 1.5e5),
+                       labels = label_number()) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
+                 guide = guide_axis(n.dodge = 2),  
+                 expand = expansion()) +  
+    labs(x = NULL,
+         y = NULL,
+         title = "Fjöldi starfandi á almennum vinnumarkaði") +
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
+          plot.title = element_text(face = "bold"))
+
+p
+```
+
+## Opinber vinnumarkaður
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <-  d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |>  
+    filter(year(dags) >= 2017) |> 
+    mutate(hlutf = Annad / (Opinbert + Annad))
+
+p <- plot_dat |> 
+    ggplot(aes(dags, Opinbert)) +  
+    geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
+    geom_line() +  
+    geom_rangeframe() +  
+    scale_y_continuous(breaks = c(range(plot_dat$Opinbert), 6e4, 6.5e4),
+                       labels = label_number()) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
+                 guide = guide_axis(n.dodge = 2),  
+                 expand = expansion()) +  
+    labs(x = NULL,
+         y = NULL,
+         title = "Fjöldi opinbers starfsfólks") +
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
+          plot.title = element_text(face = "bold"))
+
+p
+
+```
+
+## Saman
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <-  d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    filter(year(dags) >= 2017) |> 
+    mutate(tegund = fct_recode(as_factor(tegund),
+                               "Opinber" = "Opinbert",
+                               "Almennur" = "Annad"))
+
+p <- plot_dat |> 
+    ggplot(aes(dags, n)) +  
+    geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
+    geom_line(aes(col = tegund)) +
+    geom_text(data = plot_dat |> filter(dags == max(dags)),
+              aes(label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
+    geom_rangeframe() +  
+    scale_y_continuous(breaks = c(range(plot_dat$n[plot_dat$tegund == "Opinber"]), 
+                                  range(plot_dat$n[plot_dat$tegund == "Almennur"]), 0),
+                       labels = label_number(),
+                       limits = c(0, 1.5e5),
+                       expand = expansion()) +
+    scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
+                 guide = guide_axis(n.dodge = 2),  
+                 expand = expansion(add = 31),
+                 limits = c(min(plot_dat$dags), max(plot_dat$dags) + 200)) +  
+    scale_colour_brewer(type = "qual", palette = "Set1") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Fjöldi starfandi á almennum og opinberum vinnumarkaði") +
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
+          legend.position = "none",
+          plot.title = element_text(face = "bold"))
+
+p
+```
+:::
+
+# Árstíðaleiðrétt hlutfall opinbers starfsfólks
+
+:::{.panel-tabset}
+
+## Mynd
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+model_dat <- d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |>  
+    mutate(Heild = Opinbert + Annad) |> 
+    filter(year(dags) >= 2008) |>  
+    mutate(manudur = month(dags),
+           timi = as.numeric(as.factor(dags)),
+           hlutf = Opinbert / (Annad + Opinbert)) |> 
+    ungroup()
+
+m <- gam(Opinbert ~ s(manudur, bs = "cc") + s(timi, bs = "ad"), 
+         data = model_dat, offset = log(Heild), family = nb(), method = "REML")
+
+plot_dat <- emmeans(m, ~ timi + manudur, at = list(timi = model_dat$timi,
+                                                   manudur = 1:12)) |> 
+    tidy(type = "response") |> 
+    group_by(timi) |> 
+    mutate(wt = 1 / std.error,
+           wt = wt / sum(wt)) |> 
+    summarise(response = sum(response * wt)) |> 
+    inner_join(
+        model_dat,
+        by = "timi"
+    )
+
+p <- plot_dat |> 
+    ggplot(aes(dags, hlutf)) +  
+    geom_line(aes(y = hlutf), alpha = 0.1) +
+    geom_line(aes(y = response)) +  
+    geom_rangeframe() +  
+    scale_x_date(breaks = seq.Date(from = min(plot_dat$dags), to = ymd("2022-01-01"), by = "year"), 
+                 date_labels = "%Y",  
+                 guide = guide_axis(n.dodge = 1),  
+                 expand = expansion(),
+                 limits = c(min(plot_dat$dags), ymd("2022-04-01"))) +
+    scale_y_continuous(breaks = c(range(plot_dat$hlutf),
+                                  0.3, 0.325),
+                       labels = label_percent(accuracy = 0.1),
+                       limits = c(0.25, 0.37)) +  
+    labs(x = NULL, y = NULL,  
+         title = "Hlutfall opinbers starfsfólks af vinnumarkaði (2009 - 2022)",
+         subtitle = "Leiðrétt fyrir mánaðarlegum sveiflum. Raungögn teiknuð í gráu") +  
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
+          plot.title = element_text(face = "bold"))
+
+p
+
+ggsave(plot = p, filename = "hlutf_opinbert.png",
+       width = 8, height = 0.621 * 8, scale = 1.3, bg = "white")
+```
+
+## Aðferð
+
+Við getum hugsað að þetta séu tvö ferli:
+
+1. Langtímaferli sem breytist án mjög ákveðins mynsturs
+2. Árstíðabundnar sveiflur sem eru að mestu leyti svipaðar frá ári til árs
+
+Notum GAM *(Generalized Additive Models)* til að meta bæði ferlin saman. Splæsibrúunin *(e. splines)* metur ferlið í tveimur hlutum, línulegum og ólínulegum, og notar stika til að toga ólínulega hlutann í átt að línulegu ferli.
+
+1. Þar sem hæga þróunin getur verið að breytast mishratt á mismunandi árabilum notum við aðlögunarsplæsibrúun *(e. adaptive smoother)* þar sem ólínulegi stikinn fær að breytast með tíma. Í kóðanum er þetta táknað með `s(timi, bs = "ad")`
+
+2. Árstíðarferlið hefur þær skorður að frávikið í upphafi og byrjun ársins á að stefna í sömu tölu, þ.e. $\text{31. desember} \approx \text{1. janúar}$. Pakkinn `mgcv` býður upp á slíka hringrásarsplæsara *(e. cyclic smooths)* *[alveg í ruglinu með íslenskuna núna]*. Í kóðanum er þetta táknað með `s(manudur, bs = "cc")`
+
+Þegar við erum komin með mat á þessi tvö ferli er lítið mál að heilda yfir árstíðarbundnu sveiflurnar. Við vigtum árstíðarbundna matið eftir nákvæmni matsins í hverjum mánuði *(einum deilt með staðalvillu matsins)* og reiknum svo meðaltal eftir því.
+
+Allt í allt metum við þá líkanið svona *(einfölduð útgáfa af kóða)*:
+
+`gam(Opinbert ~ s(manudur, bs = "cc") + s(timi, bs = "ad"), offset = log(Heild), family = nb())`
+
+Fjöldi opinbers starfsfólks er jákvæð fjöldatala svo fyrsta ágískunin er alltaf [neikvæða tvíkostadreifingin](https://en.wikipedia.org/wiki/Negative_binomial_distribution). Við metum líkanið á lograkvarða, bæði því það er náttúrulega matið fyrir dreifinguna, en líka því við búumst við því að útkoman breytist hlutfallslega milli ára. 
+
+Hér fyrir neðan sjáum við svo matið á árstíðaráhrifum:
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- emmeans(m, ~ manudur, at = list(manudur = seq(1, 12, length.out = 100))) |> 
+    tidy(type = "response") |> 
+    mutate(response = exp(log(response) - mean(log(response))))
+
+plot_dat |> 
+    ggplot(aes(manudur, response)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    geom_line() +
+    geom_rangeframe() +
+    scale_x_continuous(breaks = 1:12,
+                       labels = c("Janúar", "Febrúar", "Mars",
+                                  "Apríl", "Maí", "Júní",
+                                  "Júli", "Ágúst", "September",
+                                  "Október", "Nóvember", "Desember")) +
+    scale_y_continuous(labels = function(x) percent(x - 1),
+                       breaks = c(range(plot_dat$response), 1, 1.03),
+                       limits = c(0.92, 1.08)) +
+    theme_tufte() +
+    theme(plot.title = element_text(face = "bold")) +
+    labs(x = "Mánuður",
+         y = "Árstíðarbundnar sveiflur",
+         title = "Árstíðarsveiflur í hlutfalli opinbers starfsfólks")
+```
+
+
+:::
+
+
+# Árlegar breytingar
+
+:::{.panel-tabset}
+
+## Hrein breyting
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |> 
+    mutate(Heild = Annad + Opinbert) |> 
+    pivot_longer(c(-dags), names_to = "tegund", values_to = "n") |> 
+    filter(year(dags) >= 2008) |>  
+    mutate(manudur = month(dags)) |>
+    group_by(manudur, tegund) |>  
+    mutate(breyting = c(0, diff(n)),
+           uppsofnud_breyting = cumsum(breyting)) |> 
+    ungroup() |> 
+    filter(year(dags) > min(year(dags))) |> 
+    mutate(tegund = fct_recode(tegund,
+                               "Almennur" = "Annad",
+                               "Opinber" = "Opinbert"))
+
+p <- plot_dat |> 
+    ggplot(aes(dags, breyting)) +  
+    # geom_vline(xintercept = ymd(seq.Date(from = min(plot_dat$dags),
+    #                                      to = ymd("2022-01-01"),
+    #                                      by = "year")), lty = 2, alpha = 0.1) +
+    geom_hline(yintercept = 1, lty = 2, alpha = 0.6) +
+    geom_line(aes(col = tegund)) +  
+    geom_text(data = plot_dat |> filter(dags == max(dags)),
+              aes(label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
+    geom_rangeframe() +  
+    scale_x_date(breaks = seq.Date(from = min(plot_dat$dags), to = ymd("2022-01-01"), by = "year"), 
+                 date_labels = "%Y",  
+                 guide = guide_axis(n.dodge = 1),  
+                 expand = expansion(),
+                 limits = c(min(plot_dat$dags), ymd("2023-10-01"))) +  
+    scale_y_continuous(labels = label_number(big.mark = ".", decimal.mark = ","),
+                       breaks = c(range(plot_dat$breyting), -1.5e4, -1e4, -5e3, 0, 5e3, 1e4, 1.5e4)) +  
+    scale_colour_brewer(type = "qual", palette = "Set1") +
+    # coord_cartesian(ylim = c(0.84, 1.127)) +
+    labs(x = NULL, y = NULL,  
+         title = "Hrein árleg breyting á fjölda starfsfólks á vinnumarkaði (2009 - 2022)",
+         subtitle = "Y-ás táknar mun á fjölda vinnandi frá sama mánuði á síðasta ári") +  
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
+          legend.position = "none",
+          plot.title = element_text(face = "bold"))
+
+p
+
+ggsave(plot = p, filename = "hrein_breyting_saman.png",
+       width = 8, height = 0.5 * 8, scale = 1.3, bg = "white")
+```
+
+## Eftir bakgrunni
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.8
+#| out.width: "100%"
+
+plot_dat <- d |>  
+    filter(rekstrarform != "Alls starfandi") |>  
+    count(dags, tegund, bakgrunnur, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |> 
+    mutate(Heild = Annad + Opinbert) |> 
+    pivot_longer(c(-dags, -bakgrunnur), names_to = "tegund", values_to = "n") |> 
+    filter(year(dags) >= 2008) |>  
+    mutate(manudur = month(dags)) |>
+    group_by(manudur, tegund, bakgrunnur) |>  
+    mutate(breyting = c(0, diff(n)),
+           uppsofnud_breyting = cumsum(breyting)) |> 
+    ungroup() |> 
+    filter(year(dags) > min(year(dags))) |> 
+    mutate(tegund = fct_recode(tegund,
+                               "Almennur" = "Annad",
+                               "Opinber" = "Opinbert"),
+           y = breyting,
+           y = case_when(tegund == "Heild" ~ y * 1.06,
+                         tegund == "Almennur" ~ y * 0.95,
+                         TRUE ~ y))
+
+p1 <- plot_dat |> 
+    filter(bakgrunnur == "Íslenskur bakgrunnur") |> 
+    ggplot(aes(dags, breyting)) +  
+    geom_line(data = tibble(x = ymd(c("2009-01-01", "2022-01-01")), y = c(0, 0)),
+              aes(x = x, y = y), lty = 2, alpha = 0.5, inherit.aes =) +
+    geom_line(aes(col = tegund)) +  
+    geom_text(data = plot_dat |> filter(dags == max(dags), bakgrunnur == "Íslenskur bakgrunnur"),
+              aes(y = y, label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
+    geom_rangeframe(sides = "l") +  
+    scale_x_date(breaks = seq.Date(from = min(plot_dat$dags), to = ymd("2022-01-01"), by = "year"), 
+                 date_labels = "%b/%Y",  
+                 guide = guide_axis(n.dodge = 1),  
+                 expand = expansion(),
+                 limits = c(min(plot_dat$dags), ymd("2024-01-01"))) +  
+    scale_y_continuous(labels = label_number(),
+                       breaks = c(0, range(plot_dat$breyting[plot_dat$bakgrunnur == "Íslenskur bakgrunnur"])),
+                       limits = range(plot_dat$breyting[plot_dat$bakgrunnur == "Íslenskur bakgrunnur"]), 
+                       oob = oob_keep) +  
+    scale_colour_brewer(type = "qual", palette = "Set1") +
+    facet_grid(bakgrunnur ~ .) +
+    labs(x = NULL, y = NULL,
+         title = "Hrein árleg breyting á fjölda starfsfólks á vinnumarkaði (2009 - 2022)",
+         subtitle = "Y-ás táknar mun á fjölda vinnandi frá sama mánuði árið á undan",) +  
+    theme_tufte() +  
+    coord_cartesian(clip = "off") +
+    theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
+          legend.position = "none",
+          plot.title = element_text(face = "bold"),
+          strip.background = element_rect(fill = "grey95", colour = NA),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank())
+
+p2 <- plot_dat |> 
+    filter(bakgrunnur == "Innflytjendur") |> 
+    ggplot(aes(dags, breyting)) +  
+    geom_line(data = tibble(x = ymd(c("2009-01-01", "2022-01-01")), y = c(0, 0)),
+              aes(x = x, y = y), lty = 2, alpha = 0.5, inherit.aes = FALSE) +
+    geom_line(aes(col = tegund)) +  
+    geom_text(data = plot_dat |> filter(dags == max(dags), bakgrunnur == "Innflytjendur"),
+              aes(y = y, label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
+    geom_rangeframe(sides = "l") +  
+    scale_x_date(breaks = seq.Date(from = min(plot_dat$dags), to = ymd("2022-01-01"), by = "year"), 
+                 date_labels = "%b/%Y",  
+                 guide = guide_axis(n.dodge = 1),  
+                 expand = expansion(),
+                 limits = c(min(plot_dat$dags), ymd("2024-01-01"))) +  
+    scale_y_continuous(labels = label_number(),
+                       breaks = c(0, range(plot_dat$breyting[plot_dat$bakgrunnur == "Innflytjendur"])),
+                       limits = range(plot_dat$breyting[plot_dat$bakgrunnur == "Innflytjendur"]),
+                       oob = oob_keep) +  
+    scale_colour_brewer(type = "qual", palette = "Set1") +
+    facet_grid(bakgrunnur ~ .) +
+    labs(x = NULL, y = NULL) +  
+    theme_tufte() +  
+    coord_cartesian(clip = "off") +
+    theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 9),
+          legend.position = "none",
+          plot.title = element_text(face = "bold"),
+          strip.background = element_rect(fill = "grey95", colour = NA),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank())
+
+p3 <- plot_dat |> 
+    filter(bakgrunnur == "Alls") |> 
+    ggplot(aes(dags, breyting)) +  
+    geom_line(data = tibble(x = ymd(c("2009-01-01", "2022-01-01")), y = c(0, 0)),
+              aes(x = x, y = y), lty = 2, alpha = 0.5, inherit.aes = FALSE) +
+    geom_line(aes(col = tegund)) +  
+    geom_text(data = plot_dat |> filter(dags == max(dags), bakgrunnur == "Alls"),
+              aes(y = y, label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
+    geom_rangeframe() +  
+    scale_x_date(breaks = seq.Date(from = min(plot_dat$dags), to = ymd("2022-01-01"), by = "year"), 
+                 date_labels = "%Y",  
+                 guide = guide_axis(n.dodge = 1),  
+                 expand = expansion(),
+                 limits = c(min(plot_dat$dags), ymd("2024-01-01"))) +  
+    scale_y_continuous(labels = label_number(),
+                       breaks = c(range(plot_dat$breyting), 0),
+                       limits = range(plot_dat$breyting),
+                       oob = oob_keep) +  
+    scale_colour_brewer(type = "qual", palette = "Set1") +
+    facet_grid(bakgrunnur ~ .) +
+    labs(x = NULL, y = NULL,) +  
+    theme_tufte() +  
+    coord_cartesian(clip = "off") +
+    theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
+          legend.position = "none",
+          plot.title = element_text(face = "bold"),
+          strip.background = element_rect(fill = "grey95", colour = NA))
+
+p <- plot_grid(p1, p2, p3, ncol = 1, rel_heights = c(1, 0.85, 1))
+
+p
+
+ggsave(plot = p, filename = "hrein_breyting_saman_facet.png",
+       width = 8, height = 0.7 * 8, scale = 1.2, bg = "white")
+```
+
+## Hlutfallsleg breyting
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |>  
+    filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
+    count(dags, tegund, wt = starfandi) |>  
+    pivot_wider(names_from = tegund, values_from = n) |> 
+    mutate(Heild = Annad + Opinbert) |> 
+    pivot_longer(c(-dags), names_to = "tegund", values_to = "n") |> 
+    filter(year(dags) >= 2008) |>  
+    mutate(manudur = month(dags)) |>
+    group_by(manudur, tegund) |>  
+    mutate(breyting = c(1, exp(diff(log(n)))),
+           uppsofnud_breyting = exp(cumsum(log(breyting)))) |> 
+    ungroup() |> 
+    filter(year(dags) > min(year(dags))) |> 
+    mutate(tegund = fct_recode(tegund,
+                               "Almennur" = "Annad",
+                               "Opinber" = "Opinbert"))
+
+p <- plot_dat |> 
+    ggplot(aes(dags, breyting)) +  
+    # geom_vline(xintercept = ymd(seq.Date(from = min(plot_dat$dags),
+    #                                      to = ymd("2022-01-01"),
+    #                                      by = "year")), lty = 2, alpha = 0.1) +
+    geom_hline(yintercept = 1, lty = 2, alpha = 0.6) +
+    geom_line(aes(col = tegund)) +  
+    geom_text(data = plot_dat |> filter(dags == max(dags)),
+              aes(label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
+    geom_rangeframe() +  
+    scale_x_date(breaks = seq.Date(from = min(plot_dat$dags), to = ymd("2022-01-01"), by = "year"), 
+                 date_labels = "%Y",  
+                 guide = guide_axis(n.dodge = 1),  
+                 expand = expansion(),
+                 limits = c(min(plot_dat$dags), ymd("2023-10-01"))) +  
+    scale_y_log10(breaks = c(range(plot_dat$breyting, na.rm = T), 0.9, 0.95, 1, 1.05, 1.1),
+                  labels = function(x) percent(x - 1)) +  
+    scale_colour_brewer(type = "qual", palette = "Set1") +
+    coord_cartesian(ylim = c(0.84, 1.127)) +
+    labs(x = NULL, y = NULL,  
+         title = "Hlutfallsleg árleg breyting á fjölda starfsfólks á vinnumarkaði (2009 - 2022)",
+         subtitle = "Y-ás er á lograkvarða svo að -50% og +100% eru jafnlangt frá 0% breytingu") +  
+    theme_tufte() +  
+    theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
+          legend.position = "none",
+          plot.title = element_text(face = "bold"))
+
+p
+
+ggsave(plot = p, filename = "hlutf_breyting_saman.png",
+       width = 8, height = 0.621 * 8, scale = 1.3, bg = "white")
+```
+
+:::
