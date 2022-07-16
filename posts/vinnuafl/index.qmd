@@ -28,7 +28,8 @@ title-block-banner: true
 standalone: true
 self-contained: true
 categories:
-    - orkumál
+    - efnahagur
+    - vinnumarkaður
     - R
     - íslenska
 image: hlutf_opinbert.png
