@@ -4,5 +4,6 @@
 .Ruserdata
 /.quarto/
 .DS_Store
-docs/CNAME
-.*/.* 2.
+**/CNAME
+**/* 2.*
+**/* 2
