@@ -8,7 +8,7 @@ author:
         url: "https://twitter.com/bgautijonsson"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
-date: "2022/07/16"
+date: "2022/07/17"
 format: 
     html:
         code-fold: true
@@ -110,18 +110,16 @@ plot_dat <-  d |>
     filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
     count(dags, tegund, wt = starfandi) |>  
     pivot_wider(names_from = tegund, values_from = n) |>  
-    filter(year(dags) >= 2017)
+    filter(year(dags) >= 2008)
 
 p <- plot_dat |> 
     ggplot(aes(dags, Annad)) +  
-    geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
     geom_line() +  
     geom_rangeframe() +  
     scale_y_continuous(breaks = c(range(plot_dat$Annad), 1.2e5, 1.3e5, 1.4e5),
-                       limits = c(1.1e5, 1.5e5),
+                       limits = c(1e5, 1.5e5),
                        labels = label_number()) +
-    scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
-                 guide = guide_axis(n.dodge = 2),  
+    scale_x_date(date_breaks = "1 year", date_labels = "%Y",   
                  expand = expansion()) +  
     labs(x = NULL,
          y = NULL,
@@ -144,19 +142,15 @@ p
 plot_dat <-  d |>  
     filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
     count(dags, tegund, wt = starfandi) |>  
-    pivot_wider(names_from = tegund, values_from = n) |>  
-    filter(year(dags) >= 2017) |> 
-    mutate(hlutf = Annad / (Opinbert + Annad))
+    pivot_wider(names_from = tegund, values_from = n)
 
 p <- plot_dat |> 
     ggplot(aes(dags, Opinbert)) +  
-    geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
     geom_line() +  
     geom_rangeframe() +  
-    scale_y_continuous(breaks = c(range(plot_dat$Opinbert), 6e4, 6.5e4),
+    scale_y_continuous(breaks = c(range(plot_dat$Opinbert), 5e4, 5.5e4, 6e4, 6.5e4),
                        labels = label_number()) +
-    scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
-                 guide = guide_axis(n.dodge = 2),  
+    scale_x_date(date_breaks = "year", date_labels = "%Y", 
                  expand = expansion()) +  
     labs(x = NULL,
          y = NULL,
@@ -166,7 +160,6 @@ p <- plot_dat |>
           plot.title = element_text(face = "bold"))
 
 p
-
 ```
 
 ## Saman
@@ -180,14 +173,12 @@ p
 plot_dat <-  d |>  
     filter(rekstrarform != "Alls starfandi", bakgrunnur == "Alls") |>  
     count(dags, tegund, wt = starfandi) |>  
-    filter(year(dags) >= 2017) |> 
     mutate(tegund = fct_recode(as_factor(tegund),
                                "Opinber" = "Opinbert",
                                "Almennur" = "Annad"))
 
 p <- plot_dat |> 
     ggplot(aes(dags, n)) +  
-    geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
     geom_line(aes(col = tegund)) +
     geom_text(data = plot_dat |> filter(dags == max(dags)),
               aes(label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
@@ -197,16 +188,16 @@ p <- plot_dat |>
                        labels = label_number(),
                        limits = c(0, 1.5e5),
                        expand = expansion()) +
-    scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
-                 guide = guide_axis(n.dodge = 2),  
+    scale_x_date(date_breaks = "year", date_labels = "%Y",  
                  expand = expansion(add = 31),
-                 limits = c(min(plot_dat$dags), max(plot_dat$dags) + 200)) +  
+                 limits = c(min(plot_dat$dags), max(plot_dat$dags) + 15)) +  
     scale_colour_brewer(type = "qual", palette = "Set1") +
     labs(x = NULL,
          y = NULL,
          title = "Fjöldi starfandi á almennum og opinberum vinnumarkaði") +
+    coord_cartesian(clip = "off") +
     theme_tufte() +  
-    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
+    theme(plot.margin = margin(t = 5, r = 60, b = 5, l = 5),
           legend.position = "none",
           plot.title = element_text(face = "bold"))
 
