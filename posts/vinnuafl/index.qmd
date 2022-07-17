@@ -509,7 +509,7 @@ p2 <- plot_dat2 |>
     labs(x = NULL,
          y = NULL,
          title = "Mánaðarleg hlutfallsleg breyting fjölda starfsfólks (2008 - 2022)",
-         subtitle = "Er hækkun/lækkun hlutfalls að ofan vegna breytinga á opinberum eða almennum vinnumarkaði?")
+         subtitle = "Er hækkun/lækkun hlutfalls að ofan vegna breytinga á opinberum eða almennum vinnumarkaði?\nÞegar blá lína er ofar en sú rauða hækkar hlutfallið, og þegar hún er neðar lækkar hlutfallið")
 
 
 p <- plot_grid(p1, p2, ncol = 1)
