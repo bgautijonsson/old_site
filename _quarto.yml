@@ -6,6 +6,7 @@ website:
   title: "Brynjólfur Gauti Guðrúnar Jónsson"
   site-url: https://www.bggj.is
   description: Blogg um tölfræði og gögn
+  favicon: favicon.ico
   repo-url: https://github.com/bgautijonsson/bgautijonsson.github.io
   twitter-card: 
     creator: "@bgautijonsson"
