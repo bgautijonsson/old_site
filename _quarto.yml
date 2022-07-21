@@ -13,16 +13,20 @@ website:
     background: "#08306b"
     foreground: "#ffffff"
     right:
-      - href: about.qmd
+      - href: pages/about.qmd
         text: Um mig
+      - href: pages/radgjof.qmd
+        text: Ráðgjöf
+      - href: index.qmd
+        text: Færslur
       - text: Verkefni
         menu:
             - text: Mælaborð Sveitarfélaga
-              href: sveitarfelog.qmd
+              href: pages/sveitarfelog.qmd
             - text: Mælaborð COVID-19
               href: http://covid.rhi.hi.is/shiny/dashboard/
             - text: Spálíkan COVID-19
-              href: covid_spalikan.qmd
+              href: pages/covid_spalikan.qmd
       - icon: github
         href: https://github.com/bgautijonsson
       - icon: twitter

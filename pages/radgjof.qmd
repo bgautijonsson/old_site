@@ -1,0 +1,40 @@
+---
+title: "Ráðgjöf"
+image: radgjof.png
+about:
+    template: solana
+    image-shape: rounded
+    links:
+        - icon: twitter
+          href: https://twitter.com/bgautijonsson
+        - icon: linkedin
+          href: https://linkedin.com/in/bgautijonsson
+        - icon: github
+          href: https://github.com/bgautijonsson
+        - icon: file-earmark-person-fill
+          href: https://bgautijonsson.github.io/resume
+
+---
+
+Ég hef mikla reynslu í ráðgjöf þar sem ég kennt Tölfræðiráðgjöf við Háskóla Íslands núna í nokkur ár og starfaði áður í Tölfræðiráðgjöf Heilbrigðisvísindasviðs Háskólans.
+
+Ég býð upp á aðstoð við meðal annars:
+
+* Skipulag gagnasöfnunar fyrir rannsóknir
+* Gagnahreinsun til að undirbúa fyrir líkanasmíð
+* Val á tölfræðiaðferð
+* Framkvæmd tölfræðilegra greininga
+* Framsetningu niðurstaðna í myndum, töflum og texta
+
+Ef þig vantar aðstoð með tölfræði af einhverju tagi endilega [hafðu samband við mig í tölvupósti](mailto:bgautijonsson@gmail.com).
+
+# Verð
+
+Verðið er mismunandi eftir umfangi og tímaþröng verkefnisins. Þegar tími leyfir býð ég upp á 30 mínútna ókeypis ráðgjöf til að fara yfir þarfir verkefnisins þar sem við getum svo í kjölfarið náð samkomulagi um verð.
+
+
+---
+
+> To consult the statistician after an experiment is finished is often merely to ask him to conduct a post mortem examination. He can perhaps say what the experiment died of.
+
+> Ronald Fisher

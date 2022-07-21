@@ -1,0 +1,122 @@
+---
+title: "Orkunotkun á Íslandi"
+subtitle: "Hvernig skiptist orkunotkun í flokka á Íslandi?"
+author: 
+    -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
+        url: "https://twitter.com/bgautijonsson"
+        affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
+        affiliation-url: "https://www.hi.is/tolfraedi_0"
+date: "2022/07/15"
+format: 
+    html:
+        code-fold: true
+        toc: true
+        toc-depth: 2
+        toc-location: right
+        toc-title: Efnisyfirlit
+        page-layout: full
+        max-width: "1000px"
+execute: 
+  echo: true
+  warning: false
+  cache: true
+editor: source
+theme: flatly
+title-block-banner: true
+standalone: true
+self-contained: true
+draft: true
+categories:
+    - orkumál
+    - R
+    - íslenska
+---
+
+
+```{r}
+#| include: false
+
+library(cowplot)
+library(tidyverse)
+library(scales)
+library(pxweb)
+library(ggthemes)
+library(kableExtra)
+library(gganimate)
+library(lubridate)
+library(geomtextpath)
+library(ggtext)
+library(here)
+library(readxl)
+library(janitor)
+library(plotly)
+```
+
+# Gögn
+
+Hér nota ég gögn frá Hagstofu Íslands um [Orkunotkun eftir atvinnugreinum og orkugjöfum 2014-2020](https://px.hagstofa.is/pxis/pxweb/is/Umhverfi/Umhverfi__4_orkumal__3_orkuflaedireikningar/UMH40100.px)
+
+
+```{r}
+url <- "https://px.hagstofa.is:443/pxis/api/v1/is/Umhverfi/4_orkumal/3_orkuflaedireikningar/UMH40100.px"
+
+px_vars <- pxweb_get(url)
+
+query_list <- list(  
+    "Ár" = c("*"),
+    "Orkugjafi" = c("*"),
+    "Atvinnugrein" = c("*")
+    
+)
+
+d <- pxweb_get(url, query = pxweb_query(query_list), verbose = FALSE) |>  
+    as.data.frame() |>  
+    as_tibble() |>  
+    janitor::clean_names() |> 
+    rename(orka = 4) |> 
+    mutate(ar = parse_number(ar)) |> 
+    filter(str_detect(atvinnugrein, "^[A-Z] - |^Heimili"),
+           !str_detect(str_to_lower(orkugjafi), "samtals|stadif|orkuvörur")) |> 
+    mutate(flokkur = ifelse(str_detect(atvinnugrein, "Heimili"), "Heimili", "Atvinna"),
+           undirflokkur = str_replace(atvinnugrein, "^Heimili - |^[A-Z] - ", ""),
+           orkugjafi = str_replace(orkugjafi, "^[A-Z][0-9]{2} - ", "")) |> 
+    select(ar, flokkur, undirflokkur, orkugjafi, orka)
+```
+
+```{r}
+d |> 
+    count(undirflokkur, wt = orka,  sort = T) |> 
+    mutate(p = n / sum(n))
+```
+
+```{r}
+d |> 
+    filter(flokkur == "Heimili", undirflokkur == "Akstur") |> 
+    drop_na() |> 
+    group_by(orkugjafi) |> 
+    filter(any(orka > 0)) |> 
+    ungroup() |> 
+    group_by(ar) |> 
+    mutate(p = orka / sum(orka)) |> 
+    ungroup() |> 
+    mutate(orkugjafi = fct_reorder(orkugjafi, orka)) |> 
+    ggplot(aes(ar, orka)) +
+    geom_col(aes(fill = orkugjafi), position = "fill")
+```
+
+```{r}
+p <- d |> 
+    filter(flokkur == "Atvinna") |> 
+    count(ar, undirflokkur, wt = orka) |> 
+    group_by(ar) |> 
+    mutate(p = n / sum(n)) |> 
+    ungroup() |> 
+    filter(p > 0.02) |> 
+    mutate(undirflokkur = fct_reorder(undirflokkur, p)) |> 
+    ggplot(aes(ar, p)) +
+    geom_col(aes(fill = undirflokkur), position = "fill") +
+    theme(legend.position = "none")
+
+ggplotly(p)
+```
+

@@ -1,39 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.bggj.is/sveitarfelog.html</loc>
-    <lastmod>2022-07-15T21:08:02.966Z</lastmod>
-  </url>
-  <url>
     <loc>https://www.bggj.is/posts/lanategundir/index.html</loc>
-    <lastmod>2022-07-15T21:08:03.751Z</lastmod>
+    <lastmod>2022-07-21T21:19:39.134Z</lastmod>
   </url>
   <url>
     <loc>https://www.bggj.is/posts/kosningarannsokn/index.html</loc>
-    <lastmod>2022-07-15T21:08:04.903Z</lastmod>
+    <lastmod>2022-07-21T21:19:44.378Z</lastmod>
   </url>
   <url>
     <loc>https://www.bggj.is/posts/orkumal/index.html</loc>
-    <lastmod>2022-07-15T22:43:23.023Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.bggj.is/posts/forest-plot-table/index.html</loc>
-    <lastmod>2022-07-15T21:08:16.807Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.bggj.is/covid_spalikan.html</loc>
-    <lastmod>2022-07-15T21:08:17.155Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.bggj.is/index.html</loc>
-    <lastmod>2022-07-17T20:48:39.627Z</lastmod>
-  </url>
-  <url>
-    <loc>https://www.bggj.is/about.html</loc>
-    <lastmod>2022-07-15T21:08:17.911Z</lastmod>
+    <lastmod>2022-07-21T21:19:52.715Z</lastmod>
   </url>
   <url>
     <loc>https://www.bggj.is/posts/vinnuafl/index.html</loc>
-    <lastmod>2022-07-17T20:48:38.770Z</lastmod>
+    <lastmod>2022-07-21T21:19:56.709Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.bggj.is/posts/forest-plot-table/index.html</loc>
+    <lastmod>2022-07-21T21:20:00.342Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.bggj.is/index.html</loc>
+    <lastmod>2022-07-21T21:20:00.782Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.bggj.is/pages/sveitarfelog.html</loc>
+    <lastmod>2022-07-21T21:20:01.033Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.bggj.is/pages/radgjof.html</loc>
+    <lastmod>2022-07-21T21:20:01.318Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.bggj.is/pages/covid_spalikan.html</loc>
+    <lastmod>2022-07-21T21:20:01.588Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.bggj.is/pages/about.html</loc>
+    <lastmod>2022-07-21T21:20:01.902Z</lastmod>
   </url>
 </urlset>
