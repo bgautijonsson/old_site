@@ -70,16 +70,19 @@ d <- pxweb_get(
            lidur = fct_recode(lidur,
                               "vaegi" = "Vægi, %",
                               "breyting" = "Mánaðarbreyting, %",
-                              "ahrif" = "Áhrif á vísitölu, %"))
+                              "ahrif" = "Áhrif á vísitölu, %")) |> 
+    pivot_wider(names_from = lidur, values_from = value)
 ```
 
 # Undirvísitölur
 
-Færið músina yfir myndina til að sjá hvaða litir tilheyra hvaða flokkum.
+Í grófum dráttum er vísitala neysluverðs vegið meðaltal af breytingu í verði hinna ýmsu afurða sem við kaupum. Því eru t.d. áhrif breytingar á húsnæðisverði reiknuð með því að margfalda verðbreytingar þess flokks við vægi hans í vísitölunni. Vægið á að endurspegla útgjöld einhvers konar meðal-Íslendings.
+
+Færið músina yfir myndirnar til að sjá nákvæm tölugildi og hvaða litir tilheyra hvaða flokkum.
 
 :::{.panel-tabset}
 
-## Ársbreyting
+## Vísitala
 
 ```{r}
 #| fig.width: 10
@@ -97,34 +100,37 @@ roll_fun <- function(x) {
 
 
 plot_dat <- d |> 
-    filter(lidur == "ahrif") |> 
     arrange(date) |> 
     group_by(undirvisitala) |> 
-    mutate(year_value = roll_fun(value)) |> 
+    mutate(year_ahrif = roll_fun(ahrif),
+           year_breyting = roll_fun(breyting)) |> 
     ungroup() |> 
     filter(year(date) >= 2012) |> 
-    mutate(undirvisitala = fct_reorder(undirvisitala, year_value, .fun = sum),
-           text = str_c("Undirvísitala: ", undirvisitala, "\n",
-                        "Árleg breyting: ", percent(year_value, accuracy = 0.01), "\n",
-                        "Mánaðarleg breyting: ", percent(value, accuracy = 0.01), "\n",
-                        "Dagsetning: ", format(date, "%B, %Y"))) |> 
-    group_by(date) |> 
-    mutate(samtals = sum(value)) |> 
-    ungroup()
+    mutate(undirvisitala = fct_reorder(undirvisitala, year_ahrif, .fun = sum),
+           text = str_c("<b>", undirvisitala, "</b>\n",
+                        "Dagsetning: ", format(date, "%B, %Y"), "\n",
+                        "Hrein breyting (ár): ", percent(year_breyting, accuracy = 0.01), "\n",
+                        "Hrein breyting (mánuður): ", percent(breyting, accuracy = 0.01), "\n",
+                        "Vægi í vísitölu: ", percent(vaegi, accuracy = 0.01), "\n",
+                        "<b>Áhrif á vísitölu (ár): ", percent(year_ahrif, accuracy = 0.01), "</b>\n",
+                        "<b>Áhrif á vísitölu (mánuður): ", percent(ahrif, accuracy = 0.01), "</b>"))
 
 
 
 p <- plot_dat |> 
     filter(undirvisitala != "Vísitala neysluverðs") |> 
-    ggplot(aes(date, year_value, text = text)) +
+    ggplot(aes(date, year_ahrif, text = text)) +
     geom_hline(yintercept = 0, lty = 2) +
     geom_col(aes(fill = undirvisitala, col = undirvisitala), position = "stack", width = 30) +
     geom_line(data = plot_dat |> 
                   filter(undirvisitala == "Vísitala neysluverðs") |> 
-                  mutate(text = str_c("Vísitala samtals", "\n",
-                                      "Árleg breyting: ", percent(year_value, accuracy = 0.01), "\n",
-                                      "Mánaðarleg breyting: ", percent(value, accuracy = 0.01), "\n",
-                                      "Dagsetning: ", format(date, "%B, %Y"))), 
+                  mutate(text = str_c("<b>", undirvisitala, "</b>\n",
+                                      "Dagsetning: ", format(date, "%B, %Y"),
+                                      "Hrein breyting (ár): ", percent(year_breyting, accuracy = 0.01), "\n",
+                                      "Hrein breyting (mánuður): ", percent(breyting, accuracy = 0.01), "\n",
+                                      "Vægi í vísitölu: ", percent(vaegi, accuracy = 0.01), "\n",
+                                      "<b>Áhrif á vísitölu (ár): ", percent(year_ahrif, accuracy = 0.01), "</b>\n",
+                                      "<b>Áhrif á vísitölu (mánuður): ", percent(ahrif, accuracy = 0.01), "</b>\n")), 
               aes(group = "none")) +
     scale_x_date(expand = expansion(),
                  date_breaks = "year",
@@ -137,7 +143,7 @@ p <- plot_dat |>
     theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
-         title = "Árleg breyting vísitölu og áhrif undirtalna")
+         title = "Árleg breyting vísitölu og áhrif undirtalna (2012-2022)")
 
 ggsave(plot = p, filename = "undirtolur.png",
        width = 8, height = 0.621 * 8, scale = 1)
@@ -145,10 +151,11 @@ ggsave(plot = p, filename = "undirtolur.png",
 ggplotly(
     p,
     tooltip = "text"
-)
+) |> 
+    layout(hoverlabel = list(align = "left"))
 ```
 
-## Mánaðarbreyting
+## Vægi
 
 ```{r}
 #| fig.width: 10
@@ -166,53 +173,108 @@ roll_fun <- function(x) {
 
 
 plot_dat <- d |> 
-    filter(lidur == "ahrif") |> 
     arrange(date) |> 
     group_by(undirvisitala) |> 
-    mutate(year_value = roll_fun(value)) |> 
+    mutate(year_ahrif = roll_fun(ahrif),
+           year_breyting = roll_fun(breyting)) |> 
     ungroup() |> 
-    filter(year(date) >= 2018) |> 
-    mutate(undirvisitala = fct_reorder(undirvisitala, value, .fun = sum),
-           text = str_c("Undirvísitala: ", undirvisitala, "\n",
-                        "Árleg breyting: ", percent(year_value, accuracy = 0.01), "\n",
-                        "Mánaðarleg breyting: ", percent(value, accuracy = 0.01), "\n",
-                        "Dagsetning: ", format(date, "%B, %Y"))) |> 
-    group_by(date) |> 
-    mutate(samtals = sum(value)) |> 
-    ungroup()
+    filter(year(date) >= 2012) |> 
+    mutate(undirvisitala = fct_reorder(undirvisitala, year_ahrif, .fun = sum),
+           text = str_c("<b>", undirvisitala, "</b>\n",
+                        "Dagsetning: ", format(date, "%B, %Y"), "\n",
+                        "Hrein breyting (ár): ", percent(year_breyting, accuracy = 0.01), "\n",
+                        "Hrein breyting (mánuður): ", percent(breyting, accuracy = 0.01), "\n",
+                        "<b>Vægi í vísitölu: ", percent(vaegi, accuracy = 0.01), "</b>\n",
+                        "Áhrif á vísitölu (ár): ", percent(year_ahrif, accuracy = 0.01), "\n",
+                        "Áhrif á vísitölu (mánuður): ", percent(ahrif, accuracy = 0.01)))
 
 
 
 p <- plot_dat |> 
     filter(undirvisitala != "Vísitala neysluverðs") |> 
-    ggplot(aes(date, value, text = text)) +
+    ggplot(aes(date, vaegi, text = text)) +
     geom_hline(yintercept = 0, lty = 2) +
     geom_col(aes(fill = undirvisitala, col = undirvisitala), position = "stack", width = 30) +
-    geom_line(data = plot_dat |> 
-                  filter(undirvisitala == "Vísitala neysluverðs") |> 
-                  mutate(text = str_c("Vísitala samtals", "\n",
-                                      "Árleg breyting: ", percent(year_value, accuracy = 0.01), "\n",
-                                      "Mánaðarleg breyting: ", percent(value, accuracy = 0.01), "\n",
-                                      "Dagsetning: ", format(date, "%B, %Y"))), 
-              aes(group = "none")) +
     scale_x_date(expand = expansion(),
                  date_breaks = "year",
                  date_labels = "%Y") +
     scale_y_continuous(labels = label_percent(),
-                       breaks = c(-0.02, 0, 0.04, 0.06, 0.08, 0.1)) +
+                       breaks = pretty_breaks(8),
+                       expand = expansion()) +
     scale_colour_brewer(type = "qual", palette = "Paired") +
     scale_fill_brewer(type = "qual", palette = "Paired") +
     theme_half_open() +
     theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
-         title = "Mánaðarleg breyting vísitölu og áhrif undirtalna")
-
+         title = "Vægi undirflokka í vísitölu neysluverðs (2012-2022)")
 
 ggplotly(
     p,
     tooltip = "text"
-)
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+## Verðbreyting
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 1.2
+#| out.width: "100%"
+#| 
+roll_fun <- function(x) {
+    x <- log(1 + x)
+    out <- x
+    
+    for (i in 1:11) out <- out + lag(x, n = i)
+    
+    exp(out) - 1
+}
+
+
+plot_dat <- d |> 
+    arrange(date) |> 
+    group_by(undirvisitala) |> 
+    mutate(year_ahrif = roll_fun(ahrif),
+           year_breyting = roll_fun(breyting)) |> 
+    ungroup() |> 
+    filter(year(date) >= 2012) |> 
+    mutate(undirvisitala = fct_reorder(undirvisitala, year_ahrif, .fun = sum),
+           text = str_c("<b>", undirvisitala, "</b>\n",
+                        "Dagsetning: ", format(date, "%B, %Y"), "\n",
+                        "<b>Hrein breyting (ár): ", percent(year_breyting, accuracy = 0.01), "</b>\n",
+                        "<b>Hrein breyting (mánuður): ", percent(breyting, accuracy = 0.01), "</b>\n",
+                        "Vægi í vísitölu: ", percent(vaegi, accuracy = 0.01), "\n",
+                        "Áhrif á vísitölu (ár): ", percent(year_ahrif, accuracy = 0.01), "\n",
+                        "Áhrif á vísitölu (mánuður): ", percent(ahrif, accuracy = 0.01)))
+
+
+
+p <- plot_dat |> 
+    filter(undirvisitala != "Vísitala neysluverðs") |> 
+    ggplot(aes(date, year_breyting, text = text)) +
+    geom_hline(yintercept = 0, lty = 2) +
+    geom_col(aes(fill = undirvisitala, col = undirvisitala), width = 30) +
+    scale_x_date(expand = expansion(),
+                 date_breaks = "2 year",
+                 date_labels = "%Y") +
+    scale_y_continuous(labels = label_percent(),
+                       breaks = pretty_breaks(8)) +
+    scale_colour_brewer(type = "qual", palette = "Paired") +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    facet_wrap("undirvisitala", ncol = 3) +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Árleg verðbreyting á undirflokkum vísitölu neysluverðs (2012-2022)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
 ```
 
 :::
