@@ -44,6 +44,7 @@ library(plotly)
 Sys.setlocale(locale = "is_IS.UTF-8")
 ```
 
+Hér nota ég gögn um [Hlutfallslega skiptingu og áhrifaþætti vísitölu neysluverðs](https://px.hagstofa.is/pxis/pxweb/is/Efnahagur/Efnahagur__visitolur__1_vnv__2_undirvisitolur/VIS01301.px) frá Hagstofu Íslands.
 
 ```{r}
 d <- pxweb_get(
