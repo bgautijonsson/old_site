@@ -105,8 +105,8 @@ plot_dat <- d |>
     filter(year(date) >= 2012) |> 
     mutate(undirvisitala = fct_reorder(undirvisitala, year_value, .fun = sum),
            text = str_c("Undirvísitala: ", undirvisitala, "\n",
-                        "Ársáhrif: ", percent(year_value, accuracy = 0.01), "\n",
-                        "Mánaðaráhrif: ", percent(value, accuracy = 0.01), "\n",
+                        "Árleg breyting: ", percent(year_value, accuracy = 0.01), "\n",
+                        "Mánaðarleg breyting: ", percent(value, accuracy = 0.01), "\n",
                         "Dagsetning: ", format(date, "%B, %Y"))) |> 
     group_by(date) |> 
     mutate(samtals = sum(value)) |> 
@@ -122,8 +122,8 @@ p <- plot_dat |>
     geom_line(data = plot_dat |> 
                   filter(undirvisitala == "Vísitala neysluverðs") |> 
                   mutate(text = str_c("Vísitala samtals", "\n",
-                                      "Árshækkun: ", percent(year_value, accuracy = 0.01), "\n",
-                                      "Mánaðarhækkun: ", percent(value, accuracy = 0.01), "\n",
+                                      "Árleg breyting: ", percent(year_value, accuracy = 0.01), "\n",
+                                      "Mánaðarleg breyting: ", percent(value, accuracy = 0.01), "\n",
                                       "Dagsetning: ", format(date, "%B, %Y"))), 
               aes(group = "none")) +
     scale_x_date(expand = expansion(),
@@ -174,8 +174,8 @@ plot_dat <- d |>
     filter(year(date) >= 2018) |> 
     mutate(undirvisitala = fct_reorder(undirvisitala, value, .fun = sum),
            text = str_c("Undirvísitala: ", undirvisitala, "\n",
-                        "Ársáhrif: ", percent(year_value, accuracy = 0.01), "\n",
-                        "Mánaðaráhrif: ", percent(value, accuracy = 0.01), "\n",
+                        "Árleg breyting: ", percent(year_value, accuracy = 0.01), "\n",
+                        "Mánaðarleg breyting: ", percent(value, accuracy = 0.01), "\n",
                         "Dagsetning: ", format(date, "%B, %Y"))) |> 
     group_by(date) |> 
     mutate(samtals = sum(value)) |> 
@@ -191,8 +191,8 @@ p <- plot_dat |>
     geom_line(data = plot_dat |> 
                   filter(undirvisitala == "Vísitala neysluverðs") |> 
                   mutate(text = str_c("Vísitala samtals", "\n",
-                                      "Árshækkun: ", percent(year_value, accuracy = 0.01), "\n",
-                                      "Mánaðarhækkun: ", percent(value, accuracy = 0.01), "\n",
+                                      "Árleg breyting: ", percent(year_value, accuracy = 0.01), "\n",
+                                      "Mánaðarleg breyting: ", percent(value, accuracy = 0.01), "\n",
                                       "Dagsetning: ", format(date, "%B, %Y"))), 
               aes(group = "none")) +
     scale_x_date(expand = expansion(),
