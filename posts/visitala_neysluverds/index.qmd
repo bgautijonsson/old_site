@@ -125,7 +125,7 @@ p <- plot_dat |>
     geom_line(data = plot_dat |> 
                   filter(undirvisitala == "Vísitala neysluverðs") |> 
                   mutate(text = str_c("<b>", undirvisitala, "</b>\n",
-                                      "Dagsetning: ", format(date, "%B, %Y"),
+                                      "Dagsetning: ", format(date, "%B, %Y"), "\n",
                                       "Hrein breyting (ár): ", percent(year_breyting, accuracy = 0.01), "\n",
                                       "Hrein breyting (mánuður): ", percent(breyting, accuracy = 0.01), "\n",
                                       "Vægi í vísitölu: ", percent(vaegi, accuracy = 0.01), "\n",
