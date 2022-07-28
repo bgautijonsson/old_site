@@ -114,7 +114,7 @@ d1 <- leiguskra |>
 
 
 
-d1 |> 
+p <- d1 |> 
     filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
                                "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
                                "Mosfellsbær")) |> 
@@ -134,12 +134,18 @@ d1 |>
     theme(legend.position = "top",
           plot.title = element_text(face = "bold"),
           panel.spacing.x = unit(0.5, "cm"),
-          strip.background = element_rect(fill = "grey95", colour = "black")) +
+          strip.background = element_rect(fill = "grey95", colour = "black"),
+          plot.margin = margin(t = 5, r = 15, b = 5, l = 5)) +
     labs(x = NULL,
          y = NULL,
          col = NULL,
          title = "Hvernig hefur mánaðarlegt leiguverð þróast? (2011 - 2022)",
          subtitle = "Miðgildi leiguverðs fyrir íbúðir innan sama stærðarflokks, sveitarfélags og árs")
+
+p
+
+ggsave(plot = p, filename = "leiga.png",
+       width = 8, height = 0.7 * 8, scale = 1.2, bg = "white")
 ```
 
 
@@ -211,7 +217,7 @@ d2 <- kaupskra |>
 
 
 
-d2 |> 
+p <- d2 |> 
     filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
                                "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
                                "Mosfellsbær")) |> 
@@ -231,12 +237,18 @@ d2 |>
     theme(legend.position = "top",
           plot.title = element_text(face = "bold"),
           panel.spacing.x = unit(0.5, "cm"),
-          strip.background = element_rect(fill = "grey95", colour = "black")) +
+          strip.background = element_rect(fill = "grey95", colour = "black"),
+          plot.margin = margin(t = 5, r = 15, b = 5, l = 5)) +
     labs(x = NULL,
          y = NULL,
          col = NULL,
          title = "Hvernig hefur kaupverð þróast? (2011 - 2022)",
          subtitle = "Miðgildi kaupverðs fyrir íbúðir innan sama stærðarflokks, sveitarfélags og árs")
+
+p
+
+ggsave(plot = p, filename = "kaupverd.png",
+       width = 8, height = 0.7 * 8, scale = 1.2, bg = "white")
 ```
 
 #### Tafla
@@ -313,7 +325,7 @@ d2 <- d2 |>
 
 
 
-d2 |> 
+p <- d2 |> 
     filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
                                "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
                                "Mosfellsbær")) |> 
@@ -333,12 +345,16 @@ d2 |>
     theme(legend.position = "top",
           plot.title = element_text(face = "bold"),
           panel.spacing.x = unit(0.5, "cm"),
-          strip.background = element_rect(fill = "grey95", colour = "black")) +
+          strip.background = element_rect(fill = "grey95", colour = "black"),
+          plot.margin = margin(t = 5, r = 15, b = 5, l = 5)) +
     labs(x = NULL,
          y = NULL,
          col = NULL,
          title = "Hvernig hafa afborganir af húsnæðisláni þróast? (2011 - 2022)",
          subtitle = "Miðgildi afborgana fyrir íbúðir innan sama stærðarflokks, sveitarfélags og árs")
+
+ggsave(plot = p, filename = "afborganir.png",
+       width = 8, height = 0.7 * 8, scale = 1.2, bg = "white")
 ```
 
 #### Tafla
