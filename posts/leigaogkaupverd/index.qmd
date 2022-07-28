@@ -29,11 +29,13 @@ title-block-banner: true
 standalone: true
 self-contained: true
 categories:
-    - menntun
-    - atvinna
+    - fasteignir
+    - efnahagur
     - R
     - íslenska
 image: leiga_hlutf_afborgun.png
+twitter-card:
+    image: leiga_hlutf_afborgun.png
 ---
 
 
