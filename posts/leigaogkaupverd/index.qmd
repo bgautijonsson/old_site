@@ -2,7 +2,7 @@
 title: "Leiga og kaupverð fasteigna"
 subtitle: "Hvernig ber leiguverði saman við afborganir húsnæðisláns?"
 description: |
-    Stundum er talað um að leiga vaxi of hratt, eða að hún vaxi hægar en húsnæðisverð. Hérna nota ég kaupskrá, leiguskrá og vaxtatöflu Landabanka til að bera leigu saman við afboranir á óverðtryggðu láni með jöfnum greiðslum og breytilegum vöxtum að því gefnu að kaupandi vær lán fyrir 80% af kaupverði fasteignarinnar.
+    Stundum er talað um að leiga vaxi of hratt, eða að hún vaxi hægar en húsnæðisverð. Hérna nota ég kaupskrá, leiguskrá og vaxtatöflu Landsbanka til að bera leigu saman við afborganir á óverðtryggðu láni með jöfnum greiðslum og breytilegum vöxtum að því gefnu að kaupandi fær lán fyrir 80% af kaupverði fasteignarinnar.
 author: 
     -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
         url: "https://twitter.com/bgautijonsson"
@@ -64,7 +64,7 @@ Gögnin sem ég nota eru:
 * [Kaupskrá fasteigna](https://www.skra.is/gogn/grunngogn-til-nidurhals/kaupskra-fasteigna/){target="_blank"}
 * [Leiguskrá íbúðarhúsnæðis](https://www.skra.is/gogn/grunngogn-til-nidurhals/leiguskra-ibudarhusnaedis/){target="_blank"}
 
-Ég mun reikna mánaðarleg miðgildi leiguverðs og kaupverðs eftir stærð og sveitarfélagi, og tengja þessi gagnasöfn svo saman til samanburðar.
+Ég mun reikna árleg miðgildi leiguverðs og kaupverðs eftir stærð og sveitarfélagi, og tengja þessi gagnasöfn svo saman til samanburðar.
 
 ```{r}
 kaupskra <- read_csv2("https://www.skra.is/library/Skrar/kaupskra/kaupskra.csv", locale = locale(encoding = "ISO-8859-1"))
@@ -290,7 +290,7 @@ $$
 * $v$ eru mánaðarlegir vextir
 * $T$ er lengd lánsins *(í mánuðum)*
 
-Ef við gefum okkur að höfuðstóllinn sé alltaf 80% af kaupverði, lánstíminn er 40 ár þ.a. $T = 40 \cdot 12 = 480$ og notfærum okkur [vaxtatöflu Landsbankans](https://www.landsbankinn.is/uploads/documents/vextir/Throun-vaxta-fra-2008.pdf){target="_blank"} *(ég set inn 6% fyrir vexti 2022)* getum við reiknað miðgildi lánsafborgana  miðað við þessar forsendur. Þetta verður ekki nákvæmlega rétt tala en eins og [John Tukey](https://en.wikipedia.org/wiki/John_Tukey){target="_blank"} sagði
+Ef við gefum okkur að höfuðstóllinn sé alltaf 80% af kaupverði, lánstíminn sé 40 ár þ.a. $T = 40 \cdot 12 = 480$ og notfærum okkur [vaxtatöflu Landsbankans](https://www.landsbankinn.is/uploads/documents/vextir/Throun-vaxta-fra-2008.pdf){target="_blank"} *(ég set inn 6% fyrir vexti 2022)* getum við reiknað miðgildi lánsafborgana  miðað við þessar forsendur. Þetta verður ekki nákvæmlega rétt tala en eins og [John Tukey](https://en.wikipedia.org/wiki/John_Tukey){target="_blank"} sagði
 
 > An approximate answer to the right question is worth far more than a precise answer to the wrong one.
 >
@@ -389,7 +389,8 @@ d2 |>
 
 # Leiga sem hlutfall af afborgun láns
 
-Núna erum við tilbúin til að bera saman þróun leiguverð og afborganir af húsnæðislánum samkvæmt forsendum að ofan.
+Núna erum við tilbúin til að bera saman þróun leiguverðs og afborganir af húsnæðislánum samkvæmt forsendum að ofan.
+
 
 ```{r}
 #| fig.width: 10
