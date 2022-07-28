@@ -74,7 +74,7 @@ d <- pxweb_get(
     pivot_wider(names_from = lidur, values_from = value)
 ```
 
-# Undirvísitölur
+# Undirvísitölur 
 
 Í grófum dráttum er vísitala neysluverðs vegið meðaltal af breytingu í verði hinna ýmsu afurða sem við kaupum. Því eru t.d. áhrif breytingar á húsnæðisverði reiknuð með því að margfalda verðbreytingar þess flokks við vægi hans í vísitölunni. Vægið á að endurspegla útgjöld einhvers konar meðal-Íslendings.
 
@@ -152,7 +152,11 @@ ggplotly(
     p,
     tooltip = "text"
 ) |> 
-    layout(hoverlabel = list(align = "left"))
+    layout(hoverlabel = list(align = "left"),
+           xaxis = list(
+               rangeslider = list(type = "date")
+           )
+    )
 ```
 
 ## Vægi
@@ -213,7 +217,10 @@ ggplotly(
     p,
     tooltip = "text"
 ) |> 
-    layout(hoverlabel = list(align = "left"))
+    layout(hoverlabel = list(align = "left"),
+           xaxis = list(
+               rangeslider = list(type = "date")
+           ))
 ```
 
 ## Verðbreyting
@@ -274,7 +281,10 @@ ggplotly(
     p,
     tooltip = "text"
 ) |> 
-    layout(hoverlabel = list(align = "left"))
+    layout(hoverlabel = list(align = "left"),
+           xaxis = list(
+               rangeslider = list(type = "date")
+           ))
 ```
 
 :::

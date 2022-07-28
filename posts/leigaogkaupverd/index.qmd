@@ -1,0 +1,429 @@
+---
+title: "Leiga og kaupverð fasteigna"
+subtitle: "Hvernig ber leiguverði saman við afborganir húsnæðisláns?"
+description: |
+    Stundum er talað um að leiga vaxi of hratt, eða að hún vaxi hægar en húsnæðisverð. Hérna nota ég kaupskrá, leiguskrá og vaxtatöflu Landabanka til að bera leigu saman við afboranir á óverðtryggðu láni með jöfnum greiðslum og breytilegum vöxtum að því gefnu að kaupandi vær lán fyrir 80% af kaupverði fasteignarinnar.
+author: 
+    -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
+        url: "https://twitter.com/bgautijonsson"
+        affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
+        affiliation-url: "https://www.hi.is/tolfraedi_0"
+date: "2022/07/28"
+format: 
+    html:
+        code-fold: true
+        toc: true
+        toc-depth: 4
+        toc-location: left
+        toc-title: Efnisyfirlit
+        page-layout: full
+        max-width: "1000px"
+execute: 
+  echo: true
+  warning: false
+  cache: true
+editor: source
+theme: flatly
+draft: false
+title-block-banner: true
+standalone: true
+self-contained: true
+categories:
+    - menntun
+    - atvinna
+    - R
+    - íslenska
+image: leiga_hlutf_afborgun.png
+twitter-card:
+    image: leiga_hlutf_afborgun.png
+---
+
+
+```{r}
+#| include: false
+
+library(cowplot)
+library(tidyverse)
+library(scales)
+library(pxweb)
+library(ggthemes)
+library(kableExtra)
+library(gganimate)
+library(lubridate)
+library(geomtextpath)
+library(ggtext)
+library(readxl)
+library(janitor)
+library(plotly)
+```
+
+# Gögn
+
+Gögnin sem ég nota eru:
+
+* [Kaupskrá fasteigna](https://www.skra.is/gogn/grunngogn-til-nidurhals/kaupskra-fasteigna/){target="_blank"}
+* [Leiguskrá íbúðarhúsnæðis](https://www.skra.is/gogn/grunngogn-til-nidurhals/leiguskra-ibudarhusnaedis/){target="_blank"}
+
+Ég mun reikna mánaðarleg miðgildi leiguverðs og kaupverðs eftir stærð og sveitarfélagi, og tengja þessi gagnasöfn svo saman til samanburðar.
+
+```{r}
+kaupskra <- read_csv2("https://www.skra.is/library/Skrar/kaupskra/kaupskra.csv", locale = locale(encoding = "ISO-8859-1"))
+
+
+leiguskra <- read_csv2("https://www.skra.is/library/Skrar/leiguskra/leiguskra.csv")
+
+vextir_landsbanki <- read_csv("vextir_landsb.csv")
+```
+
+
+## Leiguverð
+
+Fyrst lítum við á þróun leiguverðs.
+
+```{r}
+d1 <- leiguskra |> 
+    janitor::clean_names() |> 
+    mutate(ar = dmy(utgdag) |> year()) |> 
+    filter(is.na(onothaefur_samningur), tegund == "Fjolbyli",
+           staerd < 150, staerd >= 50) |> 
+    select(sveitarfelag, ar, leiguverd = heildarverd, staerd, tegund) |> 
+    mutate(staerd = cut(staerd,
+                        breaks = c(50, 60, 70, 80, 90, 100, 110, 150),
+                        labels = c("50-59",
+                                   "60-69",
+                                   "70-79",
+                                   "80-89",
+                                   "90-99",
+                                   "100-109",
+                                   "110-150"),
+                        include.lowest = TRUE,
+                        right = FALSE)) |> 
+    group_by(sveitarfelag, ar, staerd) |> 
+    summarise(leiguverd = median(leiguverd),
+              .groups = "drop")
+```
+
+:::{.panel-tabset}
+
+### Mynd
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+
+d1 |> 
+    filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
+                               "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
+                               "Mosfellsbær")) |> 
+    ggplot(aes(ar, leiguverd)) +
+    geom_line(aes(group = staerd, col = staerd)) +
+    # geom_rangeframe() +
+    scale_x_continuous(breaks = c(seq(2012, 2022, by = 2)), expand = expansion(add = 0.2)) +
+    scale_y_continuous(labels = label_number(accuracy = 1,
+                                             big.mark = ".",
+                                             decimal.mark = ",",
+                                             suffix = " kr"),
+                       expand = expansion()) +
+    scale_colour_brewer(type = "div", palette = "RdYlBu", guide = guide_legend(nrow = 1)) +
+    facet_wrap("sveitarfelag") +
+    # coord_cartesian(ylim = c(0.5, 2)) +
+    theme_half_open(font_size = 10) +
+    theme(legend.position = "top",
+          plot.title = element_text(face = "bold"),
+          panel.spacing.x = unit(0.5, "cm"),
+          strip.background = element_rect(fill = "grey95", colour = "black")) +
+    labs(x = NULL,
+         y = NULL,
+         col = NULL,
+         title = "Hvernig hefur mánaðarlegt leiguverð þróast? (2011 - 2022)",
+         subtitle = "Miðgildi leiguverðs fyrir íbúðir innan sama stærðarflokks, sveitarfélags og árs")
+```
+
+
+### Tafla
+
+```{r}
+d1 |> 
+    mutate(leiguverd = number(leiguverd, suffix = " kr", big.mark = ".", decimal.mark = ",", accuracy = 1)) |> 
+    filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
+                               "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
+                               "Mosfellsbær")) |> 
+    pivot_wider(names_from = staerd, values_from = leiguverd) |> 
+    rename("Sveitarfélag" = sveitarfelag, "Ár" = ar) |> 
+    kable(caption = "Miðgildi mánaðarleiguverðs eftir stærð og sveitarfélagi (2011-2022)",
+          align = c("l", rep("c",8))) |> 
+    kable_styling(bootstrap_options = c("striped", "hover"), full_width = T, font_size = 14) |> 
+    column_spec(1, width = "12em") |> 
+    column_spec(2, width = "1cm") |> 
+    collapse_rows(1) |> 
+    add_header_above(c("", "", "Stærð (m2)" = 7)) |> 
+    scroll_box(height = "500px", width = "100%")
+```
+
+:::
+
+## Mánaðarlegar afborganir húsnæðisláns
+
+Lánsafborganir skýrast bæði af húsnæðisverði og vaxtastigi útlánsaðila *(banka og lífeyrissjóða)*. Við vinnum fyrst úr kaupverði til að fá sömu árlegu miðgildi og í leigugögnunum, svo notum við þau til að reikna afborganirnar.
+
+```{r}
+d2 <- kaupskra |> 
+    janitor::clean_names() |> 
+    mutate(ar = year(utgdag)) |> 
+    filter(onothaefur_samningur == 0, tegund == "Fjolbyli", fullbuid == 1,
+           einflm < 150, einflm >= 50) |> 
+    select(sveitarfelag, ar, kaupverd, fasteignamat, staerd = einflm, tegund) |> 
+    mutate(staerd = cut(staerd,
+                        breaks = c(50, 60, 70, 80, 90, 100, 110, 150),
+                        labels = c("50-59",
+                                   "60-69",
+                                   "70-79",
+                                   "80-89",
+                                   "90-99",
+                                   "100-109",
+                                   "110-150"),
+                        include.lowest = TRUE,
+                        right = FALSE),
+           kaupverd = kaupverd * 1000,
+           fasteignamat = fasteignamat * 1000) |> 
+    group_by(sveitarfelag, ar, staerd) |> 
+    summarise(kaupverd = median(kaupverd),
+              fasteignamat = median(fasteignamat),
+              .groups = "drop") |> 
+    semi_join(d1, by = "ar") |> 
+    arrange(ar, staerd)
+
+```
+
+### Húsnæðisverð
+
+:::{.panel-tabset}
+
+#### Mynd
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+
+d2 |> 
+    filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
+                               "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
+                               "Mosfellsbær")) |> 
+    ggplot(aes(ar, kaupverd)) +
+    geom_line(aes(group = staerd, col = staerd)) +
+    # geom_rangeframe() +
+    scale_x_continuous(breaks = c(seq(2012, 2022, by = 2)), expand = expansion(add = 0.2)) +
+    scale_y_continuous(labels = label_number(accuracy = 1,
+                                             big.mark = ".",
+                                             decimal.mark = ",",
+                                             suffix = " kr"),
+                       expand = expansion()) +
+    scale_colour_brewer(type = "div", palette = "RdYlBu", guide = guide_legend(nrow = 1)) +
+    facet_wrap("sveitarfelag") +
+    # coord_cartesian(ylim = c(0.5, 2)) +
+    theme_half_open(font_size = 10) +
+    theme(legend.position = "top",
+          plot.title = element_text(face = "bold"),
+          panel.spacing.x = unit(0.5, "cm"),
+          strip.background = element_rect(fill = "grey95", colour = "black")) +
+    labs(x = NULL,
+         y = NULL,
+         col = NULL,
+         title = "Hvernig hefur kaupverð þróast? (2011 - 2022)",
+         subtitle = "Miðgildi kaupverðs fyrir íbúðir innan sama stærðarflokks, sveitarfélags og árs")
+```
+
+#### Tafla
+
+```{r}
+d2 |> 
+    select(-fasteignamat) |> 
+    mutate(kaupverd = number(kaupverd, suffix = " kr", big.mark = ".", decimal.mark = ",", accuracy = 1)) |> 
+    filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
+                               "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
+                               "Mosfellsbær")) |> 
+    pivot_wider(names_from = staerd, values_from = kaupverd, values_fill = " ") |> 
+    rename("Sveitarfélag" = sveitarfelag, "Ár" = ar) |> 
+    kable(caption = "Miðgildi kaupverðs eftir stærð og sveitarfélagi (2011-2022)",
+          align = c("l", rep("c",8))) |> 
+    kable_styling(bootstrap_options = c("striped", "hover"), full_width = T, font_size = 14) |> 
+    column_spec(1, width = "12em") |> 
+    column_spec(2, width = "1cm") |> 
+    collapse_rows(1) |> 
+    add_header_above(c("", "", "Stærð (m2)" = 7)) |> 
+    scroll_box(height = "500px", width = "100%")
+```
+
+
+:::
+
+### Afborganir
+
+Við getum reiknað mánaðarlegar afborganir af láni [með formúlunni](https://en.wikipedia.org/wiki/Amortization_calculator#Derivation_of_the_formula){target="_blank"}
+
+$$
+A = L \cdot v \cdot  \frac{(1 + v)^{T}}{(1 + v)^T - 1},
+$$
+
+þar sem
+
+* $A$ eru mánaðarlegar afborganir
+* $L$ er höfuðstóll lánsins
+* $v$ eru mánaðarlegir vextir
+* $T$ er lengd lánsins *(í mánuðum)*
+
+Ef við gefum okkur að höfuðstóllinn sé alltaf 80% af kaupverði, lánstíminn er 40 ár þ.a. $T = 40 \cdot 12 = 480$ og notfærum okkur [vaxtatöflu Landsbankans](https://www.landsbankinn.is/uploads/documents/vextir/Throun-vaxta-fra-2008.pdf){target="_blank"} *(ég set inn 6% fyrir vexti 2022)* getum við reiknað miðgildi lánsafborgana  miðað við þessar forsendur. Þetta verður ekki nákvæmlega rétt tala en eins og [John Tukey](https://en.wikipedia.org/wiki/John_Tukey){target="_blank"} sagði
+
+> An approximate answer to the right question is worth far more than a precise answer to the wrong one.
+>
+> John Tukey
+
+```{r}
+jafn_greidsl <- function(fastverd, vextir = 0.05/12, n = 12 * 40) {
+    (fastverd * (1 + vextir)^n) / ((((1 + vextir)^n - 1) / vextir) * (1 + vextir))
+}
+
+d2 <- d2 |> 
+    inner_join(
+        vextir_landsbanki |> 
+            drop_na() |> 
+            group_by(ar = year(dags)) |> 
+            summarise(vextir = mean(vextir, na.rm = T)) |> 
+            add_row(ar = 2022, vextir = 0.06),
+        by = "ar"
+    ) |> 
+    mutate(afborgun = jafn_greidsl(kaupverd * 0.8, vextir = vextir/12, n = 12 * 40))
+```
+
+
+:::{.panel-tabset}
+
+#### Mynd
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+
+d2 |> 
+    filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
+                               "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
+                               "Mosfellsbær")) |> 
+    ggplot(aes(ar, afborgun)) +
+    geom_line(aes(group = staerd, col = staerd)) +
+    # geom_rangeframe() +
+    scale_x_continuous(breaks = c(seq(2012, 2022, by = 2)), expand = expansion(add = 0.2)) +
+    scale_y_continuous(labels = label_number(accuracy = 1,
+                                             big.mark = ".",
+                                             decimal.mark = ",",
+                                             suffix = " kr"),
+                       expand = expansion()) +
+    scale_colour_brewer(type = "div", palette = "RdYlBu", guide = guide_legend(nrow = 1)) +
+    facet_wrap("sveitarfelag") +
+    # coord_cartesian(ylim = c(0.5, 2)) +
+    theme_half_open(font_size = 10) +
+    theme(legend.position = "top",
+          plot.title = element_text(face = "bold"),
+          panel.spacing.x = unit(0.5, "cm"),
+          strip.background = element_rect(fill = "grey95", colour = "black")) +
+    labs(x = NULL,
+         y = NULL,
+         col = NULL,
+         title = "Hvernig hafa afborganir af húsnæðisláni þróast? (2011 - 2022)",
+         subtitle = "Miðgildi afborgana fyrir íbúðir innan sama stærðarflokks, sveitarfélags og árs")
+```
+
+#### Tafla
+
+```{r}
+d2 |> 
+    select(-fasteignamat, -kaupverd) |> 
+    mutate(afborgun = number(afborgun,
+                             suffix = " kr", 
+                             big.mark = ".", 
+                             decimal.mark = ",", 
+                             accuracy = 1),
+           vextir = percent(vextir, accuracy = 0.1,big.mark = ".", decimal.mark = ",")) |> 
+    filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
+                               "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
+                               "Mosfellsbær")) |> 
+    pivot_wider(names_from = staerd, values_from = afborgun, values_fill = " ") |> 
+    rename("Sveitarfélag" = sveitarfelag, "Ár" = ar, Vextir = vextir) |> 
+    kable(caption = "Miðgildi lánaafborgana eftir stærð og sveitarfélagi (2011-2022)",
+          align = c("l", rep("c",8))) |> 
+    kable_styling(bootstrap_options = c("striped", "hover"), full_width = T, font_size = 14) |> 
+    column_spec(1, width = "12em") |> 
+    column_spec(2, width = "1cm") |> 
+    collapse_rows(1) |> 
+    add_header_above(c("", "", "", "Stærð (m2)" = 7)) |> 
+    scroll_box(height = "500px", width = "100%")
+```
+
+:::
+
+# Leiga sem hlutfall af afborgun láns
+
+Núna erum við tilbúin til að bera saman þróun leiguverð og afborganir af húsnæðislánum samkvæmt forsendum að ofan.
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.8
+#| out.width: "100%"
+
+d <- d1 |> 
+    inner_join(
+        d2,
+        by = c("ar", "staerd", "sveitarfelag")
+    )
+
+plot_dat <- d |> 
+    mutate(hlutf = leiguverd / afborgun) |> 
+    filter(sveitarfelag %in% c("Reykjavíkurborg", "Kópavogsbær", 
+                               "Seltjarnarnesbær", "Garðabær", "Hafnarfjarðarkaupstaður",
+                               "Mosfellsbær")) |> 
+    mutate(staerd = str_c(staerd, " m2") |> 
+               fct_relevel("50-59 m2",
+                           "60-69 m2",
+                           "70-79 m2",
+                           "80-89 m2",
+                           "90-99 m2",
+                           "100-109 m2"))
+
+p <- plot_dat |> 
+    ggplot(aes(ar, hlutf)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    geom_line(aes(group = staerd, col = staerd)) +
+    # geom_rangeframe() +
+    scale_x_continuous(breaks = seq(2012, 2022, by = 2), expand = expansion(add = 0.2)) +
+    scale_y_log10(labels = label_percent(accuracy = 1),
+                  breaks = c(0.5, 1/1.6, 0.8, 1, 1.25, 1.6, 2),
+                  expand = expansion()) +
+    scale_colour_brewer(type = "div", palette = "RdYlBu", guide = guide_legend(nrow = 1)) +
+    facet_wrap("sveitarfelag") +
+    coord_cartesian(ylim = c(0.5, 2)) +
+    theme_half_open(font_size = 10) +
+    theme(legend.position = "top",
+          plot.title = element_text(face = "bold"),
+          panel.spacing.x = unit(0.5, "cm"),
+          strip.background = element_rect(fill = "grey95", colour = "black"),
+          plot.margin = margin(t = 5, r = 15, b = 5, l = 5)) +
+    labs(x = NULL,
+         y = "Leiguverð / Afborgun",
+         col = NULL,
+         title = "Hvernig hefur mánaðarlegt leiguverð þróast sem hlutfall af íbúðalánaafborgunum?",
+         subtitle = "Hér gildir 100% að leiguverð = afborgun, yfir 100% að leiguverð er hærra og undir 100% að það sé lægra.",
+         caption = "Óverðtryggt lán tekið fyrir 80% af miðgildi kaupverðs innan hvers flokks með jöfnum greiðslum og breytilegum vöxtum samkvæmt lánatöflu Landsbankans.\nMyndin er á lograkvarða (50% og 200% eru jafnlangt frá 100%)")
+
+p
+
+ggsave(plot = p, filename = "leiga_hlutf_afborgun.png",
+       width = 8, height = 0.7 * 8, scale = 1.2, bg = "white")
+```
