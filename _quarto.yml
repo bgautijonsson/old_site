@@ -10,6 +10,7 @@ website:
   repo-url: https://github.com/bgautijonsson/bgautijonsson.github.io
   twitter-card: 
     creator: "@bgautijonsson"
+    card-style: summary_large_image
   navbar:
     background: "#08306b"
     foreground: "#ffffff"
