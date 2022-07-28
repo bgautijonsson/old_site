@@ -34,8 +34,6 @@ categories:
     - R
     - íslenska
 image: leiga_hlutf_afborgun.png
-twitter-card:
-    image: leiga_hlutf_afborgun.png
 ---
 
 
