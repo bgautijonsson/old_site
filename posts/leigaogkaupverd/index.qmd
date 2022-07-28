@@ -353,6 +353,8 @@ p <- d2 |>
          title = "Hvernig hafa afborganir af húsnæðisláni þróast? (2011 - 2022)",
          subtitle = "Miðgildi afborgana fyrir íbúðir innan sama stærðarflokks, sveitarfélags og árs")
 
+p
+
 ggsave(plot = p, filename = "afborganir.png",
        width = 8, height = 0.7 * 8, scale = 1.2, bg = "white")
 ```
