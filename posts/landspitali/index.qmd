@@ -1,0 +1,638 @@
+---
+title: "Landspítalinn"
+subtitle: "Hvaða upplýsingar eru til um rekstur Landspítalans og hvar má finna þær?"
+description: |
+    Hér ætla ég aðeins að skoða hvaða gögn eru til um rekstur landspítalans, hvar má finna þau og hvað mætti betur fara í birtingu þeirra gagna.
+author: 
+    -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
+        url: "https://twitter.com/bgautijonsson"
+        affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
+        affiliation-url: "https://www.hi.is/tolfraedi_0"
+date: "2022/08/08"
+format: 
+    html:
+        code-fold: true
+        toc: true
+        toc-depth: 2
+        toc-location: right
+        toc-title: Efnisyfirlit
+        page-layout: full
+execute: 
+  echo: true
+  warning: false
+  cache: false
+editor: source
+theme: flatly
+draft: false
+title-block-banner: true
+standalone: true
+self-contained: true
+categories:
+    - landspítali
+    - R
+    - íslenska
+image: hjukthyngd.png
+twitter-card: 
+    image: hjukthyngd.png
+---
+
+
+```{r}
+#| include: false
+
+library(cowplot)
+library(tidyverse)
+library(scales)
+library(pxweb)
+library(ggthemes)
+library(kableExtra)
+library(gganimate)
+library(lubridate)
+library(geomtextpath)
+library(ggtext)
+library(readxl)
+library(janitor)
+library(plotly)
+```
+
+# Gögn
+
+Gögnin eru fengin úr [starfsemisupplýsingum Landspítala](https://www.landspitali.is/um-landspitala/spitalinn-i-tolum/starfsemisupplysingar-lsh/?branch=7ae95bda-92f7-11ec-a2e6-005056865b13){target="_blank"}. Þar sem þetta er allt í PDF skjölum er ég ekki búinn að sækja öll gögnin, en ég birti hérna yfirlit yfir það helsta sem ég hef náð að safna saman. Það er kannski óþarfi að segja það, en það væri mikill kostur ef Landspítali myndi birta töflurnar úr þessum PDF skýrslum t.d. á csv formi, eða sem excell skrár. Seðlabankinn birtir t.d. excell skrár með viðeigandi gögnum samhliða PDF skýrslum sínum.
+
+Eitt það besta sem yfirvöld geta gert til að auka traust á rekstri spítalans eða ákvarðanir í kringum hann er að auðvelda almenningi að nálgast upplýsingar um reksturinn. Það er ekki nóg að lesa/heyra í fjölmiðlum að einhver klár manneskja segir eitthvað um reksturinn, það verður að vera hægt að sannreyna þetta.
+
+```{r}
+d <- read_csv2("landspitali.csv")
+
+visitala <- pxweb_get(
+    url ="https://px.hagstofa.is:443/pxis/api/v1/is/Efnahagur/visitolur/1_vnv/1_vnv/VIS01000.px", 
+    query = list(
+        "Mánuður" = c("*"),
+        "Vísitala"  = c("CPI"),
+        "Liður" = c("index")
+    ),
+    verbose = FALSE
+) |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    janitor::clean_names() |> 
+    separate(manudur, into = c("ar", "manudur"), sep = "M", convert = T) |> 
+    mutate(manudur = str_pad(manudur, width = 2, side = "left", pad = "0"),
+           date = str_c(ar, "-", manudur, "-01") |> ymd()) |> 
+    select(-manudur, -ar, -visitala, -lidur) |> 
+    mutate(ar = year(date)) |> 
+    group_by(ar) |> 
+    filter(date == min(date)) |> 
+    ungroup() |> 
+    mutate(visitala_2022 = visitala_neysluverds / visitala_neysluverds[ar == 2022]) |> 
+    select(-date, -visitala_neysluverds)
+
+
+url_mannfjoldi <- "https://px.hagstofa.is:443/pxis/api/v1/is/Ibuar/mannfjoldi/1_yfirlit/Yfirlit_mannfjolda/MAN00109.px"
+
+query_list_mannfjoldi <- list(
+    "Ár" = c("*"),
+    "Aldur" = c("*"),
+    "Kyn" = c("0")
+)
+
+
+mannfjoldi <- pxweb_get(url_mannfjoldi, query = pxweb_query(query_list_mannfjoldi),
+                        verbose = FALSE) |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    janitor::clean_names()  |> 
+    filter(aldur == "Alls") |> 
+    mutate(ar = parse_number(ar)) |> 
+    group_by(ar) |> 
+    summarise(mannfjoldi = sum(mannfjoldi_1841_2066))
+
+mannfjoldi <- pxweb_get(
+    url ="https://px.hagstofa.is:443/pxis/api/v1/is/Ibuar/mannfjoldi/2_byggdir/sveitarfelog/MAN02005.px", 
+    query = list(
+        "Sveitarfélag" = c("*"),
+        "Aldur" = c("-1"),
+        "Ár" = c("*"),
+        "Kyn" = c("0")
+    ),
+    verbose = FALSE
+) |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    janitor::clean_names() |> 
+    rename(mannfjoldi = mannfjoldi_eftir_sveitarfelagi_kyni_og_aldri_1_januar_1998_2022) |> 
+    mutate(ar = parse_number(ar)) |> 
+    filter(sveitarfelag %in% c("Alls", "Reykjavíkurborg", "Garðabær", "Hafnarfjarðarkaupstaður", "Kópavogsbær", "Seltjarnarnesbær", "Mosfellsbær")) |> 
+    mutate(stadur = ifelse(sveitarfelag == "Alls", "mannfjoldi_island", "mannfjoldi_hfbsv")) |> 
+    count(ar, stadur, wt = mannfjoldi) |> 
+    pivot_wider(names_from = stadur, values_from = n)
+
+lands_laun <- read_csv("landspitali_laun.csv") |> 
+    rename(tegund_launa = tegund3,
+           samtals_laun = samtals)
+
+d <- d |> 
+    inner_join(
+        visitala,
+        by = "ar"
+    ) |> 
+    inner_join(
+        mannfjoldi,
+        by = "ar"
+    )
+
+```
+
+
+# Veikindahlutfall
+
+Veikindahlutfall starfsfólks á Landspítala hefur verið frekar stöðugt í kringum 6,5%, en fór að aukast upp úr 2015 og jókst svo gífurlega *(í 11,8%)* á fyrstu þremur mánuðum ársins 2022 .
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+plot_dat <- d |> 
+    mutate(veikindahlutfall = veikindahlutfall / 100,
+           text = str_c("Ár: ", ar, "\n",
+                        "Veikindahlutfall: ", percent(veikindahlutfall, accuracy = 0.1,
+                                                      big.mark = ".", decimal.mark = ","))) |> 
+    select(ar, veikindahlutfall, text)
+
+
+p <- plot_dat |> 
+    ggplot(aes(ar, veikindahlutfall, text = text)) +
+    geom_hline(yintercept = 0.04, lty = 2, alpha = 0.9) +
+    annotate(x = 2012, y = 0.036, geom = "text", label = "Viðmið samkvæmt mannauðsstjórum", alpha = 0.9) +
+    geom_area(aes(group = "none"), alpha = 0.5, col = "black") +
+    scale_x_continuous(breaks = 2007:2022,
+                       labels = c(2007:2021, "2022\n(Jan-Mars)"),
+                       expand = expansion()) +
+    scale_y_continuous(labels = label_percent(),
+                       breaks = c(0, 0.04,0.06, 0.07,  0.08, 0.09, 0.1, 0.11, 0.12),
+                       limits = c(0, 0.12),
+                       expand = expansion()) +
+    theme_half_open() +
+    theme() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Veikindahlutfall á Landspítala (2007 - 2022)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left",
+                             font = list(color = "#ffffff")))
+```
+
+# Hjúkrunarþyngd
+
+Í grófum drætti er hjúkrunarþyngd skráð fyrir hvern sjúkling og hvern dag. Lægsta þyngdin er 1 og hæsta er 5. Landspítalinn birtir svo dreifingu hjúkrunarþungans eða heildarfjölda legudaga í hverjum þyngdarflokki. Nánar um hjúkrunarþyngd í [þessari grein Halldóru Hálfdánardóttur, Elísabetar Guðmundsdóttur og Helgu Bragadóttur.](https://www.hjukrun.is/library/Timarit---Skrar/Timarit/Timarit-2011/4.-tbl-2011/TENGSL%20STARFSMANNAvELTU,%20vEIKINdAFJARvISTA%20HJÚKRUNARFRÆÐINGA%20OG%20HJÚKRUN.pdf){target="_blank"}
+
+Á myndinni hér fyrir neðan sjáum við að meðalþyngd hjúkrunar hefur aukist stöðugt frá 2012 *(2,59)* til 2022 *(3,39)* samhliða því að stöðugt hærra hlutfall hjúkrunardaga skráist í þyngstu flokkana, 14% árið 2012 en 48,5% á fyrstu þremur mánuðum 2022.
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+plot_dat <-d |> 
+    select(ar, f1:f5) |> 
+    drop_na() |> 
+    pivot_longer(c(-ar)) |> 
+    group_by(ar) |> 
+    mutate(value = value / sum(value),
+           name = parse_number(name),
+           skor = sum(value * name) / 5,
+           flokkur = as_factor(name) |> fct_recode("1 (Minnst)" = "1", "5 (Mest)" = "5") |>  fct_reorder(name)) |> 
+    ungroup() |> 
+    mutate(text = str_c("Ár: ", ar, "\n",
+                        "Flokkur: ", flokkur, "\n",
+                        "Hlutfall: ", percent(value, accuracy = 0.1,
+                                              big.mark = ".", decimal.mark = ",")))
+
+
+p <- plot_dat |> 
+    ggplot(aes(ar, value, text = text)) +
+    geom_col(aes(fill = flokkur, group = flokkur), position = "stack", width = 0.95) +
+    geom_line(data = plot_dat |> 
+                  distinct(ar, skor) |> 
+                  mutate(text = str_c("Ár: ", ar, "\n",
+                                      "Meðalskor: ", number(skor * 5, accuracy = 0.01, 
+                                                            decimal.mark = ",", big.mark = "."))),
+              aes(y = skor, group = "none", yaxis = "y2"), 
+              size = 2) +
+    scale_x_continuous(breaks = 2012:2022, 
+                       labels = c(2012:2021, "2022\n(Jan-Mars)"),
+                       expand = expansion()) +
+    scale_y_continuous(labels = label_percent(),
+                       expand = expansion(),
+                       sec.axis = sec_axis(trans = ~ .x * 5)) +
+    scale_fill_brewer(type = "seq", direction = 1, palette = "OrRd") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         fill = NULL,
+         title = "Hjúkrunarþyngd legudaga á Landspítala (2012 - 2022)")
+
+ggsave(plot = p + theme(legend.position = "right") + labs(subtitle = "Súlur sýna dreifingu (vinstri ás) og lína sýnir meðalþyngd legudaga (hægri ás)"), filename = "hjukthyngd.png",
+       width = 8, height = 0.5 * 8, scale = 1.3, bg = "white")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+# Legurými
+
+## Hlutfall lausra rýma
+
+Á hverjum tímapunkti er mikilvægt að ákveðið hlutfall legurýma sé laust, bæði til að bregðast við slysum, en líka til að geta fært sjúklinga á milli deilda. Við getum reiknað meðaltal hlutfalls lausra rýma með því að reikna meðalfjölda inniliggjandi sjúklinga og deila í með meðalfjölda legurýma yfir árið.
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    mutate(nyting = medalfjoldi_sjukl/fjoldi_rum,
+           laust_plass = 1 - nyting) |> 
+    drop_na(laust_plass, ar) |> 
+    mutate(text = str_c("Ár: ", ar, "\n",
+                        "Meðalfjöldi rúma: ", fjoldi_rum, "\n",
+                        "Meðalfjöldi inniliggjandi: ", medalfjoldi_sjukl, "\n",
+                        "Hlutfall lausra rúma: ", percent(laust_plass, accuracy = 0.1, 
+                                                          big.mark = ".", decimal.mark = ",")))
+
+
+p <- plot_dat |> 
+    ggplot(aes(ar, laust_plass)) +
+    geom_hline(yintercept = 0.15, lty = 2, alpha= 0.5) +
+    geom_area(aes(text = text, group = "none"), alpha = 0.5, col = "black") +
+    scale_x_continuous(breaks = 2008:2022,
+                       labels = c(2008:2021, "2022\n(Jan-Mars)"),
+                       expand = expansion()) +
+    scale_y_continuous(breaks = c(0, 0.05, 0.1, 0.15, 0.2),
+                       labels = label_percent(),
+                       expand = expansion(),
+                       limits = c(0, 0.2)) +
+    theme_half_open() +
+    theme(plot.title = element_text(face = "bold")) +
+    labs(x = NULL,
+         y = NULL,
+         title = "Hlutfall lausra legurýma á Landspítala (2008 - 2022)")
+
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left",
+                             font = list(color = "#ffffff")))
+```
+
+# Stöðugildi
+
+Hér tek ég saman gögn um fjölda stöðugilda á Landspítala eftir stéttarfélögum.
+
+## Læknar, Hjúkrunarfræðingar og Sjúkraliðar
+
+Í fréttum hefur verið talað um að of mikið starfsfólk sé ekki beintengt umönnun sjúklinga. Ein tilraun til að sannreyna þetta er að reikna hlutfall stöðugilda sem eru ekki hjúkrunarfræðingar, læknar eða sjúkraliðar. Aðrar fagstéttir tengjast líka sjúklingum beint *(t.d. sálfræðingar, lyfjafræðingar, meinafræðingar og sjúkraþjálfararar)*, en til einföldunar skoðum við hérna þessar þrjár stóru stéttir.
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    mutate(annad = stodugildi - stg_hjukr - stg_laekna - stg_sjukral,
+           hlutf_annad = annad / stodugildi) |> 
+    select(ar, annad, hlutf_annad) |> 
+    mutate(text = str_c("Ár: ", ar, "\n",
+                        "<b>Hlutfall: ", percent(hlutf_annad, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "</b>\n",
+                        "Fjöldi: ", number(annad, suffix = " stöðugildi", big.mark = ".", decimal.mark = ","), "\n")) |> 
+    drop_na()
+
+p <- plot_dat |> 
+    ggplot(aes(ar, hlutf_annad, text = text)) +
+    geom_line(aes(group = "none")) +
+    scale_x_continuous(expand = expansion(add = 0.6),
+                       breaks = 2006:2021) +
+    scale_y_continuous(expand = expansion(),
+                       labels = label_percent(),
+                       breaks = c(0.4, 0.45, 0.5, 0.55, 0.6),
+                       limits = c(0.4, 0.6)) +
+    scale_colour_brewer(type = "qual", palette = "Paired") +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Hlutfall stöðugilda Landspítala sem eru ekki hjúkrunarfræðingar,\n\t\t\tlæknar eða sjúkraliðar (2010 - 2021)",
+         subtitle = "Reiknað út frá starfsemisupplýsingum Landspítala um stöðugildi eftir stéttarfélögum")
+
+ggsave(plot = p +
+           geom_rangeframe() +
+           theme_tufte() +
+           scale_y_continuous(expand = expansion(),
+                              labels = label_percent(),
+                              limits = c(0.4, 0.6),
+                              breaks = c(range(plot_dat$hlutf_annad), 0.5, 0.45, 0.55, 0.6)) +
+           theme(plot.title = element_text(face = "bold")) +
+           labs(title =  "Hlutfall stöðugilda Landspítala sem eru ekki hjúkrunarfræðingar, læknar eða sjúkraliðar (2010 - 2021)"), 
+       filename = "hlutf_ekki3.png",
+       width = 8, height = 0.5 * 8, scale = 1.5,
+       bg = "white")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+
+## Stéttarfélög
+
+Hér má sjá fjölda og hlutföll stöðugilda fyrir fleiri stéttarfélög. Þar sem Sameyki varð ekki til fyrr en 2019 lagði ég saman fjölda stöðugilda hjá viðeigandi stéttarfélögum fyrir þann. 
+
+:::{.panel-tabset}
+
+### Hlutföll
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    select(ar, stodugildi, starts_with("stg"), -ends_with("svid")) |> 
+    drop_na() |> 
+    pivot_longer(c(-ar, -stodugildi)) |> 
+    group_by(ar) |> 
+    mutate(annad = stodugildi - sum(value)) |> 
+    pivot_wider(names_from = name, values_from = value) |> 
+    pivot_longer(c(-ar, -stodugildi)) |> 
+    mutate(name = fct_reorder(name, value * (name != "annad"))) |> 
+    group_by(ar) |> 
+    mutate(hlutf = value / sum(value)) |> 
+    ungroup() |> 
+    mutate(name = fct_recode(name,
+                             "Annað" = "annad",
+                             "Hjúkrunarfræðingar" = "stg_hjukr",
+                             "Læknar" = "stg_laekna",
+                             "Sjúkraliðar" = "stg_sjukral",
+                             "Sameyki" = "stg_sameyki",
+                             "Sálfræðingar" = "stg_salfr",
+                             "Sjúkraþjálfarar" = "stg_sjukrathj",
+                             "Félagsráðgjafar" = "stg_felrad",
+                             "Lyfjafræðingar" = "stg_lyfjafr",
+                             "Iðjuþjálfar" = "stg_idjuthj",
+                             "Ljósmæður" = "stg_ljosmaedur"),
+           text = str_c("<b>", name, "</b>", "\n",
+                        "Ár: ", ar, "\n",
+                        "<b>Hlutfall: ", percent(hlutf, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "</b>\n",
+                        "Fjöldi: ", number(value, suffix = " stöðugildi", big.mark = ".", decimal.mark = ","), "\n"))
+
+p <- plot_dat |> 
+    ggplot(aes(ar, value, text = text)) +
+    geom_col(aes(fill = name, col = name), width = 1, position = "fill") +
+    scale_x_continuous(expand = expansion(),
+                       breaks = 2010:2021) +
+    scale_y_continuous(expand = expansion(),
+                       labels = label_percent()) +
+    scale_colour_brewer(type = "qual", palette = "Paired") +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Dreifing stöðugilda á Landspítala eftir stéttarfélagi (2010 - 2021)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+### Fjöldi
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    select(ar, stodugildi, starts_with("stg"), -ends_with("svid")) |> 
+    drop_na() |> 
+    pivot_longer(c(-ar, -stodugildi)) |> 
+    group_by(ar) |> 
+    mutate(annad = stodugildi - sum(value)) |> 
+    pivot_wider(names_from = name, values_from = value) |> 
+    pivot_longer(c(-ar, -stodugildi)) |> 
+    mutate(name = fct_reorder(name, value * (name != "annad"))) |> 
+    group_by(ar) |> 
+    mutate(hlutf = value / sum(value)) |> 
+    ungroup() |> 
+    mutate(name = fct_recode(name,
+                             "Annað" = "annad",
+                             "Hjúkrunarfræðingar" = "stg_hjukr",
+                             "Læknar" = "stg_laekna",
+                             "Sjúkraliðar" = "stg_sjukral",
+                             "Sameyki" = "stg_sameyki",
+                             "Sálfræðingar" = "stg_salfr",
+                             "Sjúkraþjálfarar" = "stg_sjukrathj",
+                             "Félagsráðgjafar" = "stg_felrad",
+                             "Lyfjafræðingar" = "stg_lyfjafr",
+                             "Iðjuþjálfar" = "stg_idjuthj",
+                             "Ljósmæður" = "stg_ljosmaedur"),
+           text = str_c("<b>", name, "</b>", "\n",
+                        "Ár: ", ar, "\n",
+                        "Hlutfall: ", percent(hlutf, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "\n",
+                        "<b>Fjöldi: ", number(value, suffix = " stöðugildi", big.mark = ".", decimal.mark = ","), "</b>\n"))
+
+p <- plot_dat |> 
+    ggplot(aes(ar, value, text = text)) +
+    geom_col(aes(fill = name, col = name), width = 1, position = "stack") +
+    scale_x_continuous(expand = expansion(),
+                       breaks = 2010:2021) +
+    scale_y_continuous(expand = expansion(),
+                       labels = label_number(big.mark = ".", decimal.mark = ",")) +
+    scale_colour_brewer(type = "qual", palette = "Paired") +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Fjöldi stöðugilda á Landspítala eftir stéttarfélagi (2010 - 2021)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+
+:::
+
+# Launaútgjöld
+
+Á [rikisreikningur.is](https://rikisreikningur.is) eru gögn um bókhald ríkisstjórnarinnar. Með þeim gögnum getum við skoðað launaútgjöldin til Landspítala og skipt þeim upp eftir dagvinnulaunum, yfirvinnulaunum o.s.f. 
+
+Eitt sem mér finnst vanta í þessu gögn er að sjá launaútgjöldin eftir starfsstétt eða einhverskonar flokkun eftir starfsheitum.
+
+```{r}
+d <- d |> 
+    left_join(lands_laun,by = "ar")
+```
+
+
+:::{.panel-tabset}
+
+## Hlutföll
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    mutate(samtals_per_stg =samtals_laun / stodugildi / 12) |> 
+    group_by(ar) |> 
+    mutate(p = samtals_laun / sum(samtals_laun),
+           heild_per_stg = sum(samtals_per_stg)) |> 
+    ungroup() |> 
+    mutate(tegund_launa = str_to_sentence(tegund_launa) |> 
+               fct_relevel("Yfirvinna",
+                           "Vaktaálagsgreiðslur"),
+           text = str_c("<b>", tegund_launa, "</b>", "\n",
+                        "Ár: ", ar, "\n",
+                        "<b>Hlutfall: ", percent(p, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "</b>\n",
+                        "Mánaðarlaunlaunagjöld per stöðugildi (undirflokkur): ", number(samtals_per_stg, suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
+                        "Mánaðarlaunagjöld per stöðugildi (samtals): ", number(heild_per_stg, suffix = " kr", big.mark = ".", decimal.mark = ","), ""))
+
+
+subtitle_dat <- plot_dat |> 
+    group_by(ar) |> 
+    mutate(p = samtals_laun / sum(samtals_laun)) |> 
+    ungroup() |> 
+    group_by(tegund_launa) |> 
+    summarise(p = mean(p) |> percent()) |> 
+    pivot_wider(names_from = tegund_launa, values_from = p)
+
+p <- plot_dat |> 
+    ggplot(aes(ar, samtals_laun, text = text)) +
+    geom_col(aes(fill = tegund_launa,group = tegund_launa), position = "fill") +
+    scale_x_continuous(expand = expansion(),
+                       breaks = c(2004:2021)) +
+    scale_y_continuous(expand = expansion(),
+                       labels = label_percent()) +
+    scale_fill_brewer(type = "qual", palette = "Set1") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL, 
+         y = NULL,
+         fill = NULL,
+         title = "Hlutfallsleg skipting launaútgjalda Landspítala (2006 - 2021)",
+         subtitle = str_c("Að meðaltali fóru ", 
+                          subtitle_dat$Dagvinnulaun,
+                          " launaútgjalda í dagvinnulaun, ",
+                          subtitle_dat$Vaktaálagsgreiðslur, 
+                          " í vaktaálagsgreiðslur, og ", 
+                          subtitle_dat$Yfirvinna, 
+                          " í yfirvinnu"))
+
+
+
+
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+## Mánaðarleg launagjöld per stöðugildi
+
+Gögnin að neðan eru sýnd á föstu verðlagi 2022.
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    mutate(samtals_per_stg =samtals_laun / stodugildi / 12) |> 
+    group_by(ar) |> 
+    mutate(p = samtals_laun / sum(samtals_laun),
+           heild_per_stg =sum(samtals_per_stg)) |> 
+    ungroup() |> 
+    mutate(tegund_launa = str_to_sentence(tegund_launa) |> 
+               fct_relevel("Yfirvinna",
+                           "Vaktaálagsgreiðslur"),
+           text = str_c("<b>", tegund_launa, "</b>", "\n",
+                        "Ár: ", ar, "\n",
+                        "Hlutfall: ", percent(p, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "</b>\n",
+                        "<b>Mánaðarlaunagjöld per stöðugildi (undirflokkur): ", number(samtals_per_stg, suffix = " kr", big.mark = ".", decimal.mark = ","), "</b>\n",
+                        "<b>Mánaðarlaunagjöld per stöðugildi (samtals): ", number(heild_per_stg, suffix = " kr", big.mark = ".", decimal.mark = ","), "</b>"))
+
+
+subtitle_dat <- plot_dat |> 
+    group_by(ar) |> 
+    mutate(p = samtals_laun / sum(samtals_laun)) |> 
+    ungroup() |> 
+    group_by(tegund_launa) |> 
+    summarise(p = mean(p) |> percent()) |> 
+    pivot_wider(names_from = tegund_launa, values_from = p)
+
+p <- plot_dat |> 
+    ggplot(aes(ar, samtals_per_stg, text = text)) +
+    geom_col(aes(fill = tegund_launa, group = tegund_launa), position = "stack") +
+    scale_x_continuous(expand = expansion(),
+                       breaks = c(2004:2021)) +
+    scale_y_continuous(expand = expansion(),
+                       labels = label_number(suffix = " kr", big.mark = ".", decimal.mark = ","),
+                       breaks = c(3e5, 5e5, 7e5, 9e5, 11e5)) +
+    scale_fill_brewer(type = "qual", palette = "Set1") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL, 
+         y = NULL,
+         fill = NULL,
+         title = "Mánaðarleg launagjöld per stöðugildi  (2006 - 2021)",
+         subtitle = str_c("Að meðaltali fóru ", 
+                          subtitle_dat$Dagvinnulaun,
+                          " launaútgjalda í dagvinnulaun, ",
+                          subtitle_dat$Vaktaálagsgreiðslur, 
+                          " í vaktaálagsgreiðslur, og ", 
+                          subtitle_dat$Yfirvinna, 
+                          " í yfirvinnu"))
+
+
+
+
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+:::
+
+
