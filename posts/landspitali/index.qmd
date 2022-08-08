@@ -361,7 +361,7 @@ ggplotly(
 
 ## Stéttarfélög
 
-Hér má sjá fjölda og hlutföll stöðugilda fyrir fleiri stéttarfélög. Þar sem Sameyki varð ekki til fyrr en 2019 lagði ég saman fjölda stöðugilda hjá viðeigandi stéttarfélögum fyrir þann. 
+Hér má sjá fjölda og hlutföll stöðugilda fyrir fleiri stéttarfélög. Þar sem Sameyki varð ekki til fyrr en 2019 lagði ég saman fjölda stöðugilda hjá viðeigandi stéttarfélögum fyrir þann tíma. 
 
 :::{.panel-tabset}
 
@@ -491,6 +491,12 @@ ggplotly(
 Á [rikisreikningur.is](https://rikisreikningur.is) eru gögn um bókhald ríkisstjórnarinnar. Með þeim gögnum getum við skoðað launaútgjöldin til Landspítala og skipt þeim upp eftir dagvinnulaunum, yfirvinnulaunum o.s.f. 
 
 Eitt sem mér finnst vanta í þessu gögn er að sjá launaútgjöldin eftir starfsstétt eða einhverskonar flokkun eftir starfsheitum.
+
+Eftir leiðréttingu fyrir verðbólgu sjáum við að árið 2006 voru mánaðarleg launaútgjöld spítalans á hvert stöðugildi að meðaltali 923.634 kr. Með því að draga svo frá launatengd gjöld, 159.441 kr, sjáum við að meðallaun starfsfólks fyrir skatt voru 764.193 kr.
+
+Fyrir árið 2021 fáum við mánaðarleg launaútgjöld upp á 1.152.415 kr per stöðugildi. Drögum frá launatengd gjöld, 209.507 kr, og fáum meðallaun fyrir skatt upp á 942.908 kr.
+
+Höfum í huga að yfirvinna og vaktaálagsgreiðslur eru innifaldar í þessum tölum. Meðallaun dagvinnu fóru úr 507.851 kr í 655.700 kr fyrir skatt á sama tímabili og meðallaun án yfirvinnu fóru úr 606.414 kr í 765.350 kr fyrir skatt.
 
 ```{r}
 d <- d |> 
