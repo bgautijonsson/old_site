@@ -57,7 +57,7 @@ library(plotly)
 
 # Gögn
 
-Gögnin eru fengin úr [starfsemisupplýsingum Landspítala](https://www.landspitali.is/um-landspitala/spitalinn-i-tolum/starfsemisupplysingar-lsh/?branch=7ae95bda-92f7-11ec-a2e6-005056865b13){target="_blank"}. Þar sem þetta er allt í PDF skjölum er ég ekki búinn að sækja öll gögnin, en ég birti hérna yfirlit yfir það helsta sem ég hef náð að safna saman. Það er kannski óþarfi að segja það, en það væri mikill kostur ef Landspítali myndi birta töflurnar úr þessum PDF skýrslum t.d. á csv formi, eða sem excell skrár. Seðlabankinn birtir t.d. excell skrár með viðeigandi gögnum samhliða PDF skýrslum sínum.
+Gögnin eru fengin úr [starfsemisupplýsingum Landspítala](https://www.landspitali.is/um-landspitala/spitalinn-i-tolum/starfsemisupplysingar-lsh/?branch=7ae95bda-92f7-11ec-a2e6-005056865b13){target="_blank"}. Þar sem þetta er allt í PDF skjölum er ég ekki búinn að sækja öll gögnin, en ég birti hérna yfirlit yfir það helsta sem ég hef náð að safna saman. Það er kannski óþarfi að segja það, en það væri mikill kostur ef Landspítali myndi birta töflurnar úr þessum PDF skýrslum t.d. á csv formi, eða sem excel skrár. Seðlabankinn birtir t.d. excel skrár með viðeigandi gögnum samhliða PDF skýrslum sínum.
 
 Eitt það besta sem yfirvöld geta gert til að auka traust á rekstri spítalans eða ákvarðanir í kringum hann er að auðvelda almenningi að nálgast upplýsingar um reksturinn. Það er ekki nóg að lesa/heyra í fjölmiðlum að einhver klár manneskja segir eitthvað um reksturinn, það verður að vera hægt að sannreyna þetta.
 
