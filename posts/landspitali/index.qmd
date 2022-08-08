@@ -187,6 +187,17 @@ ggplotly(
                              font = list(color = "#ffffff")))
 ```
 
+Í starfsemisupplýsingum er bent á mikla fjarveru vegna COVID-19 veikinda. Við getum skoðað muninn á veikindahlutföllum 2021 og 2022 eftir starfskjarna spítalans líka.
+
+```{r}
+#| fig-width: 4
+#| out-width: "60%"
+#| fig-align: "center"
+#| fig-cap: "Munur á Jan-Mars veikindahlutföllum 2021 og 2022"
+knitr::include_graphics("veikindi_kjarnar.png")
+```
+
+
 # Hjúkrunarþyngd
 
 Í grófum drætti er hjúkrunarþyngd skráð fyrir hvern sjúkling og hvern dag. Lægsta þyngdin er 1 og hæsta er 5. Landspítalinn birtir svo dreifingu hjúkrunarþungans eða heildarfjölda legudaga í hverjum þyngdarflokki. Nánar um hjúkrunarþyngd í [þessari grein Halldóru Hálfdánardóttur, Elísabetar Guðmundsdóttur og Helgu Bragadóttur.](https://www.hjukrun.is/library/Timarit---Skrar/Timarit/Timarit-2011/4.-tbl-2011/TENGSL%20STARFSMANNAvELTU,%20vEIKINdAFJARvISTA%20HJÚKRUNARFRÆÐINGA%20OG%20HJÚKRUN.pdf){target="_blank"}
@@ -248,46 +259,45 @@ ggplotly(
     layout(hoverlabel = list(align = "left"))
 ```
 
-# Legurými
+# Atvik
 
-## Hlutfall lausra rýma
+Höfum í huga að atvikaskráning er ófullkomin mæling á raunverulegum fjölda atvika, bæði sjúklinga og starfsfólks. Því gæti aukning verið að hluta útskýrð af aukinni atvikaskráningu jafn sem fjölgun atvika.
 
-Á hverjum tímapunkti er mikilvægt að ákveðið hlutfall legurýma sé laust, bæði til að bregðast við slysum, en líka til að geta fært sjúklinga á milli deilda. Við getum reiknað meðaltal hlutfalls lausra rýma með því að reikna meðalfjölda inniliggjandi sjúklinga og deila í með meðalfjölda legurýma yfir árið.
+:::{.panel-tabset}
+
+## Atvik sjúklinga
 
 ```{r}
 #| fig.width: 10
 #| fig.asp: 0.621
 #| out.width: "100%"
 
-
 plot_dat <- d |> 
-    mutate(nyting = medalfjoldi_sjukl/fjoldi_rum,
-           laust_plass = 1 - nyting) |> 
-    drop_na(laust_plass, ar) |> 
-    mutate(text = str_c("Ár: ", ar, "\n",
-                        "Meðalfjöldi rúma: ", fjoldi_rum, "\n",
-                        "Meðalfjöldi inniliggjandi: ", medalfjoldi_sjukl, "\n",
-                        "Hlutfall lausra rúma: ", percent(laust_plass, accuracy = 0.1, 
-                                                          big.mark = ".", decimal.mark = ",")))
+    mutate(hlutfall = 1000 * atvik / legudagar,
+           text = str_c("Ár: ", ar, "\n",
+                        "Atvik: ", number(atvik, big.mark = ".", decimal.mark = ","), "\n",
+                        "Legudagar: ", number(legudagar, big.mark = ".", decimal.mark = ","), "\n",
+                        "Atvik per 1000 legudagar: ", number(hlutfall, accuracy = 0.01,
+                                                      big.mark = ".", decimal.mark = ","))) |> 
+    select(ar, hlutfall, text) |> 
+    drop_na()
 
 
 p <- plot_dat |> 
-    ggplot(aes(ar, laust_plass)) +
-    geom_hline(yintercept = 0.15, lty = 2, alpha= 0.5) +
-    geom_area(aes(text = text, group = "none"), alpha = 0.5, col = "black") +
-    scale_x_continuous(breaks = 2008:2022,
-                       labels = c(2008:2021, "2022\n(Jan-Mars)"),
+    ggplot(aes(ar, hlutfall, text = text)) +
+    geom_area(aes(group = "none"), alpha = 0.5, col = "black") +
+    scale_x_continuous(breaks = 2007:2022,
+                       labels = c(2007:2021, "2022\n(Jan-Mars)"),
                        expand = expansion()) +
-    scale_y_continuous(breaks = c(0, 0.05, 0.1, 0.15, 0.2),
-                       labels = label_percent(),
-                       expand = expansion(),
-                       limits = c(0, 0.2)) +
+    scale_y_continuous(labels = label_number(),
+                       breaks = c(0, seq(10, 31, by = 3)),
+                       limits = c(0, 30),
+                       expand = expansion()) +
     theme_half_open() +
-    theme(plot.title = element_text(face = "bold")) +
+    theme() +
     labs(x = NULL,
-         y = NULL,
-         title = "Hlutfall lausra legurýma á Landspítala (2008 - 2022)")
-
+         y = "Atvik per 100 stöðugildi",
+         title = "Atvik sjúklinga á Landspítala (2012 - 2022)")
 
 ggplotly(
     p,
@@ -296,6 +306,184 @@ ggplotly(
     layout(hoverlabel = list(align = "left",
                              font = list(color = "#ffffff")))
 ```
+
+## Ofbeldisatvik gegn starfsfólki
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+plot_dat <- d |> 
+    mutate(hlutfall = 100 * ofbeldisatvik_starfs / stodugildi,
+           text = str_c("Ár: ", ar, "\n",
+                        "Ofbeldisatvik: ", number(ofbeldisatvik_starfs, big.mark = ".", decimal.mark = ","), "\n",
+                        "Stöðugildi: ", number(stodugildi, big.mark = ".", decimal.mark = ","), "\n",
+                        "Ofbeldisatvik per 100 stöðugildi: ", number(hlutfall, accuracy = 0.01,
+                                                      big.mark = ".", decimal.mark = ","))) |> 
+    select(ar, hlutfall, text) |> 
+    drop_na()
+
+
+p <- plot_dat |> 
+    ggplot(aes(ar, hlutfall, text = text)) +
+    geom_area(aes(group = "none"), alpha = 0.5, col = "black") +
+    scale_x_continuous(breaks = 2007:2022,
+                       labels = c(2007:2021, "2022\n(Jan-Mars)"),
+                       expand = expansion()) +
+    scale_y_continuous(labels = label_number(),
+                       breaks = c(0, seq(7, 23, by = 2)),
+                       limits = c(0, 15),
+                       expand = expansion()) +
+    theme_half_open() +
+    theme() +
+    labs(x = NULL,
+         y = "Atvik per 100 stöðugildi",
+         title = "Ofbeldisatvik gegn starfsfólki á Landspítala (2007 - 2021)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left",
+                             font = list(color = "#ffffff")))
+```
+
+:::
+
+# Starfsmannavelta
+
+
+
+:::{.panel-tabset}
+
+## Læknar
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+plot_dat <- d |> 
+    mutate(laeknavelta = laeknavelta / 100,
+           text = str_c("Ár: ", ar, "\n",
+                        "Læknavelta: ", percent(laeknavelta, big.mark = ".", decimal.mark = ","))) |> 
+    select(ar, laeknavelta, text) |> 
+    drop_na()
+
+
+p <- plot_dat |> 
+    ggplot(aes(ar, laeknavelta, text = text)) +
+    geom_area(aes(group = "none"), alpha = 0.5, col = "black") +
+    scale_x_continuous(breaks = 2007:2022,
+                       labels = c(2007:2021, "2022\n(Jan-Mars)"),
+                       expand = expansion()) +
+    scale_y_continuous(labels = label_percent(big.mark = ".", decimal.mark = ","),
+                       breaks = c(0, seq(0.03, 0.12, by = 0.03)),
+                       limits = c(0, 0.12),
+                       expand = expansion()) +
+    theme_half_open() +
+    theme() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Starfsmannavelta lækna á Landspítala (2007 - 2021)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left",
+                             font = list(color = "#ffffff")))
+```
+
+## Hjúkrunarfræðingar
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+plot_dat <- d |> 
+    mutate(hjukrvelta = hjukrvelta / 100,
+           text = str_c("Ár: ", ar, "\n",
+                        "Hjúkrunarfræðingavelta: ", percent(hjukrvelta, big.mark = ".", decimal.mark = ","))) |> 
+    select(ar, hjukrvelta, text) |> 
+    drop_na()
+
+
+p <- plot_dat |> 
+    ggplot(aes(ar, hjukrvelta, text = text)) +
+    geom_area(aes(group = "none"), alpha = 0.5, col = "black") +
+    scale_x_continuous(breaks = 2007:2022,
+                       labels = c(2007:2021, "2022\n(Jan-Mars)"),
+                       expand = expansion()) +
+    scale_y_continuous(labels = label_percent(big.mark = ".", decimal.mark = ","),
+                       breaks = c(0, seq(0.03, 0.15, by = 0.03)),
+                       limits = c(0, 0.14),
+                       expand = expansion()) +
+    theme_half_open() +
+    theme() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Starfsmannavelta hjúkrunarfræðinga á Landspítala (2007 - 2021)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left",
+                             font = list(color = "#ffffff")))
+```
+
+## Sjúkraliðar
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+plot_dat <- d |> 
+    mutate(sjukralvelta = sjukralvelta / 100,
+           text = str_c("Ár: ", ar, "\n",
+                        "Sjúkraliðavelta: ", percent(sjukralvelta, big.mark = ".", decimal.mark = ","))) |> 
+    select(ar, sjukralvelta, text) |> 
+    drop_na()
+
+
+p <- plot_dat |> 
+    ggplot(aes(ar, sjukralvelta, text = text)) +
+    geom_area(aes(group = "none"), alpha = 0.5, col = "black") +
+    scale_x_continuous(breaks = 2007:2021,
+                       labels = c(2007:2021),
+                       expand = expansion()) +
+    scale_y_continuous(labels = label_percent(big.mark = ".", decimal.mark = ","),
+                       breaks = c(0, seq(0.12, 0.25, by = 0.02)),
+                       limits = c(0, 0.20),
+                       expand = expansion()) +
+    theme_half_open() +
+    theme() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Starfsmannavelta sjúkraliða á Landspítala (2007 - 2021)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left",
+                             font = list(color = "#ffffff")))
+```
+
+:::
+
+
+# Nýting legurýma
+
+Ég vildi skrifa um nýtingu legurýma á Landspítala, en þau gögn eru ekki til eða allavega ekki aðgengileg. Ég bendi í stað þess á [Bréf til blaðsins. Skortur á legurými fyrir bráðveika á Landspítala](https://www.laeknabladid.is/tolublod/2021/12/nr/7909) og greinina [Bráð vandamál Landspítala eftir Martin Inga Sigurðsson, Elías Sæbjörn Eyþórsson,  Theódór Skúla Sigurðsson og Runólfur Pálsson](https://www.laeknabladid.is/tolublod/2021/09/nr/7790), sem birtust í Læknablaðinu í fyrra.
+
+Í fyrrnefndum skrifum birtist eftirfarandi mynd
+
+![Tafla frá: Bréf til blaðsins. Skortur á legurými fyrir bráðveika á Landspítala (Læknablaðið 12. tölublað, 107. árgangur 2021)](nyting_ryma.png)
 
 # Stöðugildi
 
@@ -641,4 +829,11 @@ ggplotly(
 
 :::
 
+# Niðurlag
 
+Það vantar meiri og betri gögn frá Landspítala. Þau gögn sem birtast gera það í miðjum PDF skýrslum sem gerir fólki óþarflega erfitt fyrir að skoða þau. Hvernig er nýting legurýma? Hvaða hlutfall launa fer í þessi margræddu millistjórnendastörf?
+
+Gögn um laun og fjármál má finna á [rikisreikningur.is](https://rikisreikningur.is), en þau eru ekki nógu nákvæm. Við getum ekki séð hvert launaútgjöldin fara á Landspítala, bara skiptingu þeirra í dagvinnu o.s.f. Til samanburðar [gat ég auðveldlega fundið hlutfall launaútgjalda Reykjavíkurborgar sem fara í eitthvað sem gæti kallast "skrifstofustörf"](https://twitter.com/bggjonsson/status/1521228214655410176).
+
+
+Eins og Onora O'Neill sagði: [Við getum ekki óskað eftir því að okkur sé treyst, við getum bara sýnt að við séum traustsins virði og leyft traustinu að vaxa af sjálfsdáðum](https://www.youtube.com/watch?v=1PNX6M_dVsk). Til þess þarf opin og aðgengileg gögn, og gegnsæa aðferðafræði sem er auðvelt að endurtaka. Mikilvægast er að gera það auðvelt fyrir aðra að taka eftir og tilkynna þegar við höfum rangt fyrir okkur.
