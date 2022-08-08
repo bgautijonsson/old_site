@@ -187,7 +187,7 @@ ggplotly(
                              font = list(color = "#ffffff")))
 ```
 
-Í starfsemisupplýsingum er bent á mikla fjarveru vegna COVID-19 veikinda. Við getum skoðað muninn á veikindahlutföllum 2021 og 2022 eftir starfskjarna spítalans líka.
+Í starfsemisupplýsingum er bent á mikla fjarveru vegna COVID-19 veikinda Jan-Mars 2022. Við getum því skoðað muninn á veikindahlutföllum 2021 og 2022 eftir starfskjarna spítalans líka til að athuga hvort þetta sé bundið við ákveðnar starfsemistegundir.
 
 ```{r}
 #| fig-width: 4
