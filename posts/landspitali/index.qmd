@@ -259,7 +259,7 @@ ggplotly(
 
 # Atvik
 
-Höfum í huga að atvikaskráning er ófullkomin mæling á raunverulegum fjölda atvika, bæði sjúklinga og starfsfólks. Því gæti aukning verið að hluta útskýrð af aukinni atvikaskráningu jafn sem fjölgun atvika.
+Höfum í huga að atvikaskráning er ófullkomin mæling á raunverulegum fjölda atvika, bæði sjúklinga og starfsfólks. Því gæti aukning verið að hluta útskýrð af aukinni atvikaskráningu jafnt sem fjölgun atvika. Á hinn bóginn gæti flókið kerfi atvikaskráninga líka haft letjandi áhrif svo að atvikum hafi fjölgað meira en virðist vera.
 
 :::{.panel-tabset}
 
@@ -386,6 +386,10 @@ p <- plot_dat |>
          y = NULL,
          title = "Starfsmannavelta lækna á Landspítala (2007 - 2021)")
 
+ggsave(p + theme(plot.margin = margin(t = 5, r = 15, b = 5, l = 5)),
+       filename = "laeknavelta.png", 
+       width = 8, height = 0.5 * 8, scale = 1.3, bg = "white")
+
 ggplotly(
     p,
     tooltip = "text"
@@ -425,6 +429,10 @@ p <- plot_dat |>
          y = NULL,
          title = "Starfsmannavelta hjúkrunarfræðinga á Landspítala (2007 - 2021)")
 
+ggsave(p + theme(plot.margin = margin(t = 5, r = 15, b = 5, l = 5)),
+       filename = "hjukrveltavelta.png", 
+       width = 8, height = 0.5 * 8, scale = 1.3, bg = "white")
+
 ggplotly(
     p,
     tooltip = "text"
@@ -463,6 +471,10 @@ p <- plot_dat |>
     labs(x = NULL,
          y = NULL,
          title = "Starfsmannavelta sjúkraliða á Landspítala (2007 - 2021)")
+
+ggsave(p + theme(plot.margin = margin(t = 5, r = 15, b = 5, l = 5)),
+       filename = "sjukralvelta.png", 
+       width = 8, height = 0.5 * 8, scale = 1.3, bg = "white")
 
 ggplotly(
     p,
@@ -678,11 +690,7 @@ ggplotly(
 
 Eitt sem mér finnst vanta í þessu gögn er að sjá launaútgjöldin eftir starfsstétt eða einhverskonar flokkun eftir starfsheitum.
 
-Eftir leiðréttingu fyrir verðbólgu sjáum við að árið 2006 voru mánaðarleg launaútgjöld spítalans á hvert stöðugildi að meðaltali 923.634 kr. Með því að draga svo frá launatengd gjöld, 159.441 kr, sjáum við að meðallaun starfsfólks fyrir skatt voru 764.193 kr.
 
-Fyrir árið 2021 fáum við mánaðarleg launaútgjöld upp á 1.152.415 kr per stöðugildi. Drögum frá launatengd gjöld, 209.507 kr, og fáum meðallaun fyrir skatt upp á 942.908 kr.
-
-Höfum í huga að yfirvinna og vaktaálagsgreiðslur eru innifaldar í þessum tölum. Meðallaun dagvinnu fóru úr 507.851 kr í 655.700 kr fyrir skatt á sama tímabili og meðallaun án yfirvinnu fóru úr 606.414 kr í 765.350 kr fyrir skatt.
 
 ```{r}
 d <- d |> 
@@ -693,6 +701,16 @@ d <- d |>
 :::{.panel-tabset}
 
 ## Hlutföll
+
+```{r}
+prosentur_text <- lands_laun |> 
+    count(tegund_launa, wt = samtals_laun) |> 
+    mutate(n = percent(n / sum(n))) |> 
+    pivot_wider(names_from = tegund_launa, values_from = n)
+```
+
+Á tímabilinu fóru `r prosentur_text[["Yfirvinna"]]` launaútgjalda í yfirvinnu, `r prosentur_text[["Vaktaálagsgreiðslur"]]` í vaktaálagsgreiðslur, `r prosentur_text[["Launatengd gjöld"]]` í launatengd gjöld og `r prosentur_text[["Dagvinnulaun"]]` í dagvinnulaun.
+
 
 ```{r}
 #| fig.width: 10
@@ -715,15 +733,6 @@ plot_dat <- d |>
                         "Mánaðarlaunlaunagjöld per stöðugildi (undirflokkur): ", number(samtals_per_stg, suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
                         "Mánaðarlaunagjöld per stöðugildi (samtals): ", number(heild_per_stg, suffix = " kr", big.mark = ".", decimal.mark = ","), ""))
 
-
-subtitle_dat <- plot_dat |> 
-    group_by(ar) |> 
-    mutate(p = samtals_laun / sum(samtals_laun)) |> 
-    ungroup() |> 
-    group_by(tegund_launa) |> 
-    summarise(p = mean(p) |> percent()) |> 
-    pivot_wider(names_from = tegund_launa, values_from = p)
-
 p <- plot_dat |> 
     ggplot(aes(ar, samtals_laun, text = text)) +
     geom_col(aes(fill = tegund_launa,group = tegund_launa), position = "fill") +
@@ -739,16 +748,18 @@ p <- plot_dat |>
          fill = NULL,
          title = "Hlutfallsleg skipting launaútgjalda Landspítala (2006 - 2021)",
          subtitle = str_c("Að meðaltali fóru ", 
-                          subtitle_dat$Dagvinnulaun,
+                          prosentur_text$Dagvinnulaun,
                           " launaútgjalda í dagvinnulaun, ",
-                          subtitle_dat$Vaktaálagsgreiðslur, 
+                          prosentur_text$Vaktaálagsgreiðslur, 
                           " í vaktaálagsgreiðslur, og ", 
-                          subtitle_dat$Yfirvinna, 
+                          prosentur_text$Yfirvinna, 
                           " í yfirvinnu"))
 
 
 
-
+ggsave(p + theme(legend.position = "right"),
+       filename = "laun_hlutf.png",
+       width = 8, height = 0.5 * 9, scale = 1.3, bg = "white")
 
 ggplotly(
     p,
@@ -758,6 +769,12 @@ ggplotly(
 ```
 
 ## Mánaðarleg launagjöld per stöðugildi
+
+Eftir leiðréttingu fyrir verðbólgu sjáum við að árið 2006 voru mánaðarleg launaútgjöld spítalans á hvert stöðugildi að meðaltali 923.634 kr. Með því að draga svo frá launatengd gjöld, 159.441 kr, sjáum við að meðallaun starfsfólks fyrir skatt voru 764.193 kr.
+
+Fyrir árið 2021 fáum við mánaðarleg launaútgjöld upp á 1.152.415 kr per stöðugildi. Drögum frá launatengd gjöld, 209.507 kr, og fáum meðallaun fyrir skatt upp á 942.908 kr.
+
+Höfum í huga að yfirvinna og vaktaálagsgreiðslur eru innifaldar í þessum tölum. Meðallaun dagvinnu fóru úr 507.851 kr í 655.700 kr fyrir skatt á sama tímabili og meðallaun án yfirvinnu fóru úr 606.414 kr í 765.350 kr fyrir skatt.
 
 Gögnin að neðan eru sýnd á föstu verðlagi 2022.
 
