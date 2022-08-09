@@ -23,11 +23,7 @@ execute:
   warning: false
   cache: true
 editor: source
-theme: flatly
-draft: false
 title-block-banner: true
-standalone: true
-self-contained: true
 categories:
     - fasteignir
     - efnahagur

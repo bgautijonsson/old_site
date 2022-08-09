@@ -23,10 +23,7 @@ execute:
   warning: false
   cache: true
 editor: source
-theme: flatly
 title-block-banner: true
-standalone: true
-self-contained: true
 categories:
     - orkumál
     - R

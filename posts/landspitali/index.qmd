@@ -2,7 +2,7 @@
 title: "Landspítalinn"
 subtitle: "Hvaða upplýsingar eru til um rekstur Landspítalans og hvar má finna þær?"
 description: |
-    Hér ætla ég aðeins að skoða hvaða gögn eru til um rekstur landspítalans, hvar má finna þau og hvað mætti betur fara í birtingu þeirra gagna.
+    Hvernig er nýting legurýma á Landspítala? Hvaða hlutfall launa fer í þessi margræddu millistjórnendastörf? Hér ætla ég aðeins að skoða hvaða gögn eru til um rekstur landspítalans, hvar má finna þau og hvað mætti betur fara í birtingu þeirra gagna.
 author: 
     -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
         url: "https://twitter.com/bgautijonsson"
@@ -22,11 +22,7 @@ execute:
   warning: false
   cache: false
 editor: source
-theme: flatly
-draft: false
 title-block-banner: true
-standalone: true
-self-contained: true
 categories:
     - landspítali
     - R
