@@ -294,7 +294,7 @@ p <- plot_dat |>
     theme_half_open() +
     theme() +
     labs(x = NULL,
-         y = "Atvik per 100 stöðugildi",
+         y = "Atvik per 1000 legudagar",
          title = "Atvik sjúklinga á Landspítala (2012 - 2022)")
 
 ggplotly(
