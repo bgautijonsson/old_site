@@ -22,9 +22,9 @@ categories:
     - efnahagur
     - R
     - íslenska
-image: "dreifing.png"
+image: dreifing.png
 twitter-card:
-    image: "dreifing.png"
+    image: dreifing.png
 ---
 
 

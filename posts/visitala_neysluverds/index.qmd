@@ -27,7 +27,6 @@ categories:
 image: undirtolur.png
 twitter-card:
     image: undirtolur.png
-    image-width: 2400
 ---
 
 ```{r}

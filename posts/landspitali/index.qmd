@@ -8,7 +8,7 @@ author:
         url: "https://twitter.com/bgautijonsson"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
-date: "2022/08/08"
+date: "2022/08/09"
 format: 
     html:
         code-fold: true
@@ -17,6 +17,8 @@ format:
         toc-location: right
         toc-title: Efnisyfirlit
         page-layout: full
+        smooth-scroll: true
+        link-external-newwindow: true
 execute: 
   echo: true
   warning: false

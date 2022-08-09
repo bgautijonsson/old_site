@@ -28,9 +28,9 @@ categories:
     - orkumál
     - R
     - íslenska
-image: "throun_fossil.png"
+image: throun_fossil.png
 twitter-card:
-    image: "throun_fossil.png"
+    image: throun_fossil.png
 ---
 
 

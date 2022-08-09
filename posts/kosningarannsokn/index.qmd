@@ -23,9 +23,9 @@ execute:
   echo: true
   warning: false
 title-block-banner: true
-image: "flokkshollusta.png"
+image: flokkshollusta.png
 twitter-card:
-    image: "flokkshollusta.png"
+    image: flokkshollusta.png
 categories:
     - R
     - kosningar
