@@ -1,0 +1,127 @@
+---
+title: "Stjórnsýsla í heilbrigðiskerfinu"
+subtitle: "Hvaða hlutfall útgjalda í heilbrigðiskerfinu er merkt stjórnsýslu og fjármögnun heilbrigðiskerfa?"
+author: 
+    -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
+        url: "https://twitter.com/bgautijonsson"
+        affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
+        affiliation-url: "https://www.hi.is/tolfraedi_0"
+date: "2022/08/10"
+format: 
+    html:
+        code-fold: true
+        toc: true
+        toc-depth: 2
+        toc-location: right
+        toc-title: Efnisyfirlit
+        page-layout: full
+        smooth-scroll: true
+        link-external-newwindow: true
+execute: 
+  echo: true
+  warning: false
+  cache: false
+editor: source
+title-block-banner: true
+categories:
+    - landspítali
+    - R
+    - íslenska
+image: stjornsysl.png
+twitter-card: 
+    image: stjornsysl.png
+---
+
+
+```{r}
+#| include: false
+
+library(cowplot)
+library(tidyverse)
+library(scales)
+library(pxweb)
+library(ggthemes)
+library(kableExtra)
+library(gganimate)
+library(lubridate)
+library(geomtextpath)
+library(ggtext)
+library(readxl)
+library(janitor)
+library(plotly)
+```
+
+# Heilbrigðisútgjöld til stjórnsýslu
+
+Hér nota ég gögn Hagstofu um [rekstrarútgjöld til heilbrigðismála eftir tegund þjónustu og fjármögnun 2003-2020](https://px.hagstofa.is/pxis/pxweb/is/Efnahagur/Efnahagur__fjaropinber__fjarmal_heilbr/THJ05551.px). Einn flokkur í *"Tegund þjónustu"* er `HC.7 Stjórnsýsla og fjármögnun heilbrigðiskerfa`. Hagstofan birtir þessar tölur bara í krónum eða sem hlutfall af landsframleiðslu, en við getum náð í gögnin og reiknað hlutfall útgjalda sem fara í þennan flokk sjálf.
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- pxweb_get(
+    url ="https://px.hagstofa.is:443/pxis/api/v1/is/Efnahagur/fjaropinber/fjarmal_heilbr/THJ05551.px", 
+    query = list(
+        "Fjármögnun (HF)" = c("*"),
+        "Tegund þjónustu (HC)"  = c("*"),
+        "Eining" = c("*"),
+        "Ár" = c("*")
+    ),
+    verbose = FALSE
+) |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    janitor::clean_names() |> 
+    filter(str_detect(fjarmognun_hf, "Hið"),
+           str_detect(tegund_thjonustu_hc, "^HC\\.[0-9] "),
+           str_detect(eining, "millj")) |> 
+    rename(value = 5) |> 
+    select(tegund = 2, 4, 5) |> 
+    mutate(ar = parse_number(ar)) |> 
+    mutate(tegund = str_sub(tegund, start = 6)) |> 
+    group_by(ar) |> 
+    mutate(hlutf = value / sum(value)) |> 
+    ungroup() |> 
+    filter(str_detect(tegund, "Stjórnsýsla")) |> 
+    mutate(text = str_c("Ár: ", ar, "\n",
+                        "Hlutfall: ", percent(hlutf, 
+                                              accuracy = 0.1,
+                                              big.mark = ".",
+                                              decimal.mark = ","), "\n",
+                        "Magn: ", number(value * 1e6, 
+                                         suffix = " kr", big.mark = ".", decimal.mark = ",")))
+
+p <- plot_dat |> 
+    ggplot(aes(ar, hlutf, text = text)) +
+    geom_line(aes(group = "none")) +
+    scale_x_continuous(breaks = c(2005, 2010, 2015, 2020)) +
+    scale_y_continuous(labels = label_percent(accuracy = 0.1),
+                       breaks = pretty_breaks(5),
+                       limits = c(0, 0.03),
+                       expand = expansion()) +
+    theme_half_open() +
+    theme(title = element_text(face = "bold", size = 12)) +
+    labs(x = NULL, y = NULL,
+         title = "Hlutfall heilbrigðisútgjalda merkt \"Stjórnsýslu og fjármögnun heilbrigðiskerfa\"")
+
+ggsave(p + 
+           theme_tufte() + 
+           geom_rangeframe() +
+           scale_x_continuous(breaks = 2002:2020) +
+           scale_y_continuous(breaks = c(range(plot_dat$hlutf),0,  0.015, 0.02, 0.025),
+                              labels = label_percent(accuracy = 0.1, big.mark = ".",
+                                                     decimal.mark = ","),
+                              limits = c(0, 0.025),
+                              expand = expansion()) +
+           theme(plot.title = element_text(face = "bold")),
+       filename = "stjornsysl.png",
+       width = 8, height = 0.5 * 8, scale = 1.3, bg = "white")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
