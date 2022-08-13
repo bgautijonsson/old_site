@@ -1,12 +1,14 @@
 ---
 title: "Stjórnsýsla í heilbrigðiskerfinu"
 subtitle: "Hvaða hlutfall útgjalda í heilbrigðiskerfinu er merkt stjórnsýslu og fjármögnun heilbrigðiskerfa?"
+description: |
+    Hér skoða ég hlutfall útgjalda heilbrigðiskerfisins sem er merkt stjórnsýslu og fjármögnun heilbrigðiskerfa. Ég teikna svo sama hlutfallið í Noregi, Svíþjóð og Danmörku til viðmiðunar.
 author: 
     -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
         url: "https://twitter.com/bgautijonsson"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
-date: "2022/08/10"
+date: "2022/08/13"
 format: 
     html:
         code-fold: true
@@ -22,7 +24,7 @@ execute:
   warning: false
   cache: false
 editor: source
-draft: true
+draft: false
 title-block-banner: true
 categories:
     - landspítali
@@ -55,7 +57,7 @@ library(plotly)
 
 # Heilbrigðisútgjöld til stjórnsýslu
 
-Hér nota ég gögn Hagstofu um [rekstrarútgjöld til heilbrigðismála eftir tegund þjónustu og fjármögnun 2003-2020](https://px.hagstofa.is/pxis/pxweb/is/Efnahagur/Efnahagur__fjaropinber__fjarmal_heilbr/THJ05551.px). Einn flokkur í *"Tegund þjónustu"* er `HC.7 Stjórnsýsla og fjármögnun heilbrigðiskerfa`. Hagstofan birtir þessar tölur bara í krónum eða sem hlutfall af landsframleiðslu, en við getum náð í gögnin og reiknað hlutfall útgjalda sem fara í þennan flokk sjálf.
+Hér nota ég gögn Hagstofu um [rekstrarútgjöld til heilbrigðismála eftir tegund þjónustu og fjármögnun 2003-2020](https://px.hagstofa.is/pxis/pxweb/is/Efnahagur/Efnahagur__fjaropinber__fjarmal_heilbr/THJ05551.px) auk gagna frá hagstofum annarra norðurlanda um sama málaflokk. Einn flokkur í *"Tegund þjónustu"* er `HC.7 Stjórnsýsla og fjármögnun heilbrigðiskerfa`. Hagstofan birtir þessar tölur bara í krónum eða sem hlutfall af landsframleiðslu, en við getum náð í gögnin og reiknað hlutfall útgjalda sem fara í þennan flokk sjálf.
 
 ```{r}
 island <- pxweb_get(
@@ -163,29 +165,30 @@ plot_dat <- island |>
 p <- plot_dat |> 
     ggplot(aes(ar, hlutf, text = text)) +
     geom_line(aes(group = land, col = land)) +
-    geom_text(data = plot_dat |> group_by(land) |> filter(ar == max(ar)) |> ungroup(),
-              aes(label = land),
-              hjust = 0, nudge_x = 2) +
     scale_x_continuous(breaks = c(2005, 2010, 2015, 2020)) +
     scale_y_continuous(labels = label_percent(accuracy = 0.1),
                        breaks = pretty_breaks(5),
                        limits = c(0, 0.06),
                        expand = expansion()) +
-    scale_colour_manual(values = c("Red",
-                                   "Blue",
-                                   "Red",
-                                   "Yellow")) +
+    scale_colour_manual(values = c("#d95f02",
+                                   "#377eb8",
+                                   "#e41a1c",
+                                   "#ffff99")) +
     theme_half_open() +
     theme(title = element_text(face = "bold", size = 12),
-          legend.position = "none") +
-    labs(x = NULL, y = NULL,
+          legend.position = "right") +
+    labs(x = NULL, y = NULL, col = NULL,
          title = "Hlutfall heilbrigðisútgjalda merkt \"Stjórnsýslu og fjármögnun heilbrigðiskerfa\"")
 
 ggsave(p + 
            theme_tufte() + 
            geom_rangeframe() +
-           scale_x_continuous(breaks = 2002:2020) +
-           scale_y_continuous(breaks = c(range(plot_dat$hlutf),0,  0.015, 0.02, 0.025),
+           geom_text(data = plot_dat |> group_by(land) |> filter(ar == max(ar)) |> ungroup(),
+                     aes(label = land, col = land),
+                     hjust = 0, nudge_x = 0.1) + 
+           scale_x_continuous(breaks = 2002:2021,
+                              limits = c(NA, 2022)) +
+           scale_y_continuous(breaks = c(range(plot_dat$hlutf),0,   0.02, 0.03, 0.04, 0.05),
                               labels = label_percent(accuracy = 0.1, big.mark = ".",
                                                      decimal.mark = ","),
                               limits = c(0, 0.06),
@@ -196,7 +199,8 @@ ggsave(p +
        width = 8, height = 0.5 * 8, scale = 1.3, bg = "white")
 
 ggplotly(
-    p,
+    p
+    ,
     tooltip = "text"
 ) |> 
     layout(hoverlabel = list(align = "left"))
