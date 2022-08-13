@@ -22,6 +22,7 @@ execute:
   warning: false
   cache: false
 editor: source
+draft: true
 title-block-banner: true
 categories:
     - landspítali
@@ -36,6 +37,7 @@ twitter-card:
 ```{r}
 #| include: false
 
+library(pxR)
 library(cowplot)
 library(tidyverse)
 library(scales)
@@ -56,12 +58,7 @@ library(plotly)
 Hér nota ég gögn Hagstofu um [rekstrarútgjöld til heilbrigðismála eftir tegund þjónustu og fjármögnun 2003-2020](https://px.hagstofa.is/pxis/pxweb/is/Efnahagur/Efnahagur__fjaropinber__fjarmal_heilbr/THJ05551.px). Einn flokkur í *"Tegund þjónustu"* er `HC.7 Stjórnsýsla og fjármögnun heilbrigðiskerfa`. Hagstofan birtir þessar tölur bara í krónum eða sem hlutfall af landsframleiðslu, en við getum náð í gögnin og reiknað hlutfall útgjalda sem fara í þennan flokk sjálf.
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
-
-
-plot_dat <- pxweb_get(
+island <- pxweb_get(
     url ="https://px.hagstofa.is:443/pxis/api/v1/is/Efnahagur/fjaropinber/fjarmal_heilbr/THJ05551.px", 
     query = list(
         "Fjármögnun (HF)" = c("*"),
@@ -85,24 +82,102 @@ plot_dat <- pxweb_get(
     mutate(hlutf = value / sum(value)) |> 
     ungroup() |> 
     filter(str_detect(tegund, "Stjórnsýsla")) |> 
-    mutate(text = str_c("Ár: ", ar, "\n",
+    select(ar, hlutf) |> 
+    mutate(land = "Ísland")
+
+
+swe <- pxweb_get("https://api.scb.se/OV0104/v1/doris/en/ssd/START/NR/NR0109/HCHF",
+                 query = list(
+                     "HC" = c("HC.7", "HC.0 - HC.7"),
+                     "Finansiar" = c("HF.1.1.1", "HF.1.1.2.1", "HF1.1.2.2+HF1.1.2.3"),
+                     "ContentsCode" = c("000001ZO"),
+                     "Tid" = c("*")
+                 )) |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    janitor::clean_names() |> 
+    count(function_of_health_care, year, wt = x2_total_health_care_expenditures_sek_million) |> 
+    rename(type = 1) |> 
+    mutate(type = str_sub(type, end = 3)) |> 
+    pivot_wider(names_from = type, values_from = n) |> 
+    mutate(hlutf = Gov / Tot,
+           year = parse_number(year),
+           land = "Svíþjóð") |> 
+    select(land, ar = year, hlutf)
+
+
+nor <- pxweb_get("https://data.ssb.no/api/v0/en/table/11743/",
+                 query = list("Sektor" = c("6100", "6500"),
+                              "MedisinKost" = c("HC.1-HC.7", "HC.7"),
+                              "ContentsCode" = c("BelopLopende"),
+                              "Tid" = c("*"))) |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    janitor::clean_names() |> 
+    count(function_of_care, year, wt = health_expenditure_in_current_prices) |> 
+    rename(type = 1) |> 
+    mutate(year = parse_number(year),
+           type = str_sub(type, end = 3)) |> 
+    pivot_wider(names_from = type, values_from = n) |> 
+    mutate(hlutf = Gov / Cur,
+           land = "Noregur") |> 
+    select(land, ar = year, hlutf)
+
+
+danmork <- read.px("dk.px") |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    janitor::clean_names() |> 
+    rename(type = 2) |> 
+    count(time, type, wt = value) |> 
+    mutate(type = ifelse(str_detect(type, "^7"), "stjorns", "alls")) |> 
+    pivot_wider(names_from = type, values_from = n) |> 
+    mutate(hlutf = stjorns / alls,
+           time = parse_number(as.character(time)),
+           land = "Danmörk") |> 
+    select(ar = time, hlutf, land)
+
+
+
+plot_dat <- island |> 
+    bind_rows(
+        swe,
+        nor,
+        danmork
+    ) |> 
+    mutate(text = str_c("<b>", land, "</b>\n",
+                        "Ár: ", ar, "\n",
                         "Hlutfall: ", percent(hlutf, 
                                               accuracy = 0.1,
                                               big.mark = ".",
-                                              decimal.mark = ","), "\n",
-                        "Magn: ", number(value * 1e6, 
-                                         suffix = " kr", big.mark = ".", decimal.mark = ",")))
+                                              decimal.mark = ","), "\n"))
+```
+
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
 
 p <- plot_dat |> 
     ggplot(aes(ar, hlutf, text = text)) +
-    geom_line(aes(group = "none")) +
+    geom_line(aes(group = land, col = land)) +
+    geom_text(data = plot_dat |> group_by(land) |> filter(ar == max(ar)) |> ungroup(),
+              aes(label = land),
+              hjust = 0, nudge_x = 2) +
     scale_x_continuous(breaks = c(2005, 2010, 2015, 2020)) +
     scale_y_continuous(labels = label_percent(accuracy = 0.1),
                        breaks = pretty_breaks(5),
-                       limits = c(0, 0.03),
+                       limits = c(0, 0.06),
                        expand = expansion()) +
+    scale_colour_manual(values = c("Red",
+                                   "Blue",
+                                   "Red",
+                                   "Yellow")) +
     theme_half_open() +
-    theme(title = element_text(face = "bold", size = 12)) +
+    theme(title = element_text(face = "bold", size = 12),
+          legend.position = "none") +
     labs(x = NULL, y = NULL,
          title = "Hlutfall heilbrigðisútgjalda merkt \"Stjórnsýslu og fjármögnun heilbrigðiskerfa\"")
 
@@ -113,9 +188,10 @@ ggsave(p +
            scale_y_continuous(breaks = c(range(plot_dat$hlutf),0,  0.015, 0.02, 0.025),
                               labels = label_percent(accuracy = 0.1, big.mark = ".",
                                                      decimal.mark = ","),
-                              limits = c(0, 0.025),
+                              limits = c(0, 0.06),
                               expand = expansion()) +
-           theme(plot.title = element_text(face = "bold")),
+           theme(plot.title = element_text(face = "bold"),
+                 legend.position = "none"),
        filename = "stjornsysl.png",
        width = 8, height = 0.5 * 8, scale = 1.3, bg = "white")
 

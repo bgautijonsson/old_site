@@ -489,7 +489,7 @@ ggplotly(
 
 # Nýting legurýma
 
-Ég vildi skrifa um nýtingu legurýma á Landspítala, en þau gögn eru ekki til eða allavega ekki aðgengileg. Ég bendi í stað þess á [Bréf til blaðsins. Skortur á legurými fyrir bráðveika á Landspítala](https://www.laeknabladid.is/tolublod/2021/12/nr/7909) og greinina [Bráð vandamál Landspítala eftir Martin Inga Sigurðsson, Elías Sæbjörn Eyþórsson,  Theódór Skúla Sigurðsson og Runólfur Pálsson](https://www.laeknabladid.is/tolublod/2021/09/nr/7790), sem birtust í Læknablaðinu í fyrra.
+Ég vildi skrifa um nýtingu legurýma á Landspítala, en þau gögn eru ekki til eða allavega ekki aðgengileg. Ég bendi í stað þess á [Bréf til blaðsins. Skortur á legurými fyrir bráðveika á Landspítala](https://www.laeknabladid.is/tolublod/2021/12/nr/7909){target="_blank"} og greinina [Bráð vandamál Landspítala eftir Martin Inga Sigurðsson, Elías Sæbjörn Eyþórsson,  Theódór Skúla Sigurðsson og Runólfur Pálsson](https://www.laeknabladid.is/tolublod/2021/09/nr/7790){target="_blank"}, sem birtust í Læknablaðinu í fyrra.
 
 Í fyrrnefndum skrifum birtist eftirfarandi mynd
 
@@ -497,11 +497,11 @@ ggplotly(
 
 # Stöðugildi
 
-Hér tek ég saman gögn um fjölda stöðugilda á Landspítala eftir stéttarfélögum.
+Hér tek ég saman gögn úr starfsemisupplýsingum um fjölda stöðugilda á Landspítala eftir stéttarfélögum, og gögn úr ýmsum fréttatilkynningum um hlutföll stjórnenda og stoðþjónustu.
 
 ## Læknar, Hjúkrunarfræðingar og Sjúkraliðar
 
-Í fréttum hefur verið talað um að of mikið starfsfólk sé ekki beintengt umönnun sjúklinga. Ein tilraun til að sannreyna þetta er að reikna hlutfall stöðugilda sem eru ekki hjúkrunarfræðingar, læknar eða sjúkraliðar. Aðrar fagstéttir tengjast líka sjúklingum beint *(t.d. sálfræðingar, lyfjafræðingar, meinafræðingar og sjúkraþjálfararar)*, en til einföldunar skoðum við hérna þessar þrjár stóru stéttir.
+Í fréttum hefur verið talað um að of mikið starfsfólk sé ekki beintengt umönnun sjúklinga. Ein tilraun til að sannreyna þetta er að reikna hlutfall stöðugilda sem eru ekki hjúkrunarfræðingar, læknar eða sjúkraliðar. Þess ber þó að geta að meðlimir þessara stéttarfélaga geta líka sinnt stjórnenda/skrifstofustörfum að hluta til eða öllu leyti. Aðrar fagstéttir tengjast líka sjúklingum beint *(t.d. sálfræðingar, lyfjafræðingar, meinafræðingar og sjúkraþjálfararar)*, en til einföldunar skoðum við hérna þessar þrjár stóru stéttir.
 
 ```{r}
 #| fig.width: 10
@@ -684,9 +684,225 @@ ggplotly(
 
 :::
 
+
+
+## Stoðþjónusta (Yfirstjórn/stjórnsýsla)
+
+Texti og gögn frá [Spurt og svarað um Landspítala](https://www.landspitali.is/um-landspitala/fjolmidlatorg/spurt-og-svarad-um-landspitala/) þar sem er m.a. vitnað í skýrslu McKinsey frá 2020.
+
+>Stjórnendur við Landspítala eru ríflega 200 talsins en starfsmenn um 6000 í rúmlega 4500 stöðugildum, að meðaltali einn stjórnandi á hverja 26 starfsmenn. Samkvæmt hinu erlenda ráðgjafarfyrirtæki McKinsey er „yfirstjórn/stjórnsýsla“ hlutfallslega minnst á Landspítala (13,2%) borið saman við Sjúkrahúsið á Akureyri (15,5%) og erlend samanburðarsjúkrahús (allt að 21,2%).
+
+>Í stoðþjónustu á Landspítala voru 602 stöðugildi árið 2020 sem gerir 13,5% af heildarfjölda stöðugilda það árið (4462 stg). Þetta er sambærilegt hlutfall og á Sjúkrahúsinu á Akureyri og einnig því samanburðarsjúkrahúsi sem valið var til samanburðar í skýrslu McKinsey frá árinu 2020.  
+
+>Þrátt fyrir að koma ekki beint að þjónustu við sjúklinga gegnir þetta starfsfólk engu að síður mikilvægu hlutverki. Þannig verður spítali ekki rekinn án fólks sem býr til mat handa sjúklingum, útvegar fatnað handa hjúkrunarfræðingum, reiknar laun handa sjúkraliðum, tæknifólks sem viðheldur öndunarvélum, forriturum sem passa upp á sjúkraskrár og svo framvegis. Þess má geta að á árunum eftir hrun var sérstaklega skorið niður í hópi þessara starfsmanna. 
+
+>Þannig var hlutfall starfsmanna í stoðþjónustu af heildarfjölda stöðugilda 16,3% árið 2008 en er sem fyrr segir 13,5% árið 2021. Það er sérstakt markmið stjórnenda Landspítala að fjölga starfsfólki í stoðþjónustu svo faglært starfsfólk geti einbeitt sér að beinni þjónustu við sjúklinga og starfað í samræmi við menntun sína (e. Working from the top of your licence).
+
+
+:::{.panel-tabset}
+
+### Hlutfall
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    select(ar, hlutf_stodtj, stodugildi) |> 
+    drop_na() |> 
+    mutate(text = str_c("Ár: ", ar, "\n",
+                        "<b>Hlutfall: ", percent(hlutf_stodtj, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "</b>\n",
+                        "Fjöldi: ", number(hlutf_stodtj * stodugildi, suffix = " stöðugildi", big.mark = ".", decimal.mark = ","), "\n")) |> 
+    drop_na()
+
+p <- plot_dat |> 
+    ggplot(aes(ar, hlutf_stodtj, text = text)) +
+    geom_line(aes(group = "none"), alpha = 0.6, col = "black") +
+    scale_x_continuous(expand = expansion(add = 0.6),
+                       breaks = 2006:2021) +
+    scale_y_continuous(expand = expansion(),
+                       labels = label_percent(),
+                       breaks = seq(0, 0.2, by = 0.02),
+                       limits = c(0.1, 0.2)) +
+    scale_colour_brewer(type = "qual", palette = "Paired") +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Hlutfall stoðþjónustu af stöðugildum Landspítala (2008 - 2020)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+### Fjöldi
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    select(ar, hlutf_stodtj, stodugildi) |> 
+    drop_na() |> 
+    mutate(fjoldi = hlutf_stodtj * stodugildi,
+           text = str_c("Ár: ", ar, "\n",
+                        "Hlutfall: ", percent(hlutf_stodtj, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "\n",
+                        "<b>Fjöldi: ", number(fjoldi, suffix = " stöðugildi", big.mark = ".", decimal.mark = ","), "</b>")) |> 
+    drop_na()
+
+p <- plot_dat |> 
+    ggplot(aes(ar, fjoldi, text = text)) +
+    geom_area(aes(group = "none"), alpha = 0.6, col = "black") +
+    scale_x_continuous(expand = expansion(add = 0.6),
+                       breaks = 2006:2021) +
+    scale_y_continuous(expand = expansion(),
+                       labels = label_number(),
+                       limits = c(0, NA)) +
+    scale_colour_brewer(type = "qual", palette = "Paired") +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Fjöldi stöðugilda stoðþjónustu á Landspítala (2008 - 2020)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+:::
+
+## Stjórnendur
+
+Fyrir tæpu ári síðan birti Landspítali [Samantekt um stjórnendur á Landspítala og laun þeirra](https://www.landspitali.is/um-landspitala/fjolmidlatorg/frettir/stok-frett/2021/08/20/Samantekt-um-stjornendur-a-Landspitala-og-laun-theirra/){target="_blank"}. Þar getum við séð hlutfall stjórnenda af öllum stöðugildum og notað svo gögnin um heildarfjölda stöðugilda til að reikna fjölda stöðugilda stjórnenda. Eins og sést að neðan hefur hlutfallið farið stöðugt lækkandi frá 2008 til 2020, og fjöldi stöðugilda stjórnenda lækkað eða haldist í stað.
+
+:::{.panel-tabset}
+
+### Hlutfall
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    select(ar, hlutf_stjornendur, stodugildi) |> 
+    drop_na() |> 
+    mutate(text = str_c("Ár: ", ar, "\n",
+                        "<b>Hlutfall: ", percent(hlutf_stjornendur, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "</b>\n",
+                        "Fjöldi: ", number(hlutf_stjornendur * stodugildi, suffix = " stöðugildi", big.mark = ".", decimal.mark = ","), "\n")) |> 
+    drop_na()
+
+p <- plot_dat |> 
+    ggplot(aes(ar, hlutf_stjornendur, text = text)) +
+    geom_line(aes(group = "none"), alpha = 0.6, col = "black") +
+    scale_x_continuous(expand = expansion(add = 0.6),
+                       breaks = 2006:2021) +
+    scale_y_continuous(expand = expansion(),
+                       labels = label_percent(),
+                       breaks = 0:10/100,
+                       limits = c(0.02, 0.07)) +
+    scale_colour_brewer(type = "qual", palette = "Paired") +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Hlutfall stjórnenda af stöðugildum Landspítala (2008 - 2020)",
+         subtitle = "Árið 2008 voru stjórnendur 5,9% af stöðugildum en 4,7% árið 2020.")
+
+ggsave(plot = p +
+           geom_rangeframe() +
+           theme_tufte() +
+           scale_y_continuous(expand = expansion(),
+                              labels = label_percent(accuracy = 0.1),
+                              limits = c(0.03, 0.07),
+                              breaks = c(range(plot_dat$hlutf_stjornendur), 
+                                         0, 0.03, 0.04, 0.05, 0.055, 0.07)) +
+           theme(plot.title = element_text(face = "bold")), 
+       filename = "hlutf_stjornendur.png",
+       width = 8, height = 0.5 * 8, scale = 1.5,
+       bg = "white")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+### Fjöldi
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+
+
+plot_dat <- d |> 
+    select(ar, hlutf_stjornendur, stodugildi) |> 
+    drop_na() |> 
+    mutate(fjoldi = hlutf_stjornendur * stodugildi,
+           text = str_c("Ár: ", ar, "\n",
+                        "Hlutfall: ", percent(hlutf_stjornendur, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "\n",
+                        "<b>Fjöldi: ", number(fjoldi, suffix = " stöðugildi", big.mark = ".", decimal.mark = ","), "</b>")) |> 
+    drop_na()
+
+p <- plot_dat |> 
+    ggplot(aes(ar, fjoldi, text = text)) +
+    geom_area(aes(group = "none"), alpha = 0.6, col = "black") +
+    scale_x_continuous(expand = expansion(add = 0.6),
+                       breaks = 2006:2021) +
+    scale_y_continuous(expand = expansion(),
+                       labels = label_number(),
+                       limits = c(0, NA)) +
+    scale_colour_brewer(type = "qual", palette = "Paired") +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Fjöldi stöðugilda stjórnenda á Landspítala (2008 - 2020)",
+         subtitle = "Árið 2008 voru stöðugildi stjórnenda 229,2 en voru 208,3 árið 2020")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(hoverlabel = list(align = "left"))
+```
+
+:::
+
+## Skrifstofa
+
+Fyrir nokkrum árum endurskilgreindi Landspítali starfsemissviðin sín og tók að nota færri yfirsvið í starfsemisupplýsingum sínum. Í starfemisupplýsingum má sjá að stöðugildum hefur fjölgað á *Skrifstofusviði*, en þessi fjölgun þýðir ekki að skrifstofufólki hefur fjölgað heldur hefur verið að færa starfsemi á milli sviða. Ég bendi áhugasömum á [Spurt og svarað um Landspítala](https://www.landspitali.is/um-landspitala/fjolmidlatorg/spurt-og-svarad-um-landspitala/).
+
+
+
+```{r}
+#| fig-width: 4
+#| out-width: "100%"
+#| fig-align: "center"
+#| fig-cap: "Tilkynning vegna skrifstofustöðugilda"
+knitr::include_graphics("skrifstof_landsp.png")
+```
+
 # Launaútgjöld
 
-Á [rikisreikningur.is](https://rikisreikningur.is) eru gögn um bókhald ríkisstjórnarinnar. Með þeim gögnum getum við skoðað launaútgjöldin til Landspítala og skipt þeim upp eftir dagvinnulaunum, yfirvinnulaunum o.s.f. 
+Á [rikisreikningur.is](https://rikisreikningur.is){target="_blank"} eru gögn um bókhald ríkisstjórnarinnar. Með þeim gögnum getum við skoðað launaútgjöldin til Landspítala og skipt þeim upp eftir dagvinnulaunum, yfirvinnulaunum o.s.f. 
 
 Eitt sem mér finnst vanta í þessu gögn er að sjá launaútgjöldin eftir starfsstétt eða einhverskonar flokkun eftir starfsheitum.
 
@@ -844,11 +1060,15 @@ ggplotly(
 
 :::
 
+
+
 # Niðurlag
 
-Það vantar meiri og betri gögn frá Landspítala. Þau gögn sem birtast gera það í miðjum PDF skýrslum sem gerir fólki óþarflega erfitt fyrir að skoða þau. Hvernig er nýting legurýma? Hvaða hlutfall launa fer í þessi margræddu millistjórnendastörf?
+Það vantar meiri og betri gögn frá Landspítala. Þau gögn sem birtast gera það í miðjum PDF skýrslum sem gerir fólki óþarflega erfitt fyrir að skoða þau, eða í fréttatilkynningum sem fólk einhverra hluta vegna tekur ekki eftir eða gleymir. Hvernig er nýting legurýma? 
 
-Gögn um laun og fjármál má finna á [rikisreikningur.is](https://rikisreikningur.is), en þau eru ekki nógu nákvæm. Við getum ekki séð hvert launaútgjöldin fara á Landspítala, bara skiptingu þeirra í dagvinnu o.s.f. Til samanburðar [gat ég auðveldlega fundið hlutfall launaútgjalda Reykjavíkurborgar sem fara í eitthvað sem gæti kallast "skrifstofustörf"](https://twitter.com/bggjonsson/status/1521228214655410176).
+Gögn um laun og fjármál má finna á [rikisreikningur.is](https://rikisreikningur.is){target="_blank"}, en þau eru ekki nógu nákvæm. Við getum ekki séð hvert launaútgjöldin fara á Landspítala, bara skiptingu þeirra í dagvinnu o.s.f. Til samanburðar [gat ég auðveldlega fundið hlutfall launaútgjalda Reykjavíkurborgar sem fara í eitthvað sem gæti kallast "skrifstofustörf"](https://twitter.com/bggjonsson/status/1521228214655410176){target="_blank"}.
 
 
-Eins og Onora O'Neill sagði: [Við getum ekki óskað eftir því að okkur sé treyst, við getum bara sýnt að við séum traustsins virði og leyft traustinu að vaxa af sjálfsdáðum](https://www.youtube.com/watch?v=1PNX6M_dVsk). Til þess þarf opin og aðgengileg gögn, og gegnsæa aðferðafræði sem er auðvelt að endurtaka. Mikilvægast er að gera það auðvelt fyrir aðra að taka eftir og tilkynna þegar við höfum rangt fyrir okkur.
+Eins og Onora O'Neill sagði: [Við getum ekki óskað eftir því að okkur sé treyst, við getum bara sýnt að við séum traustsins virði og leyft traustinu að vaxa af sjálfsdáðum](https://www.youtube.com/watch?v=1PNX6M_dVsk){target="_blank"}. Til þess þarf opin og aðgengileg gögn, og gegnsæa aðferðafræði sem er auðvelt að endurtaka. Mikilvægast er að gera það auðvelt fyrir aðra að taka eftir og tilkynna þegar við höfum rangt fyrir okkur.
+
+

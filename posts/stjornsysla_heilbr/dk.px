@@ -1,0 +1,53 @@
+CHARSET="ANSI";
+AXIS-VERSION="2000";
+CODEPAGE="Windows-1252";
+LANGUAGE="en";
+CREATION-DATE="20220810 14:38";
+SUBJECT-AREA="Economy";
+SUBJECT-CODE="3";
+MATRIX="SHA1";
+TITLE="Health care expenditures by price unit, financing scheme, provider,"
+"function and time";
+CONTENTS="Health care expenditures";
+UNITS="m DKK";
+STUB="price unit","financing scheme","provider","function";
+HEADING="time";
+VALUES("price unit")="Current prices";
+VALUES("financing scheme")="1. Government schemes and compulsory contributory health care financing schemes";
+VALUES("provider")="Health care expenditures in total";
+VALUES("function")="Health care expenditures in total","7.Governance, and health system and financing administration";
+VALUES("time")="2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021";
+TIMEVAL("time")=TLIST(A1),"2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021";
+CODES("price unit")="ENH1";
+CODES("financing scheme")="HF1";
+CODES("provider")="HPTOT";
+CODES("function")="HCTOT","HC7";
+CODES("time")="2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021";
+DOMAIN("price unit")="PRISENHED";
+DOMAIN("financing scheme")="FINANSKILDE1";
+DOMAIN("provider")="AKTOER";
+DOMAIN("function")="FUNKTION";
+ELIMINATION("price unit")="Current prices";
+ELIMINATION("provider")="Health care expenditures in total";
+ELIMINATION("function")="Health care expenditures in total";
+DECIMALS=0;
+SHOWDECIMALS=0;
+LAST-UPDATED="20220616 08:00";
+STOCKFA="F";
+CFPRICES="C";
+SOURCE="www.statbank.dk/SHA1";
+DATABASE="StatBank Denmark";
+REFPERIOD="år";
+DATA=
+161874 161327 
+168220 168348 
+172469 177478 
+181903 185923 
+190557 196398 
+208122 231298 
+7131 6897 
+8827 8523 
+8918 9444 
+9704 9738 
+10156 10876 
+11587 12219;

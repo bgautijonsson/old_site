@@ -5,8 +5,8 @@
 /.quarto/
 .DS_Store
 **/CNAME
-**/* 2.*
-**/* 2
+**/* [2-9]*
+**/* [2-9]
 posts/brautskraningar/
 docs/posts/brautskraningar/
 _freeze/posts/brautskraningar/
