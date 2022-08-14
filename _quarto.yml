@@ -8,6 +8,7 @@ website:
   description: Blogg um tölfræði og gögn
   favicon: favicon.ico
   repo-url: https://github.com/bgautijonsson/bgautijonsson.github.io
+  google-analytics: "G-EGQ9KVCY2C"
   open-graph: true
   twitter-card: 
     creator: "@bggjonsson"
