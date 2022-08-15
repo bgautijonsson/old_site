@@ -6,6 +6,13 @@ website:
   title: "Brynjólfur Gauti Guðrúnar Jónsson"
   site-url: https://www.bggj.is
   description: Blogg um tölfræði og gögn
+  page-footer: 
+    left: "Copyright 2022, Brynjólfur Gauti Guðrúnar Jónsson"
+    right: 
+        - icon: github
+          href: https://github.com/bgautijonsson
+        - icon: twitter
+          href: https://twitter.com/bgautijonsson
   favicon: favicon.ico
   repo-url: https://github.com/bgautijonsson/bgautijonsson.github.io
   google-analytics: "G-EGQ9KVCY2C"
