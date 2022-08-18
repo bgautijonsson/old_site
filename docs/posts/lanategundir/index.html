@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Brynjólfur Gauti Guðrúnar Jónsson">
-<meta name="dcterms.date" content="2022-08-15">
+<meta name="dcterms.date" content="2022-08-18">
 
 <title>Brynjólfur Gauti Guðrúnar Jónsson - Dreifing húsnæðislánategunda hjá íslenskum heimilum</title>
 <style>
@@ -252,7 +252,7 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">August 15, 2022</p>
+        <p class="date">August 18, 2022</p>
       </div>
     </div>
       
@@ -476,6 +476,69 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
 
 
 </main> <!-- /main -->
+<style>
+/* Notwendiges Zeug für Dropdowns */
+.tabset-dropdown > .nav-tabs {
+	display: inline-block;
+	max-height: 500px;
+	min-height: 44px;
+	overflow-y: auto;
+	background: white;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+    content: "";
+    font-family: 'Glyphicons Halflings';
+    display: inline-block;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+	content: "";
+	border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+	content: "";
+    font-family: 'Glyphicons Halflings';
+    display: inline-block;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+}
+
+
+.tabset-dropdown > .nav-tabs > li.active {
+	display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+	border: none;
+	display: inline-block;
+	border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+	display: block;
+	float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+	display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+	$('.tabset-dropdown > .nav-tabs > li').click(function () {
+		$(this).parent().toggleClass('nav-tabs-open')
+	});
+}); 
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const icon = "";

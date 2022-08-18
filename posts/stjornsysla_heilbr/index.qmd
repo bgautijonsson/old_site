@@ -28,6 +28,7 @@ draft: false
 title-block-banner: true
 categories:
     - landspítali
+    - Hagstofa
     - R
     - íslenska
 image: stjornsysl.png

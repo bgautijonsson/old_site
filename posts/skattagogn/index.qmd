@@ -1,0 +1,181 @@
+---
+title: "Skattagögn"
+author: 
+    -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
+        url: "https://twitter.com/bgautijonsson"
+        affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
+        affiliation-url: "https://www.hi.is/tolfraedi_0"
+date: "2022/08/13"
+format: 
+    html:
+        code-fold: true
+        toc: true
+        toc-depth: 2
+        toc-location: right
+        toc-title: Efnisyfirlit
+        page-layout: full
+        smooth-scroll: true
+        link-external-newwindow: true
+        include-after-body: footer.html
+execute: 
+  echo: true
+  warning: false
+  cache: false
+editor: source
+title-block-banner: true
+draft: true
+categories:
+    - landspítali
+    - R
+    - íslenska
+image: hjukthyngd.png
+twitter-card: 
+    image: hjukthyngd.png
+---
+
+```{r}
+#| include: false
+
+library(cowplot)
+library(tidyverse)
+library(scales)
+library(pxweb)
+library(ggthemes)
+library(kableExtra)
+library(gganimate)
+library(lubridate)
+library(geomtextpath)
+library(ggtext)
+library(readxl)
+library(janitor)
+library(plotly)
+htmltools::tagList(ggplotly(ggplot()))
+```
+
+```{r}
+visitala <- pxweb_get(
+    url ="https://px.hagstofa.is:443/pxis/api/v1/is/Efnahagur/visitolur/1_vnv/1_vnv/VIS01000.px", 
+    query = list(
+        "Mánuður" = c("*"),
+        "Vísitala"  = c("CPI"),
+        "Liður" = c("index")
+    ),
+    verbose = FALSE
+) |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    janitor::clean_names() |> 
+    separate(manudur, into = c("ar", "manudur"), sep = "M", convert = T) |> 
+    mutate(manudur = str_pad(manudur, width = 2, side = "left", pad = "0"),
+           date = str_c(ar, "-", manudur, "-01") |> ymd()) |> 
+    select(-manudur, -ar, -visitala, -lidur) |> 
+    mutate(ar = year(date)) |> 
+    group_by(ar) |> 
+    filter(date == min(date)) |> 
+    ungroup() |> 
+    mutate(visitala_2022 = visitala_neysluverds / visitala_neysluverds[ar == 2022]) |> 
+    select(-date, -visitala_neysluverds)
+
+
+d <-  pxweb_get(
+    url ="https://px.hagstofa.is:443/pxis/api/v1/is/Samfelag/lifskjor/5_skuldastada_heimili/1_skuldir_eignir/THJ09004.px", 
+    query = list(
+        "Ár" = c("*"),
+        "Tíundarhluti"  = c("*"),
+        "Eignir, skuldir, tekjur og gjöld" = c("*")
+    ),
+    verbose = FALSE
+) |> 
+    as.data.frame() |> 
+    as_tibble()|> 
+    janitor::clean_names() |> 
+    rename(name = 3, value = 4) |> 
+    mutate(ar = parse_number(ar)) |> 
+    inner_join(
+        visitala,
+        by = "ar"
+    ) |> 
+    mutate(value = value / visitala_2022) 
+```
+
+# Myndir
+
+```{r}
+plot_values <- c(
+    "Tekjur alls" = "Tekjur alls",
+    "Ráðstöfunartekjur (Tekjur -Skattar alls -Vaxtagjöld)" = "Ráðstöfunartekjur",
+    "Fjöldi í hóp" = "Fjöldi í hóp",
+    "Fjármagnstekjur"= "Fjármagnstekjur",
+    "Eignir alls"= "Eignir alls",
+    "Fasteignir"= "Fasteignir",
+    "Verðbréf" = "Verðbréf"
+)
+plot_dat <- d |> 
+    filter(tiundarhluti != "Alls",
+           name %in% names(plot_values)) |> 
+    mutate(tiundarhluti = parse_number(tiundarhluti) |> as_factor(),
+           name = plot_values[name]) |> 
+    pivot_wider() |> 
+    rename(fjoldi = "Fjöldi í hóp") |> 
+    pivot_longer(c(-ar, -tiundarhluti, -fjoldi, -visitala_2022)) |> 
+    group_by(ar, name) |> 
+    mutate(p = value / sum(value)) |> 
+    ungroup() |> 
+    mutate(per_pers = value / fjoldi * 1e6,
+           text = str_c("Ár: ", ar, "\n",
+                        "Tíund: ", tiundarhluti, "\n",
+                        "Hlutfall: ", percent(p, accuracy = 0.1, big.mark = ".", decimal.mark = ","), "\n",
+                        "Samtals: ", number(value, suffix = " mkr", big.mark = ".", decimal.mark = ",")),
+           text = case_when(
+               str_detect(name, "[Tt]ekjur") ~ str_c(text, "\n", 
+                                           "Á mann (á mánuði): ", number(per_pers / 12, suffix = " kr", accuracy = 1, 
+                                                      big.mark = ".", decimal.mark = ",")),
+               TRUE ~ str_c(text, "\n", 
+                                           "Á mann: ", number(per_pers, suffix = " kr", accuracy = 1, 
+                                                      big.mark = ".", decimal.mark = ","))
+           )) 
+
+make_fig <- function(data, ...) {
+    data |> 
+        ggplot(aes(ar, p, text = text)) +
+        geom_area(aes(fill = tiundarhluti, group = tiundarhluti), position = "fill") +
+        scale_x_continuous() +
+        scale_y_continuous(labels = label_percent()) +
+        scale_fill_brewer(type = "div", palette = "RdYlBu") +
+        coord_cartesian(expand = FALSE) +
+        labs(x = NULL,
+             y = NULL,
+             fill = NULL,
+             title = NULL)
+}
+
+plots <- plot_dat |> 
+    mutate(nm = name |>
+               as_factor() |> 
+               fct_relevel("Eignir alls",
+                           "Fasteignir", 
+                           "Verðbréf",
+                           "Tekjur alls", 
+                           "Ráðstöfunartekjur",
+                           "Fjármagnstekjur")) |> 
+    group_nest(nm) |> 
+    deframe() |> 
+    map(make_fig)
+```
+:::{.panel-tabset}
+
+```{r}
+#| results: asis
+
+iwalk(plots, ~ {
+    cat("## ", .y, "\n\n")
+    
+   print(htmltools::tagList((ggplotly(.x, tooltip = "text", height = 600))))
+    
+    cat("\n\n")
+})
+```
+
+
+
+:::

@@ -27,6 +27,7 @@ title-block-banner: true
 categories:
     - fasteignir
     - efnahagur
+    - Þjóðskrá
     - R
     - íslenska
 image: leiga_hlutf_afborgun.png

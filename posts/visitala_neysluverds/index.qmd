@@ -22,6 +22,8 @@ execute:
     warning: false
 categories:
     - efnahagur
+    - verðlag
+    - Hagstofa
     - R
     - íslenska
 image: undirtolur.png

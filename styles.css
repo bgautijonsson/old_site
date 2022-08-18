@@ -1,1 +1,11 @@
 /* css styles */
+
+
+
+.nav-tabs {
+  background-color: #FFF;
+}
+
+.tab-content {
+    border-style: none;
+}

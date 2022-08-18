@@ -27,6 +27,7 @@ title-block-banner: true
 categories:
     - efnahagur
     - vinnumarkaður
+    - Hagstofa
     - R
     - íslenska
 image: hlutf_opinbert.png

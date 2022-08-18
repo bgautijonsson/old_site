@@ -26,6 +26,7 @@ editor: source
 title-block-banner: true
 categories:
     - orkumál
+    - OurWorldInData
     - R
     - íslenska
 image: throun_fossil.png
