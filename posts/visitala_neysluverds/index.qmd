@@ -76,6 +76,54 @@ d <- pxweb_get(
     pivot_wider(names_from = lidur, values_from = value)
 ```
 
+```{r}
+#| include: false
+#| eval: false
+#| echo: false
+
+
+plot_dat <- d |> 
+    filter(undirvisitala != "Vísitala neysluverðs",
+           date %in% tail(unique(date), 12)) |> 
+    group_by(undirvisitala) |> 
+    summarise(vaegi = sum(vaegi),
+              breyting = sum(breyting),
+              ahrif = sum(ahrif),
+              .groups = "drop") |> 
+    mutate(vaegi = vaegi / sum(vaegi)) |> 
+    mutate(fill = fct_reorder(undirvisitala, ahrif),
+           undirvisitala = str_wrap(undirvisitala, width = 20),
+           undirvisitala = fct_reorder(undirvisitala, breyting)) |> 
+    arrange(desc(undirvisitala)) |> 
+    mutate(vaegi = cumsum(vaegi),
+           x_min = lag(vaegi, default = 0),
+           x_max = vaegi,
+           y_min = 0,
+           y_max = breyting,
+           area = (y_max - y_min) * (x_max - x_min))
+
+plot_dat |> 
+    ggplot(aes(xmin = x_min, xmax = x_max,
+               ymin = y_min, ymax = y_max)) +
+    geom_hline(yintercept = 0, lty = 2) +
+    geom_rect(aes(fill = fill)) +
+    geom_rangeframe(aes(y = y_max)) +
+    scale_x_continuous(labels = label_percent(),
+                       expand = expansion()) +
+    scale_y_continuous(labels = label_percent(),
+                       expand = expansion()) +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    theme_tufte() +
+    theme(legend.position = "none") +
+    labs(x = "Vægi",
+         y = "Breyting")
+
+
+
+
+```
+
+
 # Undirvísitölur 
 
 Í grófum dráttum er vísitala neysluverðs vegið meðaltal af breytingu í verði hinna ýmsu afurða sem við kaupum. Því eru t.d. áhrif breytingar á húsnæðisverði reiknuð með því að margfalda verðbreytingar þess flokks við vægi hans í vísitölunni. Vægið á að endurspegla útgjöld einhvers konar meðal-Íslendings.

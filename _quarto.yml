@@ -39,6 +39,8 @@ website:
               href: http://covid.rhi.hi.is/shiny/dashboard/
             - text: Spálíkan COVID-19
               href: pages/covid_spalikan.qmd
+            - text: Skattagögn (WIP)
+              href: pages/skattagogn.qmd
       - icon: github
         href: https://github.com/bgautijonsson
       - icon: twitter
