@@ -35,7 +35,7 @@ website:
         menu:
             - text: Ársreikningar Sveitarfélaga
               href: pages/sveitarfelog.qmd
-            - text: COVID-19
+            - text: COVID-19 (Uppfærslum hætt)
               href: http://covid.rhi.hi.is/shiny/dashboard/
             - text: Skattagögn (WIP)
               href: pages/skattagogn.qmd
