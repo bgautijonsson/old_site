@@ -31,16 +31,18 @@ website:
         text: Ráðgjöf
       - href: index.qmd
         text: Færslur
-      - text: Verkefni
+      - text: Mælaborð
         menu:
-            - text: Mælaborð Sveitarfélaga
+            - text: Ársreikningar Sveitarfélaga
               href: pages/sveitarfelog.qmd
-            - text: Mælaborð COVID-19
+            - text: COVID-19
               href: http://covid.rhi.hi.is/shiny/dashboard/
-            - text: Spálíkan COVID-19
-              href: pages/covid_spalikan.qmd
             - text: Skattagögn (WIP)
               href: pages/skattagogn.qmd
+      - text: Verkefni
+        menu:
+            - text: Spálíkan COVID-19
+              href: pages/covid_spalikan.qmd
       - icon: github
         href: https://github.com/bgautijonsson
       - icon: twitter
