@@ -1,6 +1,7 @@
 ---
-title: "bggj.is - Ársreikningar Sveitarfélaga"
+title-block-style: none
 ---
+
 
 <iframe
   src="https://bggj.shinyapps.io/sveitarfelog_maelabord/"

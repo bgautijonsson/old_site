@@ -1,5 +1,5 @@
 ---
-title: "bggj.is - Skattagögn"
+title-block-style: none
 ---
 
 

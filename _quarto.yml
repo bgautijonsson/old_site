@@ -33,11 +33,11 @@ website:
         text: Færslur
       - text: Mælaborð
         menu:
-            - text: Ársreikningar Sveitarfélaga
+            - text: Fjármál Sveitarfélaga
               href: pages/sveitarfelog.qmd
             - text: COVID-19 (Uppfærslum hætt)
               href: http://covid.rhi.hi.is/shiny/dashboard/
-            - text: Skattagögn (WIP)
+            - text: Skattagögn (Í vinnslu)
               href: pages/skattagogn.qmd
       - text: Verkefni
         menu:
