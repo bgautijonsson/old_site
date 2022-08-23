@@ -37,7 +37,7 @@ website:
               href: pages/sveitarfelog.qmd
             - text: COVID-19 (Uppfærslum hætt)
               href: http://covid.rhi.hi.is/shiny/dashboard/
-            - text: Skattagögn (Í vinnslu)
+            - text: Eignir, skuldir og tekjur
               href: pages/skattagogn.qmd
       - text: Verkefni
         menu:
