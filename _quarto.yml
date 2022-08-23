@@ -34,11 +34,11 @@ website:
       - text: Mælaborð
         menu:
             - text: Fjármál Sveitarfélaga
-              href: pages/sveitarfelog.qmd
+              href: sveitarfelog.qmd
             - text: COVID-19 (Uppfærslum hætt)
               href: http://covid.rhi.hi.is/shiny/dashboard/
             - text: Eignir, skuldir og tekjur
-              href: pages/skattagogn.qmd
+              href: skattagogn.qmd
       - text: Verkefni
         menu:
             - text: Spálíkan COVID-19
