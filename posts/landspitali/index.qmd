@@ -8,7 +8,7 @@ author:
         url: "https://twitter.com/bgautijonsson"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
-date: "2022/08/13"
+date: "2022/08/24"
 format: 
     html:
         code-fold: true
@@ -1059,6 +1059,136 @@ ggplotly(
 ```
 
 :::
+
+
+
+
+## Á höfðatölu
+
+```{r}
+d <- read_csv("data.csv") |> 
+    mutate(text = str_c("Ár: ", ar, "\n",
+                        "Launaútgjöld: ", number(laun, suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
+                        "Mannfjöldi (heild): ", number(pop, big.mark = ".", decimal.mark = ","), "\n",
+                        "Mannfjöldi (65+): ", number(pop_65, big.mark = ".", decimal.mark = ","), "\n",
+                        "Laun per íbúi (heild): ", number(laun_per_pers, suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
+                        "Laun per íbúi (65+): ", number(laun_per_pers_65, suffix = " kr", big.mark = ".", decimal.mark = ",")))
+```
+
+Við getum svo notað tölur Hagstofu um mannfjölda eftir aldri til að reikna launaútgjöld á höfðatölu, bæði fyrir alla íbúa og fyrir íbúa sem hafa náð 65 ára aldri.
+
+Upphæðirnar að neðan eru leiðréttar fyrir verðbólgu með vísitölu neysluverðs.
+
+:::{.panel-tabset}
+
+### Allir
+
+Ef við skoðum launaútgjöld á hvern íbúa sýnist okkur að launaútgjöldin hafa aldrei verið hærri.
+
+```{r}
+#| fig-width: 10
+#| fig-asp: 0.621
+#| out-width: "100%"
+
+
+p <- d |> 
+    ggplot(aes(x = ar, y = laun_per_pers, text = text)) +
+    geom_area(aes(group = "none"), alpha = 0.6, col = "black") +
+    scale_x_continuous(breaks = seq(1999, 2021, by = 2)) +
+    scale_y_continuous(labels = label_number(suffix = " kr", big.mark = ".", decimal.mark = ",")) +
+    coord_cartesian(ylim = c(0, NA)) +
+    theme_half_open() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Launaútgjöld til Landspítala á íbúa")
+
+ggplotly(
+    p,
+    tooltip = "text"
+)
+```
+
+
+### 65+
+
+En þegar við skoðum launaútgjöld á hvern íbúa sem hefur náð 65 ára aldri eru við rétt að komast upp í sömu fjárhæð og árið 2007.
+
+```{r}
+#| fig-width: 10
+#| fig-asp: 0.621
+#| out-width: "100%"
+
+
+p <- d |> 
+    ggplot(aes(x = ar, y = laun_per_pers_65, text = text)) +
+    geom_area(aes(group = "none"), alpha = 0.6, col = "black") +
+    scale_x_continuous(breaks = seq(1999, 2021, by = 2)) +
+    scale_y_continuous(labels = label_number(suffix = " kr", big.mark = ".", decimal.mark = ",")) +
+    theme_half_open() +
+    labs(x = NULL,
+         y = NULL,
+         title = "Launaútgjöld til Landspítala á 65+ ára íbúa")
+
+ggplotly(
+    p,
+    tooltip = "text"
+)
+```
+
+:::
+
+
+```{r}
+#| include: false
+#| eval: false
+#| echo: false
+
+
+plot_dat <- d |> 
+    mutate(laun_per_pers = laun_per_pers / 1e6,
+           laun_per_pers_65 = laun_per_pers_65 / 1e6)
+
+p1 <- plot_dat |> 
+    ggplot(aes(x = ar, y = laun_per_pers)) +
+    geom_line(aes(group = "none")) +
+    # geom_vline(xintercept = 2005) +
+    geom_rangeframe() +
+    scale_x_continuous(breaks = seq(1999, 2021, by = 2)) +
+    scale_y_continuous(labels = label_number(suffix = " mkr", big.mark = ".", decimal.mark = ",",
+                                             accuracy = 0.01),
+                       breaks = c(range(plot_dat$laun_per_pers),
+                                  0.13, 0.15, 0.17)) +
+    # coord_cartesian(ylim = c(0, NA)) +
+    theme_tufte() +
+    theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
+          plot.title = element_text(face = "bold")) +
+    labs(x = NULL,
+         y = NULL,
+         title = "Launaútgjöld til Landspítala á mannfjölda",
+         subtitle = "Á íbúa í heild")
+
+p2 <- plot_dat |> 
+    ggplot(aes(x = ar, y = laun_per_pers_65)) +
+    geom_line(aes(group = "none")) +
+    geom_rangeframe() +
+    # geom_vline(xintercept = 2005) +
+    scale_x_continuous(breaks = seq(1999, 2021, by = 2)) +
+    scale_y_continuous(labels = label_number(suffix = " mkr", big.mark = ".", decimal.mark = ",",
+                                             accuracy = 0.01),
+                       breaks = c(range(plot_dat$laun_per_pers_65),
+                                  1.1, 1.2)) +
+    theme_tufte() +
+    theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5)) +
+    labs(x = NULL,
+         y = NULL,
+         subtitle = "Á 65+ ára íbúa",
+         caption = "www.bggj.is/posts/landspitali")
+
+p <- plot_grid(p1, p2, ncol = 1, rel_heights = c(1, 0.96))
+
+ggsave(p, filename = "launautgjold.png",
+       width = 8, height = 0.621 * 8, scale = 1.3, bg = "white")
+```
 
 
 
