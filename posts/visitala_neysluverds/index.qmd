@@ -134,6 +134,8 @@ Færið músina yfir myndirnar til að sjá nákvæm tölugildi og hvaða litir 
 
 ## Vísitala
 
+Dragið rennuna undir myndinni til að þysja inn á tiltekið tímabil.
+
 ```{r}
 #| fig.width: 10
 #| fig.asp: 0.8
@@ -196,7 +198,7 @@ p <- plot_dat |>
          title = "Árleg breyting vísitölu og áhrif undirtalna (2012-2022)")
 
 ggsave(plot = p, filename = "undirtolur.png",
-       width = 8, height = 0.621 * 8, scale = 1)
+       width = 8, height = 0.621 * 8, scale = 1, bg = "white")
 
 ggplotly(
     p,
@@ -210,6 +212,8 @@ ggplotly(
 ```
 
 ## Vægi
+
+Dragið rennuna undir myndinni til að þysja inn á tiltekið tímabil.
 
 ```{r}
 #| fig.width: 10
@@ -331,10 +335,42 @@ ggplotly(
     p,
     tooltip = "text"
 ) |> 
-    layout(hoverlabel = list(align = "left"),
-           xaxis = list(
-               rangeslider = list(type = "date")
-           ))
+    layout(hoverlabel = list(align = "left"))
 ```
 
 :::
+
+# Árleg breyting og mánaðarleg breyting
+
+Þar sem árleg verðbólga samanstendur af verðbólgu síðustu 12 mánaða getur ekki hver og einn mánuður lækkað hana mikið. Ef mánaðarleg verðbólga síðustu 11 mánuði hefur verið 0,5% en hún mælist svo 0% verður árleg verðbólgan samt $1,005^{11} = 1,056 = 5,6\%$. Hins vegar getur verið gott að bera saman mánaðarlega verðbólgi við meðaltal síðastliðins árs. Ef mánaðarleg verðbólga er lægri en meðaltal síðasta árs er árleg verðbólga að lækka.
+
+```{r}
+#| fig.width: 10
+#| fig.asp: 0.621
+#| out.width: "100%"
+#| 
+p <- plot_dat |> 
+    mutate(text = str_c("<b>", undirvisitala, "</b>\n",
+                        "Dagsetning: ", format(date, "%B, %Y"), "\n",
+                        "<b>Árleg (deilt með 12): ", percent(year_breyting/12, accuracy = 0.01), "\n</b>",
+                        "<b>Mánaðarleg: ", percent(breyting, accuracy = 0.01), "</b>")) |> 
+    filter(undirvisitala == "Vísitala neysluverðs",
+           date >= ymd("2020-08-01")) |> 
+    ggplot(aes(year_ahrif/12, ahrif, text = text)) +
+    geom_abline(intercept = 0, slope = 1, lty = 2) +
+    geom_path(aes(group = "none")) +
+    scale_x_continuous(labels = label_percent()) +
+    scale_y_continuous(labels = label_percent()) +
+    coord_cartesian(ylim = c(0, 0.17)/12, xlim = c(0, 0.17)/12,
+                    expand = F) +
+    theme_half_open() +
+    labs(x = "Árleg verðbólga (deilt með 12)",
+         y = "Mánaðarleg verðbólga",
+         title = "Árleg verðbólga á móti mánaðarlegri verðbólgu (ágúst 2020 - ágúst 2022)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+)
+```
+
