@@ -1,0 +1,59 @@
+/*-- scss:defaults --*/
+
+$darkblue:                      #08306b;
+$lightblue:                     #74a9cf;
+$white:                         #ffffff;
+
+
+$primary:                       $darkblue;
+$secondary:                     $white;
+
+
+
+$font-size-base:                1rem; 
+$font-family-base:              "Segoe UI";
+$font-family-sans-serif:        "Lato", "Open Sans", "Montserrat", "Roboto";
+$font-family-monospace:         "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
+
+
+$headings-color:                #08306b;
+$headings-font-weight:          4000;
+$headings-font-family:          "Segoe UI";
+
+
+$navbar-brand-font-size:        $font-size-base * 1.4;
+$navbar-brand-font-family:      "Playfair Display";
+$navbar-brand-font-weight:      700;
+
+
+/*-- scss:rules --*/
+header.quarto-title-block.default .quarto-title .title {
+    color: $secondary;
+    font-family: "Playfair Display";
+    font-size: $font-size-base * 3;
+}
+
+div.quarto-post .listing-categories .listing-category {
+    color: #6c757d;
+    border: solid 1px #dee2e6;
+    border-radius: .25rem;
+    text-transform: uppercase;
+    font-size: .65em;
+    padding-left: .5em;
+    padding-right: .5em;
+    padding-top: .15em;
+    padding-bottom: .15em;
+    cursor: pointer;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+.quarto-listing-category .category {
+    font-size: $font-size-base * 0.7;
+    cursor: pointer;
+    color: #525252;
+}
+
+div.g-col-6 {
+
+}

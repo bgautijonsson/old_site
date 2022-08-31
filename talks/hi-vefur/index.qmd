@@ -1,0 +1,13 @@
+---
+title: "Viðtal á vef HÍ"
+description: |
+    Halldór Marteinsson tók viðtal við mig sem birtist á vef Háskóla Íslands 22. desember 2020.
+image: image.jpeg
+date: "2020/12/22"
+categories:
+    - viðtal
+    - íslenska
+    - covid19
+---
+
+[Viðtalið má finna hér](https://www.hi.is/frettir/tolfraedi_gengur_ut_a_ad_hafa_rangt_fyrir_ser){target="_blank"}

@@ -1,0 +1,17 @@
+---
+title: "Færslur"
+listing:
+    -   id: listing-blog
+        contents: posts
+        sort: "date desc"
+        type: default
+        categories: true
+        feed: true
+        page-size: 10
+page-layout: full
+title-block-banner: true
+---
+
+
+::: {#listing-blog}
+:::

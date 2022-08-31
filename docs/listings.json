@@ -11,6 +11,25 @@
       "/posts/orkumal/index.html",
       "/posts/forest-plot-table/index.html",
       "/posts/kosningarannsokn/index.html",
+      "/posts/lanategundir/index.html",
+      "/talks/mbl_2022-08-10/index.html",
+      "/talks/hi-vefur/index.html",
+      "/talks/mbl_2020-08-20/index.html",
+      "/talks/covid-spalikan/index.html"
+    ]
+  },
+  {
+    "listing": "/posts.html",
+    "items": [
+      "/posts/visitala_neysluverds/index.html",
+      "/posts/landspitali/index.html",
+      "/posts/lausstorf/index.html",
+      "/posts/stjornsysla_heilbr/index.html",
+      "/posts/leigaogkaupverd/index.html",
+      "/posts/vinnuafl/index.html",
+      "/posts/orkumal/index.html",
+      "/posts/forest-plot-table/index.html",
+      "/posts/kosningarannsokn/index.html",
       "/posts/lanategundir/index.html"
     ]
   }

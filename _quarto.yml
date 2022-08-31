@@ -4,7 +4,7 @@ project:
 
 website:
   title: "Brynjólfur Gauti Guðrúnar Jónsson"
-  site-url: https://www.bggj.is
+  site-url: "https://www.bggj.is"
   description: Blogg um tölfræði og gögn
   page-footer: 
     left: "Copyright 2022, Brynjólfur Gauti Guðrúnar Jónsson"
@@ -25,11 +25,11 @@ website:
     background: "#08306b"
     foreground: "#ffffff"
     right:
-      - href: pages/about.qmd
+      - href: index.qmd
         text: Um mig
       - href: pages/radgjof.qmd
         text: Ráðgjöf
-      - href: index.qmd
+      - href: posts.qmd
         text: Færslur
       - text: Mælaborð
         menu:
@@ -46,12 +46,12 @@ website:
       - icon: github
         href: https://github.com/bgautijonsson
       - icon: twitter
-        href: https://twitter.com/bgautijonsson
+        href: https://twitter.com/bggjonsson
       - icon: rss
         href: index.xml
 format:
   html:
-    theme: flatly
+    theme: theme.scss
     css: styles.css
 
 

@@ -1,0 +1,13 @@
+---
+title: "Viðtal á mbl.is um Landspítalafærslu"
+description: |
+    Karlotta Líf Sumarliðadóttir tók viðtal við mig um færsluna mína þar sem ég fjallaði um starfsemisupplýsingar Landspítala. Viðtalið birtist á mbl.is 10. ágúst 2022.
+image: image.jpg
+date: "2022/08/10"
+categories:
+    - viðtal
+    - landspítali
+    - íslenska
+---
+
+[Viðtalið má finna hér](https://www.mbl.is/frettir/innlent/2022/08/10/naerri_tvofalt_meiri_veikindi_a_landspitala/){target="_blank"}

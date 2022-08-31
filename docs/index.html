@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Brynjólfur Gauti Guðrúnar Jónsson - Færslur</title>
+<title>Brynjólfur Gauti Guðrúnar Jónsson</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,7 +31,6 @@ ul.task-list{list-style: none;}
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
@@ -59,7 +58,7 @@ ul.task-list{list-style: none;}
 <script>
 
   window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    const listingTargetEl = window.document.querySelector('#listing-listing-blog .list');
     if (!listingTargetEl) {
       // No listing discovered, do not attach.
       return; 
@@ -72,7 +71,36 @@ ul.task-list{list-style: none;}
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+    window['quarto-listings']['listing-listing-blog'] = new List('listing-listing-blog', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-listing-talks .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-title','listing-author','listing-date','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      page: 3,
+    pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
+      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description","listing-categories"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-listing-talks'] = new List('listing-listing-talks', options);
 
     if (window['quarto-listing-loaded']) {
       window['quarto-listing-loaded']();
@@ -98,17 +126,17 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="styles.css">
-<link rel="alternate" type="application/rss+xml" title="Brynjólfur Gauti Guðrúnar Jónsson" href="index.xml"><meta property="og:title" content="Brynjólfur Gauti Guðrúnar Jónsson - Færslur">
-<meta property="og:image" content="https://www.bggj.is/posts/forest-plot-table/featured.png">
+<link rel="alternate" type="application/rss+xml" title="Brynjólfur Gauti Guðrúnar Jónsson" href="index.xml"><meta property="og:title" content="Brynjólfur Gauti Guðrúnar Jónsson">
+<meta property="og:image" content="https://www.bggj.is/binni.png">
 <meta property="og:site-name" content="Brynjólfur Gauti Guðrúnar Jónsson">
-<meta property="og:image:height" content="834">
-<meta property="og:image:width" content="1344">
-<meta name="twitter:title" content="Brynjólfur Gauti Guðrúnar Jónsson - Færslur">
-<meta name="twitter:image" content="https://www.bggj.is/posts/forest-plot-table/featured.png">
+<meta property="og:image:height" content="1927">
+<meta property="og:image:width" content="1927">
+<meta name="twitter:title" content="Brynjólfur Gauti Guðrúnar Jónsson">
+<meta name="twitter:image" content="https://www.bggj.is/binni.png">
 <meta name="twitter:creator" content="@bggjonsson">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image-height" content="834">
-<meta name="twitter:image-width" content="1344">
+<meta name="twitter:image-height" content="1927">
+<meta name="twitter:image-width" content="1927">
 </head>
 
 <body class="nav-fixed">
@@ -126,13 +154,13 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./pages/about.html">Um mig</a>
+    <a class="nav-link active" href="./index.html" aria-current="page">Um mig</a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./pages/radgjof.html">Ráðgjöf</a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page">Færslur</a>
+    <a class="nav-link" href="./posts.html">Færslur</a>
   </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-mælaborð" role="button" data-bs-toggle="dropdown" aria-expanded="false">Mælaborð</a>
@@ -166,7 +194,7 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
  </a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/bgautijonsson"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/bggjonsson"><i class="bi bi-twitter" role="img">
 </i> 
  </a>
   </li>  
@@ -182,38 +210,212 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
     </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Færslur</h1>
-                      </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(10)</span></div><div class="category" data-category="Hagstofa">Hagstofa <span class="quarto-category-count">(4)</span></div><div class="category" data-category="OurWorldInData">OurWorldInData <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(10)</span></div><div class="category" data-category="efnahagur">efnahagur <span class="quarto-category-count">(5)</span></div><div class="category" data-category="english">english <span class="quarto-category-count">(1)</span></div><div class="category" data-category="fasteignir">fasteignir <span class="quarto-category-count">(1)</span></div><div class="category" data-category="kosningar">kosningar <span class="quarto-category-count">(1)</span></div><div class="category" data-category="landspítali">landspítali <span class="quarto-category-count">(2)</span></div><div class="category" data-category="orkumál">orkumál <span class="quarto-category-count">(1)</span></div><div class="category" data-category="plots">plots <span class="quarto-category-count">(1)</span></div><div class="category" data-category="tutorial">tutorial <span class="quarto-category-count">(1)</span></div><div class="category" data-category="verðlag">verðlag <span class="quarto-category-count">(1)</span></div><div class="category" data-category="vinnumarkaður">vinnumarkaður <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Þjóðskrá">Þjóðskrá <span class="quarto-category-count">(1)</span></div><div class="category" data-category="íslenska">íslenska <span class="quarto-category-count">(9)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Flokkar</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(14)</span></div><div class="category" data-category="Hagstofa">Hagstofa <span class="quarto-category-count">(4)</span></div><div class="category" data-category="OurWorldInData">OurWorldInData <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(10)</span></div><div class="category" data-category="bayesian statistics">bayesian statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="covid19">covid19 <span class="quarto-category-count">(3)</span></div><div class="category" data-category="efnahagur">efnahagur <span class="quarto-category-count">(5)</span></div><div class="category" data-category="english">english <span class="quarto-category-count">(2)</span></div><div class="category" data-category="fasteignir">fasteignir <span class="quarto-category-count">(1)</span></div><div class="category" data-category="kosningar">kosningar <span class="quarto-category-count">(1)</span></div><div class="category" data-category="landspítali">landspítali <span class="quarto-category-count">(3)</span></div><div class="category" data-category="orkumál">orkumál <span class="quarto-category-count">(1)</span></div><div class="category" data-category="plots">plots <span class="quarto-category-count">(1)</span></div><div class="category" data-category="presentation">presentation <span class="quarto-category-count">(1)</span></div><div class="category" data-category="tutorial">tutorial <span class="quarto-category-count">(1)</span></div><div class="category" data-category="verðlag">verðlag <span class="quarto-category-count">(1)</span></div><div class="category" data-category="vinnumarkaður">vinnumarkaður <span class="quarto-category-count">(2)</span></div><div class="category" data-category="viðtal">viðtal <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Þjóðskrá">Þjóðskrá <span class="quarto-category-count">(1)</span></div><div class="category" data-category="íslenska">íslenska <span class="quarto-category-count">(12)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
 
 
+<div class="quarto-about-trestles column-page-left">
+  <div class="about-entity">
+    <img src="binni.png" class="about-image
+  rounded " style="width: 250px;">
+    <div class="about-links">
+  <a href="https://twitter.com/bggjonsson" class="about-link">
+    <i class="bi bi-twitter"></i>
+     <span class="about-link-text"></span>
+  </a>
+  <a href="https://linkedin.com/in/bgautijonsson" class="about-link">
+    <i class="bi bi-linkedin"></i>
+     <span class="about-link-text"></span>
+  </a>
+  <a href="https://github.com/bgautijonsson" class="about-link">
+    <i class="bi bi-github"></i>
+     <span class="about-link-text"></span>
+  </a>
+  <a href="https://bgautijonsson.github.io/resume" class="about-link">
+    <i class="bi bi-file-earmark-person-fill"></i>
+     <span class="about-link-text"></span>
+  </a>
+</div>
+  </div>
+  <div class="about-contents"><div id="aboutme">
+<section id="um-mig" class="level2">
+<h2 data-anchor-id="um-mig">Um mig</h2>
+<p>Ég er doktorsnemi í tölfræði við Verkfræði- og Náttúruvísindasvið Háskóla Íslands að rannsaka <em>tölfræðilega skölun á hámarksúrkomu á klukkustundarskala frá veðurfræðilíkani á þéttu landfræðilegu neti</em>. Auk þessa kenni ég <a href="https://ugla.hi.is/kennsluskra/index.php?tab=nam&amp;chapter=namskeid&amp;id=70742120230&amp;namskra=0" target="_blank">Tölfræðiráðgjöf</a> og vinn hjá <a href="https://hjarta.is" target="_blank">Hjartavernd</a>.</p>
+<p>Ég býð upp á <a href="./pages/radgjof.html">tölfræðiráðgjöf gegn gjaldi</a> og hvet þig til að hafa samband ef þig vantar aðstoð!</p>
+</section>
+</div></div>
+</div>
 
+<section id="fyrirlestrar-viðtöl-og-fleira" class="level2">
+<h2 data-anchor-id="fyrirlestrar-viðtöl-og-fleira">Fyrirlestrar, viðtöl og fleira</h2>
+<div id="listing-listing-talks" class="quarto-listing quarto-listing-container-grid">
+<div class="list grid quarto-listing-cols-3">
+<div class="g-col-1" data-index="0" data-categories="viðtal,landspítali,íslenska" data-listing-date-sort="1660089600000" data-listing-file-modified-sort="1661945785609" data-listing-reading-time-sort="0.02">
+<a href="./talks/mbl_2022-08-10/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img src="./talks/mbl_2022-08-10/image.jpg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Viðtal á mbl.is um Landspítalafærslu
+</h5>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('viðtal'); return false;">
+viðtal
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('landspítali'); return false;">
+landspítali
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
+íslenska
+</div>
+</div>
+<div class="card-text listing-description">
+<p>Karlotta Líf Sumarliðadóttir tók viðtal við mig um færsluna mína þar sem ég fjallaði um starfsemisupplýsingar Landspítala. Viðtalið birtist á mbl.is 10. ágúst 2022.</p>
+</div>
+<div class="card-attribution card-text-small justify">
+<div class="listing-author">
 
+</div>
+<div class="listing-date">
+Aug 10, 2022
+</div>
+</div>
+</div>
+</div>
+</a>
+</div>
+<div class="g-col-1" data-index="1" data-categories="viðtal,íslenska,covid19" data-listing-date-sort="1608595200000" data-listing-file-modified-sort="1661945733402" data-listing-reading-time-sort="0.02">
+<a href="./talks/hi-vefur/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img src="./talks/hi-vefur/image.jpeg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Viðtal á vef HÍ
+</h5>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('viðtal'); return false;">
+viðtal
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
+íslenska
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('covid19'); return false;">
+covid19
+</div>
+</div>
+<div class="card-text listing-description">
+<p>Halldór Marteinsson tók viðtal við mig sem birtist á vef Háskóla Íslands 22. desember 2020.</p>
+</div>
+<div class="card-attribution card-text-small justify">
+<div class="listing-author">
 
+</div>
+<div class="listing-date">
+Dec 22, 2020
+</div>
+</div>
+</div>
+</div>
+</a>
+</div>
+<div class="g-col-1" data-index="2" data-categories="viðtal,covid19,íslenska" data-listing-date-sort="1597881600000" data-listing-file-modified-sort="1661945876871" data-listing-reading-time-sort="0.02">
+<a href="./talks/mbl_2020-08-20/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img src="./talks/mbl_2020-08-20/image.jpg" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Viðtal á mbl.is um störf COVID-19 hópsins
+</h5>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('viðtal'); return false;">
+viðtal
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('covid19'); return false;">
+covid19
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
+íslenska
+</div>
+</div>
+<div class="card-text listing-description">
+Alexander Kristjánsson tók viðtal fyrir mbl.is við stóran hluta hópsins sem vann að COVID-19 spálíkanagerð á vegum Háskóla Íslands, Landspítala og Landlæknis. Viðtalið…
+</div>
+<div class="card-attribution card-text-small justify">
+<div class="listing-author">
 
+</div>
+<div class="listing-date">
+Aug 20, 2020
+</div>
+</div>
+</div>
+</div>
+</a>
+</div>
+<div class="g-col-1" data-index="3" data-categories="english,presentation,covid19,bayesian statistics" data-listing-date-sort="1597276800000" data-listing-file-modified-sort="1661945766367" data-listing-reading-time-sort="0.075">
+<a href="./talks/covid-spalikan/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img data-src="./talks/covid-spalikan/image.png" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+COVID-19 Spálíkan
+</h5>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('english'); return false;">
+english
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('presentation'); return false;">
+presentation
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('covid19'); return false;">
+covid19
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('bayesian statistics'); return false;">
+bayesian statistics
+</div>
+</div>
+<div class="card-text listing-description">
+<p>Ég flutti erindi um aðferðafræðina á bak við COVID-19 spálíkan Háskóla Íslands, Landspítala og Embættis Landlæknis á StanCon árið 2020.</p>
+</div>
+<div class="card-attribution card-text-small justify">
+<div class="listing-author">
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+</div>
+<div class="listing-date">
+Aug 13, 2020
+</div>
+</div>
+</div>
+</div>
+</a>
+</div>
+</div>
+<div class="listing-no-matching d-none">
+No matching items
+</div>
+<nav id="listing-talks-pagination" class="listing-pagination" aria-label="Page Navigation">
+  <ul class="pagination"></ul>
+</nav>
+</div>
+</section>
+<section id="færslur" class="level2">
+<h2 data-anchor-id="færslur">Færslur</h2>
+<div id="listing-listing-blog" class="quarto-listing quarto-listing-container-default">
 <div class="list quarto-listing-default">
 <div class="quarto-post image-right" data-index="0" data-categories="efnahagur,verðlag,Hagstofa,R,íslenska" data-listing-date-sort="1661817600000" data-listing-file-modified-sort="1661858074896" data-listing-reading-time-sort="16.11">
 <div class="thumbnail">
@@ -662,16 +864,16 @@ Brynjólfur Gauti Guðrúnar Jónsson
 <div class="listing-no-matching d-none">
 No matching items
 </div>
-</div></main> <!-- /main -->
+</div>
+
+
+
+
+</section>
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
   const clipboard = new window.ClipboardJS('.code-copy-button', {
     target: function(trigger) {
       return trigger.previousElementSibling;
