@@ -13,6 +13,9 @@ website:
           href: https://github.com/bgautijonsson
         - icon: twitter
           href: https://twitter.com/bgautijonsson
+    center:
+        - text: Styrkja mig
+          href: https://www.buymeacoffee.com/bggj
   favicon: favicon.ico
   repo-url: https://github.com/bgautijonsson/bgautijonsson.github.io
   google-analytics: "G-EGQ9KVCY2C"

@@ -7,7 +7,7 @@ title-block-style: none
   src="https://bggj.shinyapps.io/skattagogn/"
   style="
     position: fixed;
-    top: 80px;
+    top: 60px;
     bottom: 0px;
     right: 0px;
     width: 100%;

@@ -1,11 +1,7 @@
 /* css styles */
 
+@tailwind base;
 
+@tailwind components;
 
-.nav-tabs {
-  background-color: #FFF;
-}
-
-.tab-content {
-    border-style: none;
-}
+@tailwind utilities;
