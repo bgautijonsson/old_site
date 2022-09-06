@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/skattagogn/index.html",
       "/posts/visitala_neysluverds/index.html",
       "/posts/landspitali/index.html",
       "/posts/lausstorf/index.html",
@@ -22,6 +23,7 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/skattagogn/index.html",
       "/posts/visitala_neysluverds/index.html",
       "/posts/landspitali/index.html",
       "/posts/lausstorf/index.html",

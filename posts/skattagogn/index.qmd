@@ -25,7 +25,7 @@ execute:
   cache: false
 editor: source
 title-block-banner: true
-draft: true
+draft: false
 categories:
     - skattar
     - efnahagur
