@@ -71,7 +71,8 @@ ul.task-list li input[type="checkbox"] {
 
     const options = {
       valueNames: ['listing-date','listing-title','listing-author','listing-subtitle','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
+      page: 10,
+    pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
       searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description","listing-categories"],
     };
 
@@ -222,7 +223,7 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Flokkar</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(14)</span></div><div class="category" data-category="Hagstofa">Hagstofa <span class="quarto-category-count">(4)</span></div><div class="category" data-category="OurWorldInData">OurWorldInData <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(10)</span></div><div class="category" data-category="bayesian statistics">bayesian statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="covid19">covid19 <span class="quarto-category-count">(3)</span></div><div class="category" data-category="efnahagur">efnahagur <span class="quarto-category-count">(5)</span></div><div class="category" data-category="english">english <span class="quarto-category-count">(2)</span></div><div class="category" data-category="fasteignir">fasteignir <span class="quarto-category-count">(1)</span></div><div class="category" data-category="kosningar">kosningar <span class="quarto-category-count">(1)</span></div><div class="category" data-category="landspítali">landspítali <span class="quarto-category-count">(3)</span></div><div class="category" data-category="orkumál">orkumál <span class="quarto-category-count">(1)</span></div><div class="category" data-category="plots">plots <span class="quarto-category-count">(1)</span></div><div class="category" data-category="presentation">presentation <span class="quarto-category-count">(1)</span></div><div class="category" data-category="tutorial">tutorial <span class="quarto-category-count">(1)</span></div><div class="category" data-category="verðlag">verðlag <span class="quarto-category-count">(1)</span></div><div class="category" data-category="vinnumarkaður">vinnumarkaður <span class="quarto-category-count">(2)</span></div><div class="category" data-category="viðtal">viðtal <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Þjóðskrá">Þjóðskrá <span class="quarto-category-count">(1)</span></div><div class="category" data-category="íslenska">íslenska <span class="quarto-category-count">(12)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Flokkar</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(15)</span></div><div class="category" data-category="Hagstofa">Hagstofa <span class="quarto-category-count">(4)</span></div><div class="category" data-category="OurWorldInData">OurWorldInData <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(11)</span></div><div class="category" data-category="bayesian statistics">bayesian statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="covid19">covid19 <span class="quarto-category-count">(3)</span></div><div class="category" data-category="efnahagur">efnahagur <span class="quarto-category-count">(6)</span></div><div class="category" data-category="english">english <span class="quarto-category-count">(2)</span></div><div class="category" data-category="fasteignir">fasteignir <span class="quarto-category-count">(1)</span></div><div class="category" data-category="kosningar">kosningar <span class="quarto-category-count">(1)</span></div><div class="category" data-category="landspítali">landspítali <span class="quarto-category-count">(3)</span></div><div class="category" data-category="orkumál">orkumál <span class="quarto-category-count">(1)</span></div><div class="category" data-category="plots">plots <span class="quarto-category-count">(1)</span></div><div class="category" data-category="presentation">presentation <span class="quarto-category-count">(1)</span></div><div class="category" data-category="stjórnmál">stjórnmál <span class="quarto-category-count">(1)</span></div><div class="category" data-category="tutorial">tutorial <span class="quarto-category-count">(1)</span></div><div class="category" data-category="verðlag">verðlag <span class="quarto-category-count">(1)</span></div><div class="category" data-category="vinnumarkaður">vinnumarkaður <span class="quarto-category-count">(2)</span></div><div class="category" data-category="viðtal">viðtal <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Þjóðskrá">Þjóðskrá <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ársreikningar">ársreikningar <span class="quarto-category-count">(1)</span></div><div class="category" data-category="íslenska">íslenska <span class="quarto-category-count">(13)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -264,7 +265,7 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
 <h2 data-anchor-id="fyrirlestrar-viðtöl-og-fleira">Fyrirlestrar, viðtöl og fleira</h2>
 <div id="listing-listing-talks" class="quarto-listing quarto-listing-container-grid">
 <div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-categories="viðtal,landspítali,íslenska" data-listing-date-sort="1660089600000" data-listing-file-modified-sort="1661945785609" data-listing-reading-time-sort="0.02">
+<div class="g-col-1" data-index="0" data-categories="viðtal,landspítali,íslenska" data-listing-date-sort="1660089600000" data-listing-file-modified-sort="1662310595057" data-listing-reading-time-sort="0.02">
 <a href="./talks/mbl_2022-08-10/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -300,7 +301,7 @@ Aug 10, 2022
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="1" data-categories="viðtal,íslenska,covid19" data-listing-date-sort="1608595200000" data-listing-file-modified-sort="1661945733402" data-listing-reading-time-sort="0.02">
+<div class="g-col-1" data-index="1" data-categories="viðtal,íslenska,covid19" data-listing-date-sort="1608595200000" data-listing-file-modified-sort="1662310595053" data-listing-reading-time-sort="0.02">
 <a href="./talks/hi-vefur/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -336,7 +337,7 @@ Dec 22, 2020
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="2" data-categories="viðtal,covid19,íslenska" data-listing-date-sort="1597881600000" data-listing-file-modified-sort="1661945876871" data-listing-reading-time-sort="0.02">
+<div class="g-col-1" data-index="2" data-categories="viðtal,covid19,íslenska" data-listing-date-sort="1597881600000" data-listing-file-modified-sort="1662310595055" data-listing-reading-time-sort="0.02">
 <a href="./talks/mbl_2020-08-20/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -372,7 +373,7 @@ Aug 20, 2020
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="3" data-categories="english,presentation,covid19,bayesian statistics" data-listing-date-sort="1597276800000" data-listing-file-modified-sort="1661945766367" data-listing-reading-time-sort="0.075">
+<div class="g-col-1" data-index="3" data-categories="english,presentation,covid19,bayesian statistics" data-listing-date-sort="1597276800000" data-listing-file-modified-sort="1662310595049" data-listing-reading-time-sort="0.075">
 <a href="./talks/covid-spalikan/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -424,7 +425,7 @@ No matching items
 <h2 data-anchor-id="færslur">Færslur</h2>
 <div id="listing-listing-blog" class="quarto-listing quarto-listing-container-default">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="efnahagur,verðlag,Hagstofa,R,íslenska" data-listing-date-sort="1661817600000" data-listing-file-modified-sort="1661858074896" data-listing-reading-time-sort="16.11">
+<div class="quarto-post image-right" data-index="0" data-categories="efnahagur,verðlag,Hagstofa,R,íslenska" data-listing-date-sort="1661817600000" data-listing-file-modified-sort="1662310595044" data-listing-reading-time-sort="16.11">
 <div class="thumbnail">
 <p><a href="./posts/visitala_neysluverds/index.html"> <img src="./posts/visitala_neysluverds/undirtolur.png" class="thumnail-image"> </a></p>
 </div>
@@ -471,7 +472,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="landspítali,R,íslenska" data-listing-date-sort="1661299200000" data-listing-file-modified-sort="1661351262227" data-listing-reading-time-sort="56.46">
+<div class="quarto-post image-right" data-index="1" data-categories="landspítali,R,íslenska" data-listing-date-sort="1661299200000" data-listing-file-modified-sort="1662310594796" data-listing-reading-time-sort="56.46">
 <div class="thumbnail">
 <p><a href="./posts/landspitali/index.html"> <img src="./posts/landspitali/hjukthyngd.png" class="thumnail-image"> </a></p>
 </div>
@@ -512,7 +513,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="vinnumarkaður,efnahagur,Hagstofa,R,íslenska" data-listing-date-sort="1660780800000" data-listing-file-modified-sort="1660824527113" data-listing-reading-time-sort="11.285">
+<div class="quarto-post image-right" data-index="2" data-categories="vinnumarkaður,efnahagur,Hagstofa,R,íslenska" data-listing-date-sort="1660780800000" data-listing-file-modified-sort="1662310594823" data-listing-reading-time-sort="11.285">
 <div class="thumbnail">
 <p><a href="./posts/lausstorf/index.html"> <img src="./posts/lausstorf/fig.png" class="thumnail-image"> </a></p>
 </div>
@@ -559,7 +560,58 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="landspítali,Hagstofa,R,íslenska" data-listing-date-sort="1660348800000" data-listing-file-modified-sort="1660824635783" data-listing-reading-time-sort="8.935">
+<div class="quarto-post image-right" data-index="3" data-categories="stjórnmál,efnahagur,ársreikningar,R,íslenska" data-listing-date-sort="1660348800000" data-listing-file-modified-sort="1662204874754" data-listing-reading-time-sort="8.255">
+<div class="thumbnail">
+<a href="./posts/stjornmalaflokkar/index.html">
+<div class="thumbnail-image">
+
+</div>
+</a><p><a href="./posts/stjornmalaflokkar/index.html"></a></p>
+</div>
+<div class="body">
+<a href="./posts/stjornmalaflokkar/index.html">
+<h3 class="no-anchor listing-title">
+Fjármál stjórnmálaflokkanna
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('stjórnmál'); return false;">
+stjórnmál
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('efnahagur'); return false;">
+efnahagur
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('ársreikningar'); return false;">
+ársreikningar
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
+R
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
+íslenska
+</div>
+</div>
+<a href="./posts/stjornmalaflokkar/index.html">
+<div class="listing-description">
+
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="./posts/stjornmalaflokkar/index.html">
+<div class="listing-date">
+Aug 13, 2022
+</div>
+<div class="listing-author">
+Brynjólfur Gauti Guðrúnar Jónsson
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="4" data-categories="landspítali,Hagstofa,R,íslenska" data-listing-date-sort="1660348800000" data-listing-file-modified-sort="1662310594970" data-listing-reading-time-sort="8.935">
 <div class="thumbnail">
 <p><a href="./posts/stjornsysla_heilbr/index.html"> <img src="./posts/stjornsysla_heilbr/stjornsysl.png" class="thumnail-image"> </a></p>
 </div>
@@ -603,7 +655,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="fasteignir,efnahagur,Þjóðskrá,R,íslenska" data-listing-date-sort="1658966400000" data-listing-file-modified-sort="1660824604206" data-listing-reading-time-sort="20.995">
+<div class="quarto-post image-right" data-index="5" data-categories="fasteignir,efnahagur,Þjóðskrá,R,íslenska" data-listing-date-sort="1658966400000" data-listing-file-modified-sort="1662310594827" data-listing-reading-time-sort="20.995">
 <div class="thumbnail">
 <p><a href="./posts/leigaogkaupverd/index.html"> <img src="./posts/leigaogkaupverd/leiga_hlutf_afborgun.png" class="thumnail-image"> </a></p>
 </div>
@@ -650,7 +702,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="efnahagur,vinnumarkaður,Hagstofa,R,íslenska" data-listing-date-sort="1658016000000" data-listing-file-modified-sort="1660824644198" data-listing-reading-time-sort="45.64">
+<div class="quarto-post image-right" data-index="6" data-categories="efnahagur,vinnumarkaður,Hagstofa,R,íslenska" data-listing-date-sort="1658016000000" data-listing-file-modified-sort="1662310594981" data-listing-reading-time-sort="45.64">
 <div class="thumbnail">
 <p><a href="./posts/vinnuafl/index.html"> <img src="./posts/vinnuafl/hlutf_opinbert.png" class="thumnail-image"> </a></p>
 </div>
@@ -697,7 +749,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-categories="orkumál,OurWorldInData,R,íslenska" data-listing-date-sort="1657843200000" data-listing-file-modified-sort="1660824620855" data-listing-reading-time-sort="63.43">
+<div class="quarto-post image-right" data-index="7" data-categories="orkumál,OurWorldInData,R,íslenska" data-listing-date-sort="1657843200000" data-listing-file-modified-sort="1662310594899" data-listing-reading-time-sort="63.43">
 <div class="thumbnail">
 <p><a href="./posts/orkumal/index.html"> <img src="./posts/orkumal/throun_fossil.png" class="thumnail-image"> </a></p>
 </div>
@@ -741,7 +793,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="7" data-categories="english,R,plots,tutorial" data-listing-date-sort="1656374400000" data-listing-file-modified-sort="1656436016199" data-listing-reading-time-sort="4.485">
+<div class="quarto-post image-right" data-index="8" data-categories="english,R,plots,tutorial" data-listing-date-sort="1656374400000" data-listing-file-modified-sort="1662310594788" data-listing-reading-time-sort="4.485">
 <div class="thumbnail">
 <p><a href="./posts/forest-plot-table/index.html"> <img src="./posts/forest-plot-table/featured.png" class="thumnail-image"> </a></p>
 </div>
@@ -785,7 +837,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="8" data-categories="R,kosningar,íslenska" data-listing-date-sort="1656201600000" data-listing-file-modified-sort="1660040161993" data-listing-reading-time-sort="98.155">
+<div class="quarto-post image-right" data-index="9" data-categories="R,kosningar,íslenska" data-listing-date-sort="1656201600000" data-listing-file-modified-sort="1662310594790" data-listing-reading-time-sort="98.155">
 <div class="thumbnail">
 <p><a href="./posts/kosningarannsokn/index.html"> <img src="./posts/kosningarannsokn/flokkshollusta.png" class="thumnail-image"> </a></p>
 </div>
@@ -826,9 +878,9 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="9" data-categories="efnahagur,R,íslenska" data-listing-date-sort="1655942400000" data-listing-file-modified-sort="1660040177156" data-listing-reading-time-sort="10.275">
+<div class="quarto-post image-right" data-index="10" data-categories="efnahagur,R,íslenska" data-listing-date-sort="1655942400000" data-listing-file-modified-sort="1662310594791" data-listing-reading-time-sort="10.275">
 <div class="thumbnail">
-<p><a href="./posts/lanategundir/index.html"> <img src="./posts/lanategundir/dreifing.png" class="thumnail-image"> </a></p>
+<p><a href="./posts/lanategundir/index.html"> <img data-src="./posts/lanategundir/dreifing.png" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/lanategundir/index.html">
@@ -871,6 +923,9 @@ Brynjólfur Gauti Guðrúnar Jónsson
 <div class="listing-no-matching d-none">
 No matching items
 </div>
+<nav id="listing-blog-pagination" class="listing-pagination" aria-label="Page Navigation">
+  <ul class="pagination"></ul>
+</nav>
 </div>
 
 
