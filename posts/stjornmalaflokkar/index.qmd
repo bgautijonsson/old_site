@@ -21,7 +21,7 @@ execute:
   warning: false
   cache: false
 editor: source
-draft: false
+draft: true
 title-block-banner: true
 categories:
     - stjórnmál

@@ -342,7 +342,7 @@ ggplotly(
 
 # Árleg breyting og mánaðarleg breyting
 
-Þar sem árleg verðbólga samanstendur af verðbólgu síðustu 12 mánaða getur ekki hver og einn mánuður lækkað hana mikið. Ef mánaðarleg verðbólga síðustu 11 mánuði hefur verið 0,5% en hún mælist svo 0% verður árleg verðbólgan samt $1,005^{11} = 1,056 = 5,6\%$. Hins vegar getur verið gott að bera saman mánaðarlega verðbólgi við meðaltal síðastliðins árs. Ef mánaðarleg verðbólga er lægri en meðaltal síðasta árs er árleg verðbólga að lækka.
+Þar sem árleg verðbólga samanstendur af verðbólgu síðustu 12 mánaða getur ekki hver og einn mánuður lækkað hana mikið. Ef mánaðarleg verðbólga síðustu 11 mánuði hefur verið 0,5% en hún mælist svo 0% verður árleg verðbólgan samt $1,005^{11} = 1,056 = 5,6\%$. Hins vegar getur verið gott að bera saman mánaðarlega verðbólgu við meðaltal síðastliðins árs. Ef mánaðarleg verðbólga er lægri en meðaltal síðasta árs er árleg verðbólga að lækka.
 
 ```{r}
 #| fig.width: 10
@@ -373,4 +373,90 @@ ggplotly(
     tooltip = "text"
 )
 ```
+
+
+# Samræmd vísitala neysluverðs
+
+```{r}
+d_sam <- pxweb_get(
+    url ="https://px.hagstofa.is:443/pxis/api/v1/is/Efnahagur/visitolur/2_samraemdvnv/samraemdvnv/VIS02201.px", 
+    query = list(
+        "Flokkur" = c("*"),
+        "Ár" = c("*")
+    ),
+    verbose = FALSE
+) |> 
+    as.data.frame() |> 
+    as_tibble() |> 
+    janitor::clean_names() |> 
+    rename(vaegi_samraemd = 3, undirvisitala = flokkur) |> 
+    mutate(ar = parse_number(ar),
+           vaegi_samraemd = vaegi_samraemd / 1000) |> 
+    filter(str_detect(undirvisitala, "^[0-9]{2} ")) |> 
+    mutate(undirvisitala = str_replace(undirvisitala, "^[0-9]{2} ", ""))
+```
+
+
+```{r}
+lvls <- plot_dat |> 
+    distinct(undirvisitala) |> 
+    filter(undirvisitala != "Vísitala neysluverðs")
+
+plot_dat <- d |> 
+    filter(undirvisitala != "Vísitala neysluverðs") |> 
+    select(date, undirvisitala, vaegi) |> 
+    group_by(ar = year(date), undirvisitala) |> 
+    summarise(vaegi = mean(vaegi)) |> 
+    group_by(ar) |> 
+    mutate(vaegi = vaegi / sum(vaegi)) |> 
+    ungroup() |> 
+    inner_join(
+        d_sam,
+        by = c("ar", "undirvisitala")
+    ) |> 
+    mutate(
+        undirvisitala = factor(undirvisitala, levels = levels(lvls$undirvisitala)),
+        text = str_c(
+            "<b>", undirvisitala, "</b>\n",
+            "Ár: ", ar, "\n",
+            "Vægi í vísitölu (Ísland): ", percent(vaegi, accuracy = 0.01), "\n",
+            "Vægi í vísitölu (Samræmd): ", percent(vaegi_samraemd, accuracy = 0.01))
+    )
+
+p <- plot_dat |> 
+    ggplot(aes(vaegi, vaegi_samraemd, frame = ar, text = text)) +
+    geom_abline(intercept = 0, slope = 1) +
+    geom_point(aes(col = undirvisitala)) +
+    scale_x_continuous(labels = label_percent()) +
+    scale_y_continuous(labels = label_percent()) +
+    scale_colour_brewer(type = "qual", palette = "Paired") +
+    scale_fill_brewer(type = "qual", palette = "Paired") +
+    theme_half_open() +
+    theme(legend.position = "none") +
+    labs(x = "Vægi á Íslandi",
+         y = "Samræmt vægi",
+         title = "Samanburður á íslensku og samræmdu vægi")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    animation_opts(
+        transition = 500,
+        easing = "cubic-in-out",
+        redraw = FALSE
+        
+    ) |> 
+    animation_slider(currentvalue = list(prefix = "Ár:")) |> 
+    layout(
+        hoverlabel = list(align = "left")
+    )
+```
+
+
+
+
+
+
+
 

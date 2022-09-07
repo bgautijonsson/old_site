@@ -8,7 +8,7 @@ author:
         url: "https://twitter.com/bgautijonsson"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
-date: "2022/09/06"
+date: "2022/09/07"
 format: 
     html:
         code-fold: true
@@ -31,9 +31,9 @@ categories:
     - efnahagur
     - R
     - íslenska
-image: hjukthyngd.png
+image: image.png
 twitter-card: 
-    image: hjukthyngd.png
+    image: image.png
 ---
 
 ```{r}
@@ -65,36 +65,45 @@ con <- dbConnect(RPostgres::Postgres(),
                  port = usr$port, 
                  user = usr$username, 
                  password = usr$password)
+
 ```
 
+```{r}
+d <- tbl(con, "tiundamork_1997_2021") 
+```
+
+
+# Heildartekjur og skattar
+
+## Hlutfall tekna og skatta
 
 ```{r}
 #| fig-width: 10
 #| fig-asp: 0.621
 #| out-width: "100%"
-d <- tbl(con, "tiundamork_1997_2021") |> 
-    filter(tiundarbreyta == "Heildartekjur",
+
+plot_dat <- d |>
+    filter(tiundarbreyta %in% "Heildartekjur",
            name %in% c("Tekjur alls", 
                        "Skattar alls",
                        "Fjöldi í hóp")) |> 
     collect() |> 
     pivot_wider() |> 
     rename(fjoldi = "Fjöldi í hóp") |> 
-    pivot_longer(c(-ar, -tiundarbreyta, -tiundarhluti, -fjoldi))
-
-
-
-plot_dat <- d |> 
+    pivot_longer(c(-ar, -tiundarbreyta, -tiundarhluti, -fjoldi)) |> 
     group_by(ar, name) |> 
     mutate(p = value / sum(value)) |> 
-    ungroup() |> 
+    ungroup()
+
+
+plot_dat <- plot_dat |> 
     select(-tiundarbreyta, -value) |> 
     pivot_wider(names_from = name, values_from = p) |> 
     janitor::clean_names() |> 
     rename(tekjur_hlutf = tekjur_alls, skattar_hlutf = skattar_alls) |> 
     inner_join(
-        d |> 
-            select(-tiundarbreyta) |> 
+        plot_dat |> 
+            select(-tiundarbreyta, -p) |> 
             pivot_wider(names_from = name, values_from = value) |> 
             janitor::clean_names(),
         by = c("ar", "tiundarhluti", "fjoldi")
@@ -108,13 +117,15 @@ plot_dat <- d |>
         by = "ar"
     ) |> 
     mutate(tekjur_alls = tekjur_alls / visitala,
-           skattar_alls = skattar_alls / visitala) |> 
+           skattar_alls = skattar_alls / visitala,
+           skattar_hlutf_tekjum = skattar_alls / tekjur_alls) |> 
     mutate(text = str_c("<b>Tekjutíund: ", tiundarhluti, "</b>", "\n",
                         "Ár: ", ar, "\n",
                         "Tekjur (á mann á mánuði): ", number(tekjur_alls * 1e6 / (fjoldi * 12), suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
                         "% allra tekna: ", percent(tekjur_hlutf, accuracy = 0.1), "\n",
                         "Skattar (á mann á mánuði): ", number(skattar_alls * 1e6 / (fjoldi * 12), suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
-                        "% allra skatta: ", percent(skattar_hlutf, accuracy = 0.1)))
+                        "% allra skatta: ", percent(skattar_hlutf, accuracy = 0.1), "\n",
+                        "Skattbyrði (% af tekjum): ", percent(skattar_hlutf_tekjum, accuracy = 0.1)))
 
 
 
@@ -144,7 +155,6 @@ ggplotly(
 ) |> 
     animation_opts(
         transition = 500,
-        easing = "cubic-in-out",
         redraw = FALSE
         
     ) |> 
@@ -153,5 +163,283 @@ ggplotly(
         hoverlabel = list(align = "left")
     )
 
+```
+
+<br>
+<br>
+
+## Skattbyrði
+
+```{r}
+#| fig-width: 10
+#| fig-asp: 0.621
+#| out-width: "100%"
+
+plot_dat <- plot_dat |> 
+    mutate(
+        text = str_c("<b>Tekjutíund: ", tiundarhluti, "</b>", "\n",
+                     "Ár: ", ar, "\n",
+                     "Tekjur (á mann á mánuði): ", number(tekjur_alls * 1e6 / (fjoldi * 12), suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
+                     "% allra tekna: ", percent(tekjur_hlutf, accuracy = 0.1), "\n",
+                     "Skattar (á mann á mánuði): ", number(skattar_alls * 1e6 / (fjoldi * 12), suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
+                     "% allra skatta: ", percent(skattar_hlutf, accuracy = 0.1), "\n",
+                     "<b>Skattbyrði (% af tekjum): ", percent(skattar_hlutf_tekjum, accuracy = 0.1), "</b>")
+    )
+p <- plot_dat |> 
+    ggplot(aes(tiundarhluti, skattar_hlutf_tekjum, 
+               frame = ar, text = text)) +
+    geom_line(aes(group = "none")) +
+    geom_point() +
+    scale_x_continuous(expand = expansion(add = 0.05),
+                       breaks = seq(0, 10, by = 1)) +
+    scale_y_continuous(labels = label_percent(),
+                       expand = expansion(add = 0.002),
+                       breaks = seq(0, 50, by = 10)/100) +
+    theme_half_open() +
+    theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5)) +
+    labs(x = "Tekjutíund",
+         y = "Skattbyrðu (Skattar sem % af tekjum)",
+         title = "Skattbyrði eftir tekjutíund")
+
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    animation_opts(
+        transition = 500,
+        redraw = FALSE
+        
+    ) |> 
+    animation_slider(currentvalue = list(prefix = "Ár:")) |> 
+    layout(
+        hoverlabel = list(align = "left")
+    )
+```
+
+<br>
+<br>
+
+# Þróun frá 1997
+
+## Heildartekjur
+
+```{r}
+#| fig-width: 10
+#| fig-asp: 0.621
+#| out-width: "100%"
+
+
+plot_dat <- d |> 
+    filter(tiundarbreyta == "Heildartekjur",
+           name %in% c("Tekjur alls", "Fjöldi í hóp")) |> 
+    collect() |> 
+    pivot_wider() |> 
+    rename(fjoldi = "Fjöldi í hóp") |> 
+    pivot_longer(c(-ar, -tiundarbreyta, -tiundarhluti, -fjoldi)) |> 
+    group_by(ar, name) |> 
+    mutate(p = value / sum(value)) |> 
+    ungroup() |> 
+    select(-tiundarbreyta) |> 
+    inner_join(
+        vnv() |> 
+            group_by(ar = year(date)) |> 
+            summarise(cpi = mean(cpi),
+                      .groups = "drop") |> 
+            mutate(cpi = cpi / cpi[ar == max(ar)]),
+        by = "ar"
+    ) |> 
+    mutate(
+        value = value / cpi,
+        index = value / value[ar == min(ar)],
+        text = str_c("<b>Tekjutíund: ", tiundarhluti, "</b>", "\n",
+                     "Ár: ", ar, "\n",
+                     "Heildartekjur (á mann á mánuði): ",
+                     number(value * 1e6 / (fjoldi * 12), suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
+                     "Breyting (síðan 1997): ", 
+                      ifelse(index >= 1, "+", ""),
+                     percent(index - 1, accuracy = 0.01, big.mark = ".", decimal.mark = ",")
+        )
+    )
+
+p <- plot_dat |> 
+    ggplot(aes(ar, index, text = text)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    geom_line(aes(group = tiundarhluti, col = tiundarhluti)) +
+    scale_x_continuous() +
+    scale_y_log10(
+        labels = function(x) percent(x - 1),
+        breaks = c(
+            1, 1.25, 1.5, 2, 3,
+            1/1.25, 1/1.5, 1/2, 1/3
+        )
+    ) +
+    scale_colour_distiller(type = "div", palette = "RdYlBu", direction = 1) +
+    theme_half_open() +
+    theme(legend.position = "none",
+          plot.title = element_text(size = 14)) +
+    labs(x = NULL,
+         y = NULL,
+         title = "Breyting á heildartekjum miðað við 1997 (Verðlag 2022)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(
+        hoverlabel = list(align = "left")
+    )
+```
+
+## Ráðstöfunartekjur
+
+```{r}
+#| fig-width: 10
+#| fig-asp: 0.621
+#| out-width: "100%"
+
+
+plot_dat <- d |> 
+    filter(tiundarbreyta == "Ráðstöfunartekjur",
+           name %in% c("Ráðstöfunartekjur (Tekjur - Skattar)", "Fjöldi í hóp")) |> 
+    collect() |> 
+    pivot_wider() |> 
+    rename(fjoldi = "Fjöldi í hóp") |> 
+    pivot_longer(c(-ar, -tiundarbreyta, -tiundarhluti, -fjoldi)) |> 
+    group_by(ar, name) |> 
+    mutate(p = value / sum(value)) |> 
+    ungroup() |> 
+    select(-tiundarbreyta) |> 
+    inner_join(
+        vnv() |> 
+            group_by(ar = year(date)) |> 
+            summarise(cpi = mean(cpi),
+                      .groups = "drop") |> 
+            mutate(cpi = cpi / cpi[ar == max(ar)]),
+        by = "ar"
+    ) |> 
+    mutate(
+        value = value / cpi,
+        index = value / value[ar == min(ar)],
+        text = str_c("<b>Tekjutíund: ", tiundarhluti, "</b>", "\n",
+                     "Ár: ", ar, "\n",
+                     "Ráðstöfunartekjur (á mann á mánuði): ", 
+                     number(value * 1e6 / (fjoldi * 12), suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
+                     "Breyting (síðan 1997): ", 
+                     ifelse(index >= 1, "+", ""),
+                     percent(index - 1, accuracy = 0.01, big.mark = ".", decimal.mark = ",")
+        )
+    )
+
+p <- plot_dat |> 
+    ggplot(aes(ar, index, text = text)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    geom_line(aes(group = tiundarhluti, col = tiundarhluti)) +
+    scale_x_continuous() +
+    scale_y_log10(
+        labels = function(x) percent(x - 1),
+        breaks = c(
+            1, 1.25, 1.5, 2, 3,
+            1/1.25, 1/1.5, 1/2, 1/3
+        )
+    ) +
+    scale_colour_distiller(type = "div", palette = "RdYlBu", direction = 1) +
+    theme_half_open() +
+    theme(legend.position = "none",
+          plot.title = element_text(size = 14)) +
+    labs(x = NULL,
+         y = NULL,
+         title = "Breyting á ráðstöfunartekjum miðað við 1997 (Verðlag 2022)")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(
+        hoverlabel = list(align = "left")
+    )
+```
+
+## Ráðstöfunartekjur sem hlutfall af tekjum
+
+```{r}
+#| fig-width: 10
+#| fig-asp: 0.621
+#| out-width: "100%"
+
+plot_dat <- d |> 
+    filter(tiundarbreyta == "Heildartekjur",
+           name %in% c("Tekjur alls", "Ráðstöfunartekjur (Tekjur - Skattar)")) |> 
+    collect() |> 
+    arrange(ar, tiundarhluti, name) |> 
+    select(ar, tiundarhluti, name, value) |> 
+    pivot_wider(names_from = name, values_from = value) |> 
+    janitor::clean_names() |> 
+    mutate(
+        value = radstofunartekjur_tekjur_skattar / tekjur_alls,
+        index = value / value[ar == min(ar)],
+        text = str_c("<b>Tekjutíund: ", tiundarhluti, "</b>", "\n",
+                     "Ár: ", ar, "\n",
+                     "Ráðstöfunartekjur % af heildartekjum: ", 
+                     percent(value, accuracy = 0.01, big.mark = ".", decimal.mark = ","), "\n",
+                     "Breyting (síðan 1997): ", 
+                     ifelse(index >= 1, "+", ""),
+                     percent(index - 1, accuracy = 0.01, big.mark = ".", decimal.mark = ",")
+        )
+    )
+
+p <- plot_dat |> 
+    ggplot(aes(ar, index, text = text)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    geom_line(aes(group = tiundarhluti, col = tiundarhluti)) +
+    scale_x_continuous() +
+    scale_y_continuous(
+        labels = function(x) percent(x - 1)
+    ) +
+    scale_colour_distiller(type = "div", palette = "RdYlBu", direction = 1) +
+    theme_half_open() +
+    theme(legend.position = "none",
+          plot.title = element_text(size = 14)) +
+    labs(x = NULL,
+         y = NULL,
+         title = "Breyting á ráðstöfunartekjum sem hlutfall af heildartekjum miðað við 1997")
+
+ggplotly(
+    p,
+    tooltip = "text"
+) |> 
+    layout(
+        hoverlabel = list(align = "left")
+    )
+```
+
+
+```{r}
+#| include: false
+
+p <- plot_dat |> 
+    ggplot(aes(ar, index)) +
+    geom_hline(yintercept = 1, lty = 2) +
+    geom_line(aes(group = tiundarhluti, col = tiundarhluti)) +
+    geom_rangeframe() +
+    scale_x_continuous(
+        breaks = seq(1997, 2021, by = 3)
+    ) +
+    scale_y_log10(
+        labels = function(x) percent(x - 1),
+        breaks = c(seq(0.9, 1.1, by = 0.05), range(plot_dat$index))
+    ) +
+    scale_colour_distiller(type = "div", palette = "RdYlBu", direction = 1) +
+    theme_tufte() +
+    theme(plot.title = element_text(face = "bold"),
+          legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         colour = "Tekjutíund",
+         title = "Breyting á ráðstöfunartekjum sem hlutfall af heildartekjum miðað við 1997",
+         subtitle = "Ráðstöfunartekjur hafa hækkar hægar en heildartekjur í öllum tekjutíundum nema þeirri efstu")
+
+ggsave(p, filename = "image.png",
+       width = 8, height = 0.621 * 8, scale = 1.1, bg = "white")
 ```
 
