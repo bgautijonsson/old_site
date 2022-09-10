@@ -1,5 +1,5 @@
 ---
-title: "Tekjur og skattar"
+title: "Tekjur, skattar og kaupmáttur"
 subtitle: "Hvað fær hver tekjutíund mikið af tekjum og hvað borga þær mikið af sköttum?"
 description: |
     Stundum les maður að skattakerfið ýti undir ójöfnuð, eða að það séu of háir skattar á þeim efnameiru. Hvort er það? Hér nota ég skattagögn Hagstofunnar til að skoða tekjur og skatta eftir tekjutíundum. Ég get ekki sagt hvort það sé sanngjarnt, en ég get sýnt hvernig það hefur breyst með tímanum.
