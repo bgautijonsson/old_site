@@ -8,7 +8,7 @@ author:
         url: "https://twitter.com/bgautijonsson"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
-date: "2022/07/17"
+date: "2022/09/10"
 format: 
     html:
         code-fold: true
@@ -21,7 +21,7 @@ format:
 execute: 
   echo: true
   warning: false
-  cache: true
+  cache: false
 editor: source
 title-block-banner: true
 categories:
@@ -59,7 +59,7 @@ library(broom)
 
 # Gögn
 
-Hér notum við gögn frá Hagstofunni um [Fjölda starfandi í rekstrarformum samkvæmt skrám eftir mánuðum, kyni, aldri og bakgrunni 2008-2022](https://px.hagstofa.is/pxis/pxweb/is/Samfelag/Samfelag__vinnumarkadur__vinnuaflskraargogn/VIN10052.px).
+Hér nota ég gögn frá Hagstofunni um [Fjölda starfandi í rekstrarformum samkvæmt skrám eftir mánuðum, kyni, aldri og bakgrunni 2008-2022](https://px.hagstofa.is/pxis/pxweb/is/Samfelag/Samfelag__vinnumarkadur__vinnuaflskraargogn/VIN10052.px).
 
 ```{r}
 url <- "https://px.hagstofa.is:443/pxis/api/v1/is/Samfelag/vinnumarkadur/vinnuaflskraargogn/VIN10052.px"
@@ -275,9 +275,9 @@ p <- plot_dat |>
     geom_hline(yintercept = 0, lty = 2) +  
     geom_line() +  
     geom_rangeframe() +  
-    scale_y_continuous(breaks = c(range(plot_dat$breyting), -1.5e4, -1e4, -5e3, 0, 5e3),
+    scale_y_continuous(breaks = c(range(plot_dat$breyting), -1.5e4, -1e4, -5e3, 0),
                        labels = label_number(big.mark = ".", decimal.mark = ","),
-                       limits = c(-1.8e4, 2e3)) +  
+                       limits = c(-1.8e4, NA)) +  
     scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
                  guide = guide_axis(n.dodge = 1),  
                  expand = expansion()) +  
@@ -339,7 +339,7 @@ p
 ### 2019
 
 ```{r}
-#| fig.widt: 12
+#| fig.widt: 10
 #| fig.asp: 0.621
 #| out.width: "100%"
 
@@ -419,7 +419,7 @@ plot_dat <- emmeans(m, ~ timi + manudur, at = list(timi = model_dat$timi,
 
 
 opinbert_dat <- gam(Opinbert ~ s(manudur, bs = "cc") + s(timi, bs = "ad"), data = model_dat,
-    family = nb(), method = "REML") |> 
+                    family = nb(), method = "REML") |> 
     emmeans(~ timi, at = list(timi = unique(model_dat$timi))) |> 
     tidy() |> 
     inner_join(
@@ -431,7 +431,7 @@ opinbert_dat <- gam(Opinbert ~ s(manudur, bs = "cc") + s(timi, bs = "ad"), data 
 
 
 alm_dat <- gam(Annad ~ s(manudur, bs = "cc") + s(timi, bs = "ad"), data = model_dat,
-                 family = nb(), method = "REML") |> 
+               family = nb(), method = "REML") |> 
     emmeans(~ timi, at = list(timi = unique(model_dat$timi))) |> 
     tidy() |> 
     inner_join(
@@ -443,7 +443,7 @@ alm_dat <- gam(Annad ~ s(manudur, bs = "cc") + s(timi, bs = "ad"), data = model_
 
 
 heild_dat <- gam(Heild ~ s(manudur, bs = "cc") + s(timi, bs = "ad"), data = model_dat,
-                    family = nb(), method = "REML") |> 
+                 family = nb(), method = "REML") |> 
     emmeans(~ timi, at = list(timi = unique(model_dat$timi))) |> 
     tidy() |> 
     inner_join(
@@ -473,7 +473,7 @@ p1 <- plot_dat |>
                  date_labels = "%Y",  
                  guide = guide_axis(n.dodge = 1),  
                  expand = expansion(),
-                 limits = c(min(plot_dat$dags), ymd("2022-04-01"))) +
+                 limits = c(min(plot_dat$dags), max(plot_dat$dags))) +
     scale_y_continuous(breaks = c(range(plot_dat$hlutf),
                                   0.3, 0.325),
                        labels = label_percent(accuracy = 0.01),
@@ -490,9 +490,18 @@ p2 <- plot_dat2 |>
     geom_vline(xintercept = ymd(dates), lty = 2, alpha = 0.5) +
     geom_hline(yintercept = 1, lty = 2) +
     geom_line(aes(col = tegund)) +
-    geom_text(data = plot_dat2 |> filter(dags == max(dags)),
-              aes(label = tegund, col = tegund),
-              hjust = 0, nudge_x = 20) +
+    geom_text(
+        data = plot_dat2 |> 
+            filter(dags == max(dags)) |> 
+            mutate(
+                y = case_when(
+                    tegund == "Opinber" ~ perc_change + 0.00015,
+                    tegund == "Heild" ~ perc_change - 0.00015,
+                )
+            ),
+        aes(y = y, label = tegund, col = tegund),
+        hjust = 0, nudge_x = 20
+    ) +
     geom_rangeframe() +
     scale_x_date(date_breaks = "year", date_labels = "%Y", 
                  expand = expansion()) +
