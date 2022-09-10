@@ -404,7 +404,7 @@ p <- plot_dat |>
           plot.title = element_text(size = 14)) +
     labs(x = NULL,
          y = NULL,
-         title = "Breyting á skattbyrði (ráðstöfunartekjur sem % af heildartekjum) miðað við 1997")
+         title = "Breyting á skattbyrði miðað við 1997")
 
 ggplotly(
     p,
@@ -429,7 +429,7 @@ p <- plot_dat |>
     ) +
     scale_y_continuous(
         labels = label_percent(suffix = "%-stig", decimal.mark = ",", big.mark = "."),
-        breaks = c(seq(-0.1, 0.1, by = 0.05), range(plot_dat$index))
+        breaks = c(seq(-0.05, 0.05, by = 0.05), range(plot_dat$index))
     ) +
     scale_colour_distiller(type = "div", palette = "RdYlBu", direction = 1) +
     theme_tufte() +
@@ -438,7 +438,7 @@ p <- plot_dat |>
     labs(x = NULL,
          y = NULL,
          colour = "Tekjutíund",
-         title = "Breyting á skattbyrði (ráðstöfunartekjur sem % af heildartekjum) miðað við 1997",
+         title = "Breyting á skattbyrði miðað við 1997",
          subtitle = "Skattbyrði hefur aukist hjá öllum tekjutíundum nema þeirri hæstu")
 
 ggsave(p, filename = "image.png",
