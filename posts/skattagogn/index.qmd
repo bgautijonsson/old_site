@@ -2,7 +2,7 @@
 title: "Tekjur og skattar"
 subtitle: "Hvað fær hver tekjutíund mikið af tekjum og hvað borga þær mikið af sköttum?"
 description: |
-    Hér nota ég skattagögn Hagstofunnar til að skoða tekjur og skatta eftir tekjutíundum.
+    Stundum les maður að skattakerfið ýti undir ójöfnuð, eða að það séu of háir skattar á þeim efnameiru. Hvort er það? Hér nota ég skattagögn Hagstofunnar til að skoða tekjur og skatta eftir tekjutíundum. Ég get ekki sagt hvort það sé sanngjarnt, en ég get sýnt hvernig það hefur breyst með tímanum.
 author: 
     -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
         url: "https://twitter.com/bgautijonsson"
@@ -25,7 +25,6 @@ execute:
   cache: false
 editor: source
 title-block-banner: true
-draft: false
 categories:
     - skattar
     - efnahagur
@@ -73,14 +72,75 @@ d <- tbl(con, "tiundamork_1997_2021")
 ```
 
 
+# Skilgreiningar
+
+## Tekjutíund
+
+```{r}
+plot_dat <- d |> 
+    filter(tiundarbreyta == "Heildartekjur",
+           name %in% c("Tekjur alls", "Fjöldi í hóp"),
+           ar == 2021) |> 
+    collect() |> 
+    pivot_wider(names_from = name, values_from = value) |> 
+    janitor::clean_names()
+
+fjoldi <- number(sum(plot_dat$fjoldi_i_hop), big.mark = ".", decimal.mark = ",")
+tekjur <- number(sum(plot_dat$tekjur_alls), big.mark = ".", decimal.mark = ",")
+tekjur_a_mann <- number(sum(plot_dat$tekjur_alls) / sum(plot_dat$fjoldi_i_hop), acrucay = 0.1, big.mark = ".", decimal.mark = ",")
+tekjur_a_mann_a_manudi <- number(sum(plot_dat$tekjur_alls) / sum(plot_dat$fjoldi_i_hop) / 12, accuracy = 0.1, big.mark = ".", decimal.mark = ",")
+```
+
+Það er fátt jafn sexý og þegar einhver talar um tekjutíundir, en hvað þýðir það? Í gögnum Hagstofunnar um tekjur eru samtals `r fjoldi` einstaklingar og þau fengu samtals tekjur upp á `r tekjur` milljónir króna, eða `r tekjur_a_mann` milljónir króna á mann á ári (`r tekjur_a_mann_a_manudi` milljónir á mánuði).
+
+En þessir einstaklingar höfðu ekki allir sömu tekjur, heldur er tekjum dreift ójafnt. Sum hafa hærri tekjur og aðrir lægri. Ímyndum að við tökum þessa `r fjoldi` einstaklinga, röðum þeim í vaxandi röð eftir tekjum þeirra og skiptum svo í tíu jafnstóra hópa. Þá erum við komin með það sem kallast *tekjutíundir*! Í *töflu I* að neðan sjáum við hvernig heildartekjur skiptust í tekjutíundir árið 2021.
+
+```{r}
+plot_dat |> 
+    mutate(p = tekjur_alls / sum(tekjur_alls),
+           p = percent(p, decimal.mark = ",", big.mark = "."),
+           tekjur_a_mann = tekjur_alls / fjoldi_i_hop * 1e6 / 12,
+           tekjur_a_mann = number(tekjur_a_mann, suffix = " kr", decimal.mark = ",", big.mark = "."),
+           tekjur_alls = number(tekjur_alls, suffix = " mkr", decimal.mark = ",", big.mark = ".")) |> 
+    select(tiundarhluti, tekjur_a_mann, tekjur_alls, p) |> 
+    kable(
+        format = "html",
+        col.names = c("Tekjutíund", "Tekjur á mann<br>(á mánuði)", "Tekjur alls", "Hlutfall allra tekna"), 
+        escape = FALSE, 
+        align = c("c", "c", "c", "c"),
+        caption = "Tafla I. Skipting heildartekna á tekjutíundir árið 2021"
+    ) |> 
+    kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+Við getum skipt öðrum breytum en tekjum í tíundir. Í [mælaborðinu mínu um skattahögn Hagstofunnar](https://bggj.is/skattagogn){target="_blank"} er hægt að skoða ýmsar breytur eftir tíundum heildartekna, ráðstöfunartekna, eigna og annarra breytna!
+
+
+
 # Heildartekjur og skattar
 
-## Hlutfall tekna og skatta
+Við getum skoðað skattgreiðslur mismunandi tekjuhópa á tvo vegu:
+
+* Hversu hátt hlutfall af öllum sköttum borgar hver tekjuhópur?
+* Hversu hátt hlutfall af eigin tekjum borgar hver tekjuhópur í skatta?
+
+## Hversu hátt hlutfall af öllum sköttum borgar hver tekjuhópur?
+
+Það ætti ekki að koma á óvart að efri tekjutíundir borgi hærra hlutfall af öllum sköttum heldur en lægri tíundir. [Fjármálaráðuneytið benti á það í tilkynningu þann 23. júní 2021](https://www.stjornarradid.is/efst-a-baugi/frettir/stok-frett/2022/06/23/Kaupmattur-allra-hopa-aukist-og-allir-nema-tekjuhaestu-greida-laegri-skatt-/){target="_blank"} að efstu fimm tekjutíundirnar borgi *83%* af öllum sköttum. Er þetta eftirtektarvert? Út frá töflunni okkar að ofan getum við séð að efstu fimm tíundirnar fá
+
+$$
+34.4\% + 17.4\% + 12.8\% + 9.9\% + 7.8\% = 82.3\%
+$$
+
+af öllum tekjum, og því ætti það alls ekki að koma okkur á óvart að þau borgi það hátt hlutfall af öllum sköttum. Þessi tala, 83%, þýðir því ekki að það sé vegið að þeim tekuhærri á óréttlátan hátt.
+
+En hvað borgar hver tekjutíund mikið í skatta og hvernig ber því saman við heildartekjur þeirra? Á myndinni að neðan ber ég þetta tvennt saman. Hægt er að smella á **Play** til að sjá þróunina frá 1997 til 2021 eða velja ár til að skoða. Ef allir tekjuhópar borguðu jafnt hlutfall í skatta væru allir punktarnir á brotnu línunni.
 
 ```{r}
 #| fig-width: 10
 #| fig-asp: 0.621
 #| out-width: "100%"
+#| cache: true
 
 plot_dat <- d |>
     filter(tiundarbreyta %in% "Heildartekjur",
@@ -170,10 +230,15 @@ ggplotly(
 
 ## Skattbyrði
 
+Við getum líka skoðað *skattbyrði*, eða hversu hátt hlutfall af tekjum sínum hver hópur borgar í skatta. Eins og að ofan er hægt að smella á **Play** til að sjá þróunina frá 1997 til 2021 eða velja ár sjálf til að skoða. Í  [sömu tilkynningu frá fjármálaráðuneytinu](https://www.stjornarradid.is/efst-a-baugi/frettir/stok-frett/2022/06/23/Kaupmattur-allra-hopa-aukist-og-allir-nema-tekjuhaestu-greida-laegri-skatt-/){target="_blank"} og ég nefndi að ofan var bent á að skattbyrði allra tekjutíunda nema þeirri efstu hefði lækkað frá 2019 til 2021. Það er rétt, en það er gott að hafa í huga að skattbyrði sömu tíunda hækkaði flestöll árin frá 1997 til 2019. 
+
+Neðar í færslunni mun ég svo sýna hvernig skattbyrði hefur hækkað síðan 1997 hjá öllum tekjutíundum nema þeirri efstu.
+
 ```{r}
 #| fig-width: 10
 #| fig-asp: 0.621
 #| out-width: "100%"
+#| cache: true
 
 plot_dat <- plot_dat |> 
     mutate(
@@ -222,12 +287,15 @@ ggplotly(
 
 # Þróun frá 1997
 
-## Heildartekjur
+## Kaupmáttur heildartekna
+
+Kaupmáttur er einfaldlega hækkun á tekjum umfram verðbólgu *(hækkun á verðlagi, mælt með vísitölu neysluverðs)*. Hér sjáum við hækkun kaupmáttar frá 1997 hjá meðaleinstakling úr hverru tekjutíund. 
 
 ```{r}
 #| fig-width: 10
 #| fig-asp: 0.621
 #| out-width: "100%"
+#| cache: true
 
 
 plot_dat <- d |> 
@@ -257,7 +325,7 @@ plot_dat <- d |>
                      "Heildartekjur (á mann á mánuði): ",
                      number(value * 1e6 / 12, suffix = " kr", big.mark = ".", decimal.mark = ","), "\n",
                      "Breyting (síðan 1997): ", 
-                      ifelse(index >= 1, "+", ""),
+                     ifelse(index >= 1, "+", ""),
                      percent(index - 1, accuracy = 0.01, big.mark = ".", decimal.mark = ",")
         )
     )
@@ -280,7 +348,7 @@ p <- plot_dat |>
           plot.title = element_text(size = 14)) +
     labs(x = NULL,
          y = NULL,
-         title = "Breyting á heildartekjum miðað við 1997 (Verðlag 2022)")
+         title = "Breyting á kaupmætti heildartekna frá 1997")
 
 ggplotly(
     p,
@@ -291,12 +359,15 @@ ggplotly(
     )
 ```
 
-## Ráðstöfunartekjur
+## Kaupmáttur ráðstöfunartekna
+
+Við höfum frekar áhuga á kaupmætti ráðstöfunartekna *(heildartekjur að frádegnum sköttum)*. 
 
 ```{r}
 #| fig-width: 10
 #| fig-asp: 0.621
 #| out-width: "100%"
+#| cache: true
 
 
 plot_dat <- d |> 
@@ -349,7 +420,7 @@ p <- plot_dat |>
           plot.title = element_text(size = 14)) +
     labs(x = NULL,
          y = NULL,
-         title = "Breyting á ráðstöfunartekjum miðað við 1997 (Verðlag 2022)")
+         title = "Breyting á kaupmætti ráðstöfunartekna frá 1997")
 
 ggplotly(
     p,
@@ -364,10 +435,13 @@ ggplotly(
 
 ## Skattbyrði
 
+Það er líka áhugavert að skoða breytingu í skattbyrði milli 1997 og 2021. Hér þýðir jákvæð prósenta að skattbyrði hefur aukist, en neikvæð prósenta að hún sé minni. Við sjáum að skattbyrði hefur aukist hjá öllum tekjutíundunum nema þeirri efstu. Hér erum við að skoða skattbyrði hvers hóps í heild sinni, þannig að það getur alltaf verið að þetta passi ekki við hvern og einn einstakling, heldur á þetta við um meðaltal allra einstaklinganna.
+
 ```{r}
 #| fig-width: 10
 #| fig-asp: 0.621
 #| out-width: "100%"
+#| cache: true
 
 plot_dat <- d |> 
     filter(tiundarbreyta == "Heildartekjur",
@@ -424,8 +498,23 @@ p <- plot_dat |>
     geom_hline(yintercept = 0, lty = 2) +
     geom_line(aes(group = tiundarhluti, col = tiundarhluti)) +
     geom_rangeframe() +
+    geom_text(
+        data = plot_dat |> 
+            filter(ar == max(ar)) |> 
+            mutate(
+                index = case_when(
+                    tiundarhluti == 1 ~ index + 0.0022,
+                    tiundarhluti == 8 ~ index - 0.0022,
+                    TRUE ~ index
+                )
+            ),
+        aes(col = tiundarhluti, label = str_c(tiundarhluti, ". tíund")), 
+        hjust = 0, 
+        nudge_x = 0.2
+    ) +
     scale_x_continuous(
-        breaks = seq(1997, 2021, by = 3)
+        breaks = seq(1997, 2021, by = 3),
+        limits = c(1997, 2023)
     ) +
     scale_y_continuous(
         labels = label_percent(suffix = "%-stig", decimal.mark = ",", big.mark = "."),
