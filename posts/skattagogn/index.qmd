@@ -8,7 +8,7 @@ author:
         url: "https://twitter.com/bgautijonsson"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
-date: "2022/09/10"
+date: "2022/09/11"
 format: 
     html:
         code-fold: true
