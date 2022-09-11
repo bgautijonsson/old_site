@@ -56,6 +56,7 @@ library(config)
 library(visitalaneysluverds)
 ```
 
+
 ```{r}
 usr <- config::get("postgres_user")
 con <- dbConnect(RPostgres::Postgres(), 
@@ -95,13 +96,29 @@ tekjur_a_mann_a_manudi <- number(sum(plot_dat$tekjur_alls) / sum(plot_dat$fjoldi
 
 En þessir einstaklingar höfðu ekki allir sömu tekjur, heldur er tekjum dreift ójafnt. Sum hafa hærri tekjur og aðrir lægri. Ímyndum að við tökum þessa `r fjoldi` einstaklinga, röðum þeim í vaxandi röð eftir tekjum þeirra og skiptum svo í tíu jafnstóra hópa. Þá erum við komin með það sem kallast *tekjutíundir*! Í *töflu I* að neðan sjáum við hvernig heildartekjur skiptust í tekjutíundir árið 2021.
 
+**Hér ber að hafa í huga að allir einstaklingar sem náð hafa 16 ára aldri teljast með í þessum gögnum. Því þýða mánaðartekjur upp á 37 þúsund kr í lægstu tíundinni ekki að fjölskyldur þurfi að lifa á þeim tekjum, heldur eru þarna margir einstaklingar með engar eða mjög litlar tekjur.**
+
 ```{r}
 plot_dat |> 
-    mutate(p = tekjur_alls / sum(tekjur_alls),
-           p = percent(p, decimal.mark = ",", big.mark = "."),
-           tekjur_a_mann = tekjur_alls / fjoldi_i_hop * 1e6 / 12,
-           tekjur_a_mann = number(tekjur_a_mann, suffix = " kr", decimal.mark = ",", big.mark = "."),
-           tekjur_alls = number(tekjur_alls, suffix = " mkr", decimal.mark = ",", big.mark = ".")) |> 
+    mutate(
+        p = tekjur_alls / sum(tekjur_alls),
+        p = percent(p, decimal.mark = ",", big.mark = "."),
+        tekjur_a_mann = tekjur_alls / fjoldi_i_hop * 1e6 / 12,
+        tekjur_a_mann = number(
+            tekjur_a_mann, suffix = " kr", decimal.mark = ",", big.mark = "."
+        ),
+        tekjur_a_mann = ifelse(
+            tiundarhluti == 1, 
+            str_c(
+                tekjur_a_mann, 
+                footnote_marker_alphabet(1, format = "html")
+            ),
+            tekjur_a_mann
+        ),
+        tekjur_alls = number(
+            tekjur_alls, suffix = " mkr", decimal.mark = ",", big.mark = "."
+        )
+    ) |> 
     select(tiundarhluti, tekjur_a_mann, tekjur_alls, p) |> 
     kable(
         format = "html",
@@ -110,7 +127,8 @@ plot_dat |>
         align = c("c", "c", "c", "c"),
         caption = "Tafla I. Skipting heildartekna á tekjutíundir árið 2021"
     ) |> 
-    kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+    kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) |> 
+    footnote(alphabet = c("Einstaklingar á aldrinum 16-17 hafa oft engar eða litlar tekjur meirihluta árs."), fixed_small_size = T)
 ```
 
 Við getum skipt öðrum breytum en tekjum í tíundir. Í [mælaborðinu mínu um skattahögn Hagstofunnar](https://bggj.is/skattagogn){target="_blank"} er hægt að skoða ýmsar breytur eftir tíundum heildartekna, ráðstöfunartekna, eigna og annarra breytna!
@@ -145,11 +163,13 @@ En hvað borgar hver tekjutíund mikið í skatta og hvernig ber því saman vi�
 plot_dat <- d |>
     filter(tiundarbreyta %in% "Heildartekjur",
            name %in% c("Tekjur alls", 
-                       "Skattar alls",
+                       "Ráðstöfunartekjur (Tekjur - Skattar)",
                        "Fjöldi í hóp")) |> 
     collect() |> 
     pivot_wider() |> 
     rename(fjoldi = "Fjöldi í hóp") |> 
+    mutate(`Skattar alls` = `Tekjur alls` - `Ráðstöfunartekjur (Tekjur - Skattar)`) |> 
+    select(-"Ráðstöfunartekjur (Tekjur - Skattar)") |> 
     pivot_longer(c(-ar, -tiundarbreyta, -tiundarhluti, -fjoldi)) |> 
     group_by(ar, name) |> 
     mutate(p = value / sum(value)) |> 
@@ -443,13 +463,16 @@ ggplotly(
 #| out-width: "100%"
 #| cache: true
 
-plot_dat <- d |> 
-    filter(tiundarbreyta == "Heildartekjur",
-           name %in% c("Tekjur alls", "Skattar alls")) |> 
+plot_dat <- d |>
+    filter(tiundarbreyta %in% "Heildartekjur",
+           name %in% c("Tekjur alls", 
+                       "Ráðstöfunartekjur (Tekjur - Skattar)",
+                       "Fjöldi í hóp")) |> 
     collect() |> 
-    arrange(ar, tiundarhluti, name) |> 
-    select(ar, tiundarhluti, name, value) |> 
-    pivot_wider(names_from = name, values_from = value) |> 
+    pivot_wider() |> 
+    rename(fjoldi = "Fjöldi í hóp") |> 
+    mutate(`Skattar alls` = `Tekjur alls` - `Ráðstöfunartekjur (Tekjur - Skattar)`) |> 
+    select(-"Ráðstöfunartekjur (Tekjur - Skattar)") |> 
     janitor::clean_names() |> 
     mutate(
         value = skattar_alls / tekjur_alls,
@@ -534,3 +557,7 @@ ggsave(p, filename = "image.png",
        width = 8, height = 0.621 * 8, scale = 1.1, bg = "white")
 ```
 
+
+# Gögn
+
+Hér nota ég gögn Hagstofu um [skuldir, eignir, tekjur og fleira](https://hagstofa.is/talnaefni/samfelag/lifskjor/skuldir-og-eignir/){target="_blank"} sem hún vinnur úr skattframtölum Íslendinga. Ég hef áður sótt þessi gögn og unnið úr þeim svo ég sýni gagnaúrvinnsluna ekki hér. Hins vegar mun ég birta færslu á [Patreon síðunni minni](https://www.patreon.com/bggj){target="_blank"} þar sem ég fer yfir hvernig ég bjó til og uppfæri SQL gagnagrunninn minn, þar á meðal hvernig ég hef unnið úr þessum gögnum.
