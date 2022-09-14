@@ -3,7 +3,7 @@ title: "Dreifing húsnæðislánategunda hjá íslenskum heimilum"
 subtitle: "Dæmi um notkun Quarto og RStudio til að útbúa gagnvirkar HTML skýrslur"
 author: 
     -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
-        url: "https://twitter.com/bgautijonsson"
+        url: "bggj.is"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
 date: "2022/06/23"

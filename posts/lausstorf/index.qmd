@@ -5,7 +5,7 @@ description: |
     Hagstofan birtir reglulega uppfærð gögn um fjölda og hlutfall lausra starfa eftir atvinnugreinum. Þar sem þessi gögn voru uppfærð í dag datt mér í hug að setja saman stutta samantekt á þeim sem ég get svo auðveldlega uppfært þegar gögnin sjálf eru uppfærð.
 author: 
     -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
-        url: "https://twitter.com/bgautijonsson"
+        url: "bggj.is"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
 date: "2022/08/18"

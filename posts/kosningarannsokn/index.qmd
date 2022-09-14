@@ -5,7 +5,7 @@ description: |
     Íslenska Kosningarannsóknin er framkvæmd af Félagsvísindastofnun Háskóla Íslands, og mér finnst vinnan sem fer fram þar hreint út sagt frábær og upplýsingar um gögnin vel skipulagðar, enda eina sviðið sem ég veit að sé með eigin RStudio server innanhúss!
 author: 
     -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
-        url: "https://twitter.com/bgautijonsson"
+        url: "bggj.is"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
 date: "2022/06/26"

@@ -45,7 +45,7 @@ website:
       - text: Verkefni
         menu:
             - text: Spálíkan COVID-19
-              href: pages/covid_spalikan.qmd
+              href: pages/covid19.qmd
       - icon: github
         href: https://github.com/bgautijonsson
       - icon: twitter

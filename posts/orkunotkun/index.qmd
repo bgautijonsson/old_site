@@ -23,8 +23,6 @@ execute:
 editor: source
 theme: flatly
 title-block-banner: true
-standalone: true
-self-contained: true
 draft: true
 categories:
     - orkumál

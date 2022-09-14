@@ -5,7 +5,7 @@ description: |
     I've seen this kind of figure poking around, but I didn't really think about them until the other day I was asked about how to make one in R. Here I will walk through making one of these plots using the `ggplot2` and `cowplot` packages.
 author: 
     -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
-        url: "https://twitter.com/bgautijonsson"
+        url: "bggj.is"
         affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
         affiliation-url: "https://www.hi.is/tolfraedi_0"
 date: "2022/06/28"
@@ -20,8 +20,6 @@ execute:
 editor: source
 theme: flatly
 title-block-banner: true
-standalone: true
-self-contained: true
 categories:
     - english
     - R
