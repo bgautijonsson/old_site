@@ -512,7 +512,7 @@ d |>
 d |> 
     mutate(value = adrar_tekjur,
            value = value / cpi) |> 
-    dreifing_plot(title = "Aðrar tekjur stjórnmálaflokka (2007 - 2020)")
+    magn_plot(title = "Aðrar tekjur stjórnmálaflokka (2007 - 2020)")
 ```
 
 :::
@@ -697,11 +697,11 @@ p <- plot_dat |>
     theme(legend.position = "top") +
     labs(x = NULL, y = NULL, fill = NULL,
          title = "Eigið fé íslenskra stjórnmálaflokka",
-         subtitle = "Árið 2007 átti Sjálfstæðisflokkur 100% alls eigin fjár flokkanna en 2020 er það 43,5%",
+         subtitle = "Árið 2007 átti Sjálfstæðisflokkur 100% alls eigin fjár flokkanna en 2020 á hann 43,5%",
          caption = "Mynd eftir @bggjonsson unnin úr ársreikningum stjórnmálaflokka frá Ríkisendurskoðun")
 
 ggsave(plot = p, filename = "Figures/eigidfe.png",
-       width = 8, height = 0.521 * 8, scale = 1.3, bg = "white")
+       width = 8, height = 0.5 * 8, scale = 1.3, bg = "white")
 ```
 
 
@@ -724,52 +724,61 @@ plot_dat <- d |>
         value = ifelse(
             flokkur == "Sjálfstæðisflokkur", 
             leigutekjur,
-            framlog_rikis
+            gjold
         ),
         value = value / cpi
     ) |> 
     filter(
-        flokkur %in% c("Sjálfstæðisflokkur", "Flokkur Fólksins", "Viðreisn", "Píratar"),
+        flokkur %in% c("Sjálfstæðisflokkur", "Flokkur Fólksins", "Viðreisn"),
         ar >= 2015
     ) |> 
     mutate(y = value,
-           y = case_when(
-               flokkur == "Flokkur Fólksins" ~ y * 1.006,
-               flokkur == "Viðreisn" ~ y * 0.992,
-               flokkur == "Sjálfstæðisflokkur" ~ y * 0.994,
-               TRUE ~ y
-           ))
+           # y = case_when(
+           #     flokkur == "Flokkur Fólksins" ~ y * 1.006,
+           #     flokkur == "Viðreisn" ~ y * 0.992,
+           #     flokkur == "Sjálfstæðisflokkur" ~ y * 0.994,
+           #     TRUE ~ y
+           # ),
+           label = ifelse(
+               flokkur == "Sjálfstæðisflokkur",
+               "**Sjálfstæðisflokkur** (Leigutekjur)",
+               str_c(flokkur, " (Útgjöld)")
+           )
+    )
 
 p <- plot_dat |> 
     ggplot(aes(ar, value, colour = flokkur)) +
     geom_line() +
-    geom_text(
+    geom_richtext(
         data = plot_dat |> filter(ar == max(ar)),
-        aes(label = flokkur, y = y),
+        aes(label = label, y = y),
         hjust = 0,
-        nudge_x = 0.05
+        nudge_x = 0.05,
+        fill = NA, label.color = NA
     ) +
-    scale_x_continuous(limits = c(2014.8, 2021),
+    scale_x_continuous(limits = c(2014.8, 2021.9),
                        expand = expansion(),
                        breaks = c(2015:2020)) +
     scale_y_continuous(labels = isk,
                        breaks = pretty_breaks(4),
-                       limits = c(0, NA),
+                       limits = c(0, 80e6),
                        expand = expansion()) +
     scale_colour_manual(
-        values = c(xFF, xP, xD, xC)
+        values = c(xFF, xD, xC)
     ) +
     theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
-         title = "Samanburður á tekjum flokka",
-         subtitle = "Sjálfstæðisflokkur fær jafnmiklar tekjur af útleigu og hinir tveir frá fjárlögum")
+         title = "Leigutekjur Sjálfstæðisflokks og útgjöld minni flokka",
+         subtitle = "Sjálfstæðisflokkur fengi nægar tekjur af útleigu fasteigna til að fjármagna Flokk floksins")
 
 ggsave(plot = p, filename = "Figures/samanburdur.png",
        width = 8, height = 0.5 * 8, scale = 1.2, bg = "white")
 ```
 
 # Þumalmynd
+
+Ég hef alltaf þumalmynd sem fylgir færslunni á síðunni minni. Hér er kóðinn sem ég nota til að búa hana til og vista hana.
 
 ```{r}
 #| fig-width: 10
