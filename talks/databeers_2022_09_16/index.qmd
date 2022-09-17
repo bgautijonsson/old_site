@@ -1,0 +1,21 @@
+---
+title: "Databeers #2"
+description: |
+    I gave a talk at the 2nd Databeers event hosted by Lucinity. There I talked about open data and helping people make sense of official or press statements by putting them into perspective using data.
+image: databeers.png
+date: "2022/09/16"
+categories:
+    - english
+    - presentation
+    - data literacy
+---
+
+The presentations were in the [PechaKucha](https://www.pechakucha.com) format: 
+
+* 20 slides
+* 20 seconds per slide
+
+<iframe width="700" height="400" src="https://www.bggj.is/databeers" title="Slides from my talk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+[Link to the slides in full size](https://bggj.is/databeers){target="_blank"}

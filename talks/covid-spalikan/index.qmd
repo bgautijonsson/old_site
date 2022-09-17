@@ -1,7 +1,7 @@
 ---
-title: "COVID-19 Spálíkan"
+title: "StanCon2020: COVID-19 Prediction Model"
 description: |
-    Ég flutti erindi um aðferðafræðina á bak við COVID-19 spálíkan Háskóla Íslands, Landspítala og Embættis Landlæknis á StanCon árið 2020.
+    I gave a talk about the statistical methodology behind the prediction model used by the Icelandic government during the first wave of the COVID-19 pandemic.
 image: image.png
 date: "2020/08/13"
 categories:
@@ -9,6 +9,7 @@ categories:
     - presentation
     - covid19
     - bayesian statistics
+    - trustworthiness
 ---
 
 <iframe width="700" height="400" src="https://www.youtube.com/embed/Qj94Z59PT7c" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
