@@ -1,5 +1,6 @@
 ---
 title-block-style: none
+pagetitle: "Fjármál Sveitarfélaga"
 ---
 
 
