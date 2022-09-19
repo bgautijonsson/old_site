@@ -1,6 +1,6 @@
 /*-- scss:defaults --*/
 
-$darkblue:                      #08306b;
+$darkblue:                      #484D6D;
 $lightblue:                     #74a9cf;
 $white:                         #ffffff;
 
@@ -8,22 +8,22 @@ $white:                         #ffffff;
 $primary:                       $darkblue;
 $secondary:                     #faf9f9;
 
-$body-bg:                       #ffffff;
+$body-bg:                       #faf9f9;
 
 
 
 $font-size-base:                1rem; 
 $font-family-base:              "Segoe UI";
 $font-family-sans-serif:        "Lato", "Open Sans", "Montserrat", "Roboto";
-$font-family-monospace:         "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
+$font-family-monospace:         "SFMono-Regular", "Menlo", "Monaco", "Consolas";
 
 
-$headings-color:                #08306b;
+$headings-color:                $darkblue;
 $headings-font-weight:          4000;
 $headings-font-family:          "Segoe UI";
 
 
-$navbar-brand-font-size:        $font-size-base * 1.4;
+$navbar-brand-font-size:        $font-size-base * 1.2;
 $navbar-brand-font-family:      "Playfair Display";
 $navbar-brand-font-weight:      700;
 
@@ -57,9 +57,6 @@ div.quarto-post .listing-categories .listing-category {
     color: #525252;
 }
 
-.quarto a.navbar-brand {
-    color: $secondary;
-}
 
 .tab-content {
     border-left: 0px;

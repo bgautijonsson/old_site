@@ -12,12 +12,8 @@ date: "2022/09/10"
 format: 
     html:
         code-fold: true
-        toc: true
-        toc-depth: 2
-        toc-location: right
-        toc-title: Efnisyfirlit
-        page-layout: full
-        max-width: "1000px"
+        smooth-scroll: true
+        link-external-newwindow: true
 execute: 
   echo: true
   warning: false
@@ -38,6 +34,7 @@ twitter-card:
 
 ```{r}
 #| include: false
+#| cache: false
 
 library(cowplot)
 library(tidyverse)
@@ -55,6 +52,9 @@ library(janitor)
 library(mgcv)
 library(emmeans)
 library(broom)
+library(metill)
+
+theme_set(theme_metill())
 ```
 
 # Gögn
@@ -99,9 +99,10 @@ d <- pxweb_get(url, query = pxweb_query(query_list), verbose = FALSE) |>
 ## Almennur vinnumarkaður
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.621
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <-  d |>  
@@ -113,18 +114,15 @@ plot_dat <-  d |>
 p <- plot_dat |> 
     ggplot(aes(dags, Annad)) +  
     geom_line() +  
-    geom_rangeframe() +  
-    scale_y_continuous(breaks = c(range(plot_dat$Annad), 1.2e5, 1.3e5, 1.4e5),
-                       limits = c(1e5, 1.5e5),
-                       labels = label_number()) +
     scale_x_date(date_breaks = "1 year", date_labels = "%Y",   
                  expand = expansion()) +  
+    scale_y_tufte(breaks = tufte_breaks(plot_dat$Annad),
+                  limits = c(1e5, 1.5e5),
+                  labels = label_number()) +
     labs(x = NULL,
          y = NULL,
          title = "Fjöldi starfandi á almennum vinnumarkaði") +
-    theme_tufte() +  
-    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
-          plot.title = element_text(face = "bold"))
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5))
 
 p
 ```
@@ -132,9 +130,10 @@ p
 ## Opinber vinnumarkaður
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.621
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <-  d |>  
@@ -145,17 +144,14 @@ plot_dat <-  d |>
 p <- plot_dat |> 
     ggplot(aes(dags, Opinbert)) +  
     geom_line() +  
-    geom_rangeframe() +  
-    scale_y_continuous(breaks = c(range(plot_dat$Opinbert), 5e4, 5.5e4, 6e4, 6.5e4),
-                       labels = label_number()) +
-    scale_x_date(date_breaks = "year", date_labels = "%Y", 
+    scale_x_date(date_breaks = "1 year", date_labels = "%Y",   
                  expand = expansion()) +  
+    scale_y_tufte(breaks = tufte_breaks(plot_dat$Opinbert),
+                  labels = label_number()) +
     labs(x = NULL,
          y = NULL,
          title = "Fjöldi opinbers starfsfólks") +
-    theme_tufte() +  
-    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
-          plot.title = element_text(face = "bold"))
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5))
 
 p
 ```
@@ -163,9 +159,10 @@ p
 ## Saman
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.621
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <-  d |>  
@@ -180,24 +177,19 @@ p <- plot_dat |>
     geom_line(aes(col = tegund)) +
     geom_text(data = plot_dat |> filter(dags == max(dags)),
               aes(label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
-    geom_rangeframe() +  
-    scale_y_continuous(breaks = c(range(plot_dat$n[plot_dat$tegund == "Opinber"]), 
-                                  range(plot_dat$n[plot_dat$tegund == "Almennur"]), 0),
-                       labels = label_number(),
-                       limits = c(0, 1.5e5),
-                       expand = expansion()) +
     scale_x_date(date_breaks = "year", date_labels = "%Y",  
                  expand = expansion(add = 31),
                  limits = c(min(plot_dat$dags), max(plot_dat$dags) + 15)) +  
+    scale_y_tufte(breaks = tufte_breaks(plot_dat$n),
+                  labels = label_number(),
+                  limits = c(0, 1.5e5),
+                  expand = expansion()) +
     scale_colour_brewer(type = "qual", palette = "Set1") +
     labs(x = NULL,
          y = NULL,
          title = "Fjöldi starfandi á almennum og opinberum vinnumarkaði") +
-    coord_cartesian(clip = "off") +
-    theme_tufte() +  
     theme(plot.margin = margin(t = 5, r = 60, b = 5, l = 5),
-          legend.position = "none",
-          plot.title = element_text(face = "bold"))
+          legend.position = "none")
 
 p
 ```
@@ -214,9 +206,10 @@ p
 ### 2017
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.621
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <- d |>  
@@ -234,19 +227,16 @@ p <- plot_dat |>
     geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
     geom_hline(yintercept = 0, lty = 2) +  
     geom_line() +  
-    geom_rangeframe() +  
-    scale_y_continuous(breaks = c(range(plot_dat$breyting), -1e4, -5e3, 0, 5e3),
-                       labels = label_number(),
-                       limits = c(-1.8e4, 1e4)) +  
     scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
                  guide = guide_axis(n.dodge = 2),  
                  expand = expansion()) +  
+    scale_y_tufte(breaks = tufte_breaks(plot_dat$breyting),
+                  labels = label_number(),
+                  limits = c(-1.8e4, 1e4)) +  
     labs(x = NULL, y = NULL,  
          title = "Fjöldi starfandi á almennum vinnumarkaði miðað við sama mánuð 2017",
-         subtitle = "Janúar 2022 er fyrsti mánuður þar sem fleiri unnu á almennum markaði en sama mánuð 2017") +  
-    theme_tufte() +  
-    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
-          plot.title = element_text(face = "bold"))
+         subtitle = "Janúar 2022 var fyrsti mánuður frá upphafi faraldurs COVID-19 þar sem fleiri unnu á almennum markaði en sama mánuð 2017") +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5))
 
 p
 ```
@@ -254,9 +244,10 @@ p
 ### 2019
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.621
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <- d |>  
@@ -271,22 +262,20 @@ plot_dat <- d |>
 
 p <- plot_dat |> 
     ggplot(aes(dags, breyting)) +  
-    geom_vline(xintercept = ymd(c("2020-01-01", "2021-01-01", "2022-01-01")), lty = 1, alpha = 0.1) +
+    geom_vline(xintercept = ymd(c("2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
     geom_hline(yintercept = 0, lty = 2) +  
     geom_line() +  
-    geom_rangeframe() +  
-    scale_y_continuous(breaks = c(range(plot_dat$breyting), -1.5e4, -1e4, -5e3, 0),
-                       labels = label_number(big.mark = ".", decimal.mark = ","),
-                       limits = c(-1.8e4, NA)) +  
     scale_x_date(date_breaks = "3 months", date_labels = "%b/%y",  
                  guide = guide_axis(n.dodge = 1),  
                  expand = expansion()) +  
+    scale_y_tufte(breaks = tufte_breaks(plot_dat$breyting),
+                  labels = label_number(big.mark = ".", decimal.mark = ","),
+                  limits = c(-1.8e4, NA)) +  
+    
     labs(x = NULL, y = NULL,  
          title = "Fjöldi starfandi á almennum vinnumarkaði miðað við sama mánuð 2019",
-         subtitle = "Mars 2022 er annar mánuður frá 2020 þar sem fleiri unnu á almennum markaði en sama mánuð 2019") +  
-    theme_tufte() +  
-    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
-          plot.title = element_text(face = "bold"))
+         subtitle = "Mars 2022 var annar mánuður frá 2020 þar sem fleiri unnu á almennum markaði en sama mánuð 2019") +  
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5))
 
 p
 ```
@@ -300,9 +289,10 @@ p
 ### 2017
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.621
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <- d |>  
@@ -321,17 +311,15 @@ p <- plot_dat |>
     ggplot(aes(dags, breyting)) +  
     geom_vline(xintercept = ymd(c("2018-01-01", "2019-01-01", "2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
     geom_line() +  
-    geom_rangeframe() +  
-    scale_y_continuous(breaks = c(range(plot_dat$breyting), 0.05, 0.04, 0.03, 0.02, 0.01),
-                       labels = label_percent(accuracy = 0.1)) +  
     scale_x_date(date_breaks = "3 months", date_labels = "%b\n%y",  
                  guide = guide_axis(n.dodge = 1),  
-                 expand = expansion()) +  
+                 expand = expansion()) + 
+    scale_y_tufte(breaks = tufte_breaks(plot_dat$breyting),
+                  labels = label_percent(accuracy = 0.1)) +  
+    
     labs(x = NULL, y = NULL,  
-         title = "Munur á hlutfalli opinbers starfsfólks frá sama mánuði 2017") +  
-    theme_tufte() +  
-    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
-          plot.title = element_text(face = "bold"))
+         title = "Munur á hlutfalli opinbers starfsfólks frá sama mánuði 2017") +
+    theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5))
 
 p
 ```
@@ -339,9 +327,10 @@ p
 ### 2019
 
 ```{r}
-#| fig.widt: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.621
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <- d |>  
@@ -360,15 +349,13 @@ p <- plot_dat |>
     ggplot(aes(dags, breyting)) +  
     geom_vline(xintercept = ymd(c("2020-01-01", "2021-01-01", "2022-01-01")), lty = 2, alpha = 0.3) +
     geom_line() +  
-    geom_rangeframe() +  
-    scale_y_continuous(breaks = c(range(plot_dat$breyting), 0.05, 0.04, 0.03, 0.02, 0.01),
-                       labels = label_percent(accuracy = 0.1)) +  
+    scale_y_tufte(breaks = tufte_breaks(plot_dat$breyting),
+                  labels = label_percent(accuracy = 0.1)) +  
     scale_x_date(date_breaks = "3 months", date_labels = "%b\n%y",  
                  guide = guide_axis(n.dodge = 1),  
                  expand = expansion()) +  
     labs(x = NULL, y = NULL,  
          title = "Munur á hlutfalli opinbers starfsfólks frá sama mánuði 2019") +  
-    theme_tufte() +  
     theme(plot.margin = margin(t = 5, r = 20, b = 5, l = 5),
           plot.title = element_text(face = "bold"))
 
@@ -386,9 +373,10 @@ p
 ## Mynd
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 1
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 1.3
+#| out-width: "100%"
+#| column: page
 
 
 model_dat <- d |>  
@@ -468,22 +456,18 @@ p1 <- plot_dat |>
     geom_vline(xintercept = ymd(dates), lty = 2, alpha = 0.5) +
     geom_line(aes(y = hlutf), alpha = 0.1) +
     geom_line(aes(y = response)) +  
-    geom_rangeframe(col = "black", size  = 1) +  
     scale_x_date(breaks = seq.Date(from = min(plot_dat$dags), to = ymd("2022-01-01"), by = "year"), 
                  date_labels = "%Y",  
                  guide = guide_axis(n.dodge = 1),  
                  expand = expansion(),
                  limits = c(min(plot_dat$dags), max(plot_dat$dags))) +
-    scale_y_continuous(breaks = c(range(plot_dat$hlutf),
-                                  0.3, 0.325),
-                       labels = label_percent(accuracy = 0.01),
-                       limits = c(0.25, 0.37)) +  
+    scale_y_tufte(breaks = tufte_breaks(plot_dat$hlutf),
+                  labels = label_percent(accuracy = 0.01),
+                  limits = c(0.25, 0.37)) +  
     labs(x = NULL, y = NULL,  
          title = "Hlutfall opinbers starfsfólks af vinnumarkaði (2008 - 2022)",
          subtitle = "Leiðrétt fyrir mánaðarlegum sveiflum. Raungögn teiknuð í gráu") +  
-    theme_tufte() +  
-    theme(plot.margin = margin(t = 5, r = 60, b = 5, l = 5),
-          plot.title = element_text(face = "bold"))
+    theme(plot.margin = margin(t = 5, r = 60, b = 5, l = 5))
 
 p2 <- plot_dat2 |> 
     ggplot(aes(dags, perc_change)) +
@@ -502,17 +486,15 @@ p2 <- plot_dat2 |>
         aes(y = y, label = tegund, col = tegund),
         hjust = 0, nudge_x = 20
     ) +
-    geom_rangeframe() +
     scale_x_date(date_breaks = "year", date_labels = "%Y", 
                  expand = expansion()) +
-    scale_y_log10(labels = function(x) percent(x - 1),
-                  breaks = c(1, range(plot_dat2$perc_change), 1.005, 0.995)) +
+    scale_y_tufte(labels = function(x) percent(x - 1),
+                  breaks = c(1, range(plot_dat2$perc_change), 1.005, 0.995),
+                  trans = "log10") +
     scale_colour_brewer(type = "qual", palette = "Set1") +
     coord_cartesian(clip = "off") +
-    theme_tufte() +
     theme(plot.margin = margin(t = 5, r = 60, b = 5, l = 5),
-          legend.position = "none",
-          plot.title = element_text(face = "bold")) +
+          legend.position = "none") +
     labs(x = NULL,
          y = NULL,
          title = "Mánaðarleg hlutfallsleg breyting fjölda starfsfólks (2008 - 2022)",
@@ -556,9 +538,10 @@ Fjöldi opinbers starfsfólks er jákvæð fjöldatala svo fyrsta ágískunin er
 Hér fyrir neðan sjáum við svo matið á árstíðaráhrifum:
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 1.3
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <- emmeans(m, ~ manudur, at = list(manudur = seq(1, 12, length.out = 100))) |> 
@@ -569,17 +552,14 @@ plot_dat |>
     ggplot(aes(manudur, response)) +
     geom_hline(yintercept = 1, lty = 2) +
     geom_line() +
-    geom_rangeframe() +
-    scale_x_continuous(breaks = 1:12,
-                       labels = c("Janúar", "Febrúar", "Mars",
-                                  "Apríl", "Maí", "Júní",
-                                  "Júli", "Ágúst", "September",
-                                  "Október", "Nóvember", "Desember")) +
-    scale_y_continuous(labels = function(x) percent(x - 1),
-                       breaks = c(range(plot_dat$response), 1, 1.03),
-                       limits = c(0.92, 1.08)) +
-    theme_tufte() +
-    theme(plot.title = element_text(face = "bold")) +
+    scale_x_tufte(breaks = 1:12,
+                  labels = c("Janúar", "Febrúar", "Mars",
+                             "Apríl", "Maí", "Júní",
+                             "Júli", "Ágúst", "September",
+                             "Október", "Nóvember", "Desember")) +
+    scale_y_tufte(labels = function(x) percent(x - 1),
+                  breaks = tufte_breaks(plot_dat$response),
+                  limits = c(0.92, 1.08)) +
     labs(x = "Mánuður",
          y = "Árstíðarbundnar sveiflur",
          title = "Árstíðarsveiflur í hlutfalli opinbers starfsfólks")
@@ -629,9 +609,10 @@ Hér nota ég *GAM* til að smootha gögnin og nota svo árstíðaleiðrétt smo
 ## Hrein breyting
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.621
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <- d |>  
@@ -660,23 +641,20 @@ p <- plot_dat |>
     geom_line(aes(col = tegund)) +  
     geom_text(data = plot_dat |> filter(dags == max(dags)),
               aes(label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
-    geom_rangeframe() +  
     scale_x_date(breaks = seq.Date(from = min(plot_dat$dags), to = ymd("2022-01-01"), by = "year"), 
                  date_labels = "%Y",  
                  guide = guide_axis(n.dodge = 1),  
                  expand = expansion(),
                  limits = c(min(plot_dat$dags), ymd("2023-10-01"))) +  
-    scale_y_continuous(labels = label_number(big.mark = ".", decimal.mark = ","),
-                       breaks = c(range(plot_dat$breyting), -1.5e4, -1e4, -5e3, 0, 5e3, 1e4, 1.5e4)) +  
+    scale_y_tufte(labels = label_number(big.mark = ".", decimal.mark = ","),
+                  breaks = tufte_breaks(plot_dat$breyting)) +  
     scale_colour_brewer(type = "qual", palette = "Set1") +
     # coord_cartesian(ylim = c(0.84, 1.127)) +
     labs(x = NULL, y = NULL,  
          title = "Hrein árleg breyting á fjölda starfsfólks á vinnumarkaði (2009 - 2022)",
-         subtitle = "Y-ás táknar mun á fjölda vinnandi frá sama mánuði á síðasta ári") +  
-    theme_tufte() +  
+         subtitle = "Y-ás táknar mun á fjölda vinnandi frá sama mánuði á síðasta ári") + 
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
-          legend.position = "none",
-          plot.title = element_text(face = "bold"))
+          legend.position = "none")
 
 p
 
@@ -687,9 +665,10 @@ ggsave(plot = p, filename = "hrein_breyting_saman.png",
 ## Eftir bakgrunni
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.8
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.8
+#| out-width: "100%"
+#| column: page
 
 plot_dat <- d |>  
     filter(rekstrarform != "Alls starfandi") |>  
@@ -735,12 +714,10 @@ p1 <- plot_dat |>
     labs(x = NULL, y = NULL,
          title = "Hrein árleg breyting á fjölda starfsfólks á vinnumarkaði (2009 - 2022)",
          subtitle = "Y-ás táknar mun á fjölda vinnandi frá sama mánuði árið á undan",) +  
-    theme_tufte() +  
     coord_cartesian(clip = "off") +
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
           legend.position = "none",
-          plot.title = element_text(face = "bold"),
-          strip.background = element_rect(fill = "grey95", colour = NA),
+          axis.line = element_blank(),
           axis.text.x = element_blank(),
           axis.ticks.x = element_blank())
 
@@ -765,12 +742,10 @@ p2 <- plot_dat |>
     scale_colour_brewer(type = "qual", palette = "Set1") +
     facet_grid(bakgrunnur ~ .) +
     labs(x = NULL, y = NULL) +  
-    theme_tufte() +  
     coord_cartesian(clip = "off") +
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 9),
           legend.position = "none",
-          plot.title = element_text(face = "bold"),
-          strip.background = element_rect(fill = "grey95", colour = NA),
+          axis.line = element_blank(),
           axis.text.x = element_blank(),
           axis.ticks.x = element_blank())
 
@@ -795,12 +770,10 @@ p3 <- plot_dat |>
     scale_colour_brewer(type = "qual", palette = "Set1") +
     facet_grid(bakgrunnur ~ .) +
     labs(x = NULL, y = NULL,) +  
-    theme_tufte() +  
     coord_cartesian(clip = "off") +
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
           legend.position = "none",
-          plot.title = element_text(face = "bold"),
-          strip.background = element_rect(fill = "grey95", colour = NA))
+          axis.line = element_blank())
 
 p <- plot_grid(p1, p2, p3, ncol = 1, rel_heights = c(1, 0.85, 1))
 
@@ -813,9 +786,10 @@ ggsave(plot = p, filename = "hrein_breyting_saman_facet.png",
 ## Hlutfallsleg breyting
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.621
+#| out-width: "100%"
+#| column: page
 
 
 plot_dat <- d |>  
@@ -844,23 +818,21 @@ p <- plot_dat |>
     geom_line(aes(col = tegund)) +  
     geom_text(data = plot_dat |> filter(dags == max(dags)),
               aes(label = tegund, col = tegund), hjust = 0, nudge_x = 10) +
-    geom_rangeframe() +  
     scale_x_date(breaks = seq.Date(from = min(plot_dat$dags), to = ymd("2022-01-01"), by = "year"), 
                  date_labels = "%Y",  
                  guide = guide_axis(n.dodge = 1),  
                  expand = expansion(),
                  limits = c(min(plot_dat$dags), ymd("2023-10-01"))) +  
-    scale_y_log10(breaks = c(range(plot_dat$breyting, na.rm = T), 0.9, 0.95, 1, 1.05, 1.1),
-                  labels = function(x) percent(x - 1)) +  
+    scale_y_tufte(breaks = tufte_breaks(plot_dat$breyting),
+                  labels = function(x) percent(x - 1),
+                  trans = "log10") +  
     scale_colour_brewer(type = "qual", palette = "Set1") +
     coord_cartesian(ylim = c(0.84, 1.127)) +
     labs(x = NULL, y = NULL,  
          title = "Hlutfallsleg árleg breyting á fjölda starfsfólks á vinnumarkaði (2009 - 2022)",
-         subtitle = "Y-ás er á lograkvarða svo að -50% og +100% eru jafnlangt frá 0% breytingu") +  
-    theme_tufte() +  
+         subtitle = "Y-ás er á lograkvarða svo að -50% og +100% eru jafnlangt frá 0% breytingu") +   
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
-          legend.position = "none",
-          plot.title = element_text(face = "bold"))
+          legend.position = "none")
 
 p
 
@@ -871,9 +843,10 @@ ggsave(plot = p, filename = "hlutf_breyting_saman.png",
 ## Eftir bakgrunni
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.8
-#| out.width: "100%"
+#| fig-width: 12
+#| fig-asp: 0.8
+#| out-width: "100%"
+#| column: page
 
 plot_dat <- d |>  
     filter(rekstrarform != "Alls starfandi") |>  
@@ -916,12 +889,10 @@ p1 <- plot_dat |>
     labs(x = NULL, y = NULL,
          title = "Hlutfallsleg árleg breyting á fjölda starfsfólks á vinnumarkaði (2009 - 2022)",
          subtitle = "Y-ás er á lograkvarða svo að -50% og +100% eru jafnlangt frá 0% breytingu") +  
-    theme_tufte() +  
     coord_cartesian(clip = "off") +
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
           legend.position = "none",
-          plot.title = element_text(face = "bold"),
-          strip.background = element_rect(fill = "grey95", colour = NA),
+          axis.line = element_blank(),
           axis.text.x = element_blank(),
           axis.ticks.x = element_blank())
 
@@ -944,12 +915,10 @@ p2 <- plot_dat |>
     scale_colour_brewer(type = "qual", palette = "Set1") +
     facet_grid(bakgrunnur ~ .) +
     labs(x = NULL, y = NULL) +  
-    theme_tufte() +  
     coord_cartesian(clip = "off") +
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 9),
           legend.position = "none",
-          plot.title = element_text(face = "bold"),
-          strip.background = element_rect(fill = "grey95", colour = NA),
+          axis.line = element_blank(),
           axis.text.x = element_blank(),
           axis.ticks.x = element_blank())
 
@@ -972,12 +941,10 @@ p3 <- plot_dat |>
     scale_colour_brewer(type = "qual", palette = "Set1") +
     facet_grid(bakgrunnur ~ .) +
     labs(x = NULL, y = NULL,) +  
-    theme_tufte() +  
     coord_cartesian(clip = "off") +
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
           legend.position = "none",
-          plot.title = element_text(face = "bold"),
-          strip.background = element_rect(fill = "grey95", colour = NA))
+          axis.line = element_blank())
 
 p <- plot_grid(p1, p2, p3, ncol = 1, rel_heights = c(1, 0.85, 1))
 

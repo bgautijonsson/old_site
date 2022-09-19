@@ -12,11 +12,6 @@ date: "2022/09/11"
 format: 
     html:
         code-fold: true
-        toc: true
-        toc-depth: 2
-        toc-location: right
-        toc-title: Efnisyfirlit
-        page-layout: full
         smooth-scroll: true
         link-external-newwindow: true
 execute: 
@@ -54,10 +49,9 @@ library(plotly)
 library(DBI)
 library(config)
 library(visitalaneysluverds)
-```
+library(metill)
+theme_set(theme_metill())
 
-
-```{r}
 usr <- config::get("postgres_user")
 con <- dbConnect(RPostgres::Postgres(), 
                  dbname = usr$dbname, 
@@ -66,9 +60,6 @@ con <- dbConnect(RPostgres::Postgres(),
                  user = usr$username, 
                  password = usr$password)
 
-```
-
-```{r}
 d <- tbl(con, "tiundamork_1997_2021") 
 ```
 
@@ -155,10 +146,10 @@ af öllum tekjum, og því ætti það alls ekki að koma okkur á óvart að þ
 En hvað borgar hver tekjutíund mikið í skatta og hvernig ber því saman við heildartekjur þeirra? Á myndinni að neðan ber ég þetta tvennt saman. Hægt er að smella á **Play** til að sjá þróunina frá 1997 til 2021 eða velja ár til að skoða. Ef allir tekjuhópar borguðu jafnt hlutfall í skatta væru allir punktarnir á brotnu línunni.
 
 ```{r}
-#| fig-width: 10
-#| fig-asp: 0.621
+#| fig-asp: 1
 #| out-width: "100%"
 #| cache: true
+#| column: page
 
 plot_dat <- d |>
     filter(tiundarbreyta %in% "Heildartekjur",
@@ -222,7 +213,6 @@ p <- plot_dat |>
                        expand = expansion(),
                        limits = c(min(plot_dat$skattar_hlutf), 0.5),
                        breaks = seq(0, 50, by = 10)/100) +
-    theme_half_open() +
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5)) +
     labs(x = "% af öllum tekjum",
          y = "% af öllum sköttum",
@@ -255,10 +245,9 @@ Við getum líka skoðað *skattbyrði*, eða hversu hátt hlutfall af tekjum s�
 Neðar í færslunni mun ég svo sýna hvernig skattbyrði hefur hækkað síðan 1997 hjá öllum tekjutíundum nema þeirri efstu.
 
 ```{r}
-#| fig-width: 10
-#| fig-asp: 0.621
-#| out-width: "100%"
+#| fig-asp: 1
 #| cache: true
+#| column: page
 
 plot_dat <- plot_dat |> 
     mutate(
@@ -280,7 +269,6 @@ p <- plot_dat |>
     scale_y_continuous(labels = label_percent(),
                        expand = expansion(add = 0.002),
                        breaks = seq(0, 50, by = 10)/100) +
-    theme_half_open() +
     theme(plot.margin = margin(t = 5, r = 5, b = 5, l = 5)) +
     labs(x = "Tekjutíund",
          y = "Skattbyrðu (Skattar sem % af tekjum)",
@@ -312,10 +300,9 @@ ggplotly(
 Kaupmáttur er einfaldlega hækkun á tekjum umfram verðbólgu *(hækkun á verðlagi, mælt með vísitölu neysluverðs)*. Hér sjáum við hækkun kaupmáttar frá 1997 hjá meðaleinstakling úr hverru tekjutíund. 
 
 ```{r}
-#| fig-width: 10
-#| fig-asp: 0.621
-#| out-width: "100%"
+#| fig-asp: 0.9
 #| cache: true
+#| column: page
 
 
 plot_dat <- d |> 
@@ -363,9 +350,7 @@ p <- plot_dat |>
         )
     ) +
     scale_colour_distiller(type = "div", palette = "RdYlBu", direction = 1) +
-    theme_half_open() +
-    theme(legend.position = "none",
-          plot.title = element_text(size = 14)) +
+    theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
          title = "Breyting á kaupmætti heildartekna frá 1997")
@@ -384,10 +369,9 @@ ggplotly(
 Við höfum frekar áhuga á kaupmætti ráðstöfunartekna *(heildartekjur að frádegnum sköttum)*. 
 
 ```{r}
-#| fig-width: 10
-#| fig-asp: 0.621
-#| out-width: "100%"
+#| fig-asp: 0.9
 #| cache: true
+#| column: page
 
 
 plot_dat <- d |> 
@@ -435,9 +419,7 @@ p <- plot_dat |>
         )
     ) +
     scale_colour_distiller(type = "div", palette = "RdYlBu", direction = 1) +
-    theme_half_open() +
-    theme(legend.position = "none",
-          plot.title = element_text(size = 14)) +
+    theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
          title = "Breyting á kaupmætti ráðstöfunartekna frá 1997")
@@ -458,10 +440,9 @@ ggplotly(
 Það er líka áhugavert að skoða breytingu í skattbyrði milli 1997 og 2021. Hér þýðir jákvæð prósenta að skattbyrði hefur aukist, en neikvæð prósenta að hún sé minni. Við sjáum að skattbyrði hefur aukist hjá öllum tekjutíundunum nema þeirri efstu. Hér erum við að skoða skattbyrði hvers hóps í heild sinni, þannig að það getur alltaf verið að þetta passi ekki við hvern og einn einstakling, heldur á þetta við um meðaltal allra einstaklinganna.
 
 ```{r}
-#| fig-width: 10
-#| fig-asp: 0.621
-#| out-width: "100%"
+#| fig-asp: 0.9
 #| cache: true
+#| column: page
 
 plot_dat <- d |>
     filter(tiundarbreyta %in% "Heildartekjur",
@@ -496,9 +477,7 @@ p <- plot_dat |>
         labels = label_percent(suffix = "%-stig")
     ) +
     scale_colour_distiller(type = "div", palette = "RdYlBu", direction = 1) +
-    theme_half_open() +
-    theme(legend.position = "none",
-          plot.title = element_text(size = 14)) +
+    theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
          title = "Breyting á skattbyrði miðað við 1997")
@@ -535,18 +514,16 @@ p <- plot_dat |>
         hjust = 0, 
         nudge_x = 0.2
     ) +
-    scale_x_continuous(
+    scale_x_tufte(
         breaks = seq(1997, 2021, by = 3),
         limits = c(1997, 2023)
     ) +
-    scale_y_continuous(
+    scale_y_tufte(
         labels = label_percent(suffix = "%-stig", decimal.mark = ",", big.mark = "."),
-        breaks = c(seq(-0.05, 0.05, by = 0.05), range(plot_dat$index))
+        breaks = tufte_breaks(plot_dat$index)
     ) +
     scale_colour_distiller(type = "div", palette = "RdYlBu", direction = 1) +
-    theme_tufte() +
-    theme(plot.title = element_text(face = "bold"),
-          legend.position = "none") +
+    theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
          colour = "Tekjutíund",

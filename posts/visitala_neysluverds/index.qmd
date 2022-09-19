@@ -43,6 +43,9 @@ library(kableExtra)
 library(gganimate)
 library(lubridate)
 library(plotly)
+library(metill)
+
+theme_set(theme_metill())
 Sys.setlocale(locale = "is_IS.UTF-8")
 ```
 
@@ -90,10 +93,10 @@ Færið músina yfir myndirnar til að sjá nákvæm tölugildi og hvaða litir 
 Dragið rennuna undir myndinni til að þysja inn á tiltekið tímabil.
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.8
-#| out.width: "100%"
-#| 
+#| fig.asp: 1
+#| out-width: "100%"
+#| column: page
+
 roll_fun <- function(x) {
     x <- log(1 + x)
     out <- x
@@ -144,7 +147,6 @@ p <- plot_dat |>
                        breaks = c(-0.02, 0, 0.04, 0.06, 0.08, 0.1)) +
     scale_colour_brewer(type = "qual", palette = "Paired") +
     scale_fill_brewer(type = "qual", palette = "Paired") +
-    theme_half_open() +
     theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
@@ -169,10 +171,10 @@ ggplotly(
 Dragið rennuna undir myndinni til að þysja inn á tiltekið tímabil.
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.8
-#| out.width: "100%"
-#| 
+#| fig.asp: 1
+#| out-width: "100%"
+#| column: page
+
 roll_fun <- function(x) {
     x <- log(1 + x)
     out <- x
@@ -214,7 +216,6 @@ p <- plot_dat |>
                        expand = expansion()) +
     scale_colour_brewer(type = "qual", palette = "Paired") +
     scale_fill_brewer(type = "qual", palette = "Paired") +
-    theme_half_open() +
     theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
@@ -233,10 +234,10 @@ ggplotly(
 ## Verðbreyting
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 1.2
-#| out.width: "100%"
-#| 
+#| fig.asp: 1.3
+#| out-width: "100%"
+#| column: page
+
 roll_fun <- function(x) {
     x <- log(1 + x)
     out <- x
@@ -278,7 +279,6 @@ p <- plot_dat |>
     scale_colour_brewer(type = "qual", palette = "Paired") +
     scale_fill_brewer(type = "qual", palette = "Paired") +
     facet_wrap("undirvisitala", ncol = 3) +
-    theme_half_open() +
     theme(legend.position = "none") +
     labs(x = NULL,
          y = NULL,
@@ -298,10 +298,11 @@ ggplotly(
 Þar sem árleg verðbólga samanstendur af verðbólgu síðustu 12 mánaða getur ekki hver og einn mánuður lækkað hana mikið. Ef mánaðarleg verðbólga síðustu 11 mánuði hefur verið 0,5% en hún mælist svo 0% verður árleg verðbólgan samt $1,005^{11} = 1,056 = 5,6\%$. Hins vegar getur verið gott að bera saman mánaðarlega verðbólgu við meðaltal síðastliðins árs. Ef mánaðarleg verðbólga er lægri en meðaltal síðasta árs er árleg verðbólga að lækka.
 
 ```{r}
-#| fig.width: 10
-#| fig.asp: 0.621
-#| out.width: "100%"
-#| 
+#| fig.asp: 1
+#| out-width: "100%"
+#| column: page
+
+
 p <- plot_dat |> 
     mutate(text = str_c("<b>", undirvisitala, "</b>\n",
                         "Dagsetning: ", format(date, "%B, %Y"), "\n",
@@ -316,7 +317,6 @@ p <- plot_dat |>
     scale_y_continuous(labels = label_percent()) +
     coord_cartesian(ylim = c(0, 0.17)/12, xlim = c(0, 0.17)/12,
                     expand = F) +
-    theme_half_open() +
     labs(x = "Árleg verðbólga (deilt með 12)",
          y = "Mánaðarleg verðbólga",
          title = "Árleg verðbólga á móti mánaðarlegri verðbólgu (ágúst 2020 - ágúst 2022)")
@@ -351,6 +351,10 @@ d_sam <- pxweb_get(
 
 
 ```{r}
+#| fig.asp: 1
+#| out-width: "100%"
+#| column: page
+
 lvls <- plot_dat |> 
     distinct(undirvisitala) |> 
     filter(undirvisitala != "Vísitala neysluverðs")
@@ -384,7 +388,7 @@ p <- plot_dat |>
     scale_y_continuous(labels = label_percent()) +
     scale_colour_brewer(type = "qual", palette = "Paired") +
     scale_fill_brewer(type = "qual", palette = "Paired") +
-    theme_half_open() +
+    # theme_half_open() +
     theme(legend.position = "none") +
     labs(x = "Vægi á Íslandi",
          y = "Samræmt vægi",
@@ -396,7 +400,6 @@ ggplotly(
 ) |> 
     animation_opts(
         transition = 500,
-        easing = "cubic-in-out",
         redraw = FALSE
         
     ) |> 

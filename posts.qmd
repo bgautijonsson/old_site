@@ -1,5 +1,4 @@
 ---
-title: "Færslur"
 listing:
     -   id: listing-blog
         contents: posts
@@ -11,6 +10,7 @@ listing:
 page-layout: full
 title-block-banner: true
 ---
+
 
 
 ::: {#listing-blog}

@@ -70,10 +70,10 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-subtitle','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      page: 10,
+      valueNames: ['listing-date','listing-title','listing-author','listing-subtitle','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      page: 5,
     pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
-      searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -99,10 +99,10 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-title','listing-author','listing-date','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-title','listing-author','listing-date','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       page: 3,
     pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
-      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -131,7 +131,6 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
 
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<link rel="stylesheet" href="styles.css">
 <link rel="alternate" type="application/rss+xml" title="Brynjólfur Gauti Guðrúnar Jónsson" href="index.xml"><meta property="og:title" content="">
 <meta property="og:image" content="https://www.bggj.is/binni.png">
 <meta property="og:site-name" content="Brynjólfur Gauti Guðrúnar Jónsson">
@@ -162,9 +161,6 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page">Um mig</a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./pages/radgjof.html">Ráðgjöf</a>
   </li>  
   <li class="nav-item">
@@ -184,15 +180,6 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
         <li>
     <a class="dropdown-item" href="./skattagogn.html">
  <span class="dropdown-text">Eignir, skuldir og tekjur</span></a>
-  </li>  
-    </ul>
-  </li>
-  <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-verkefni" role="button" data-bs-toggle="dropdown" aria-expanded="false">Verkefni</a>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-verkefni">    
-        <li>
-    <a class="dropdown-item" href="./pages/covid19.html">
- <span class="dropdown-text">Spálíkan COVID-19</span></a>
   </li>  
     </ul>
   </li>
@@ -221,15 +208,13 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Flokkar</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(16)</span></div><div class="category" data-category="Hagstofa">Hagstofa <span class="quarto-category-count">(4)</span></div><div class="category" data-category="OurWorldInData">OurWorldInData <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(11)</span></div><div class="category" data-category="bayesian statistics">bayesian statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="covid19">covid19 <span class="quarto-category-count">(3)</span></div><div class="category" data-category="data literacy">data literacy <span class="quarto-category-count">(1)</span></div><div class="category" data-category="efnahagur">efnahagur <span class="quarto-category-count">(6)</span></div><div class="category" data-category="english">english <span class="quarto-category-count">(3)</span></div><div class="category" data-category="fasteignir">fasteignir <span class="quarto-category-count">(1)</span></div><div class="category" data-category="kosningar">kosningar <span class="quarto-category-count">(1)</span></div><div class="category" data-category="landspítali">landspítali <span class="quarto-category-count">(3)</span></div><div class="category" data-category="orkumál">orkumál <span class="quarto-category-count">(1)</span></div><div class="category" data-category="plots">plots <span class="quarto-category-count">(1)</span></div><div class="category" data-category="presentation">presentation <span class="quarto-category-count">(2)</span></div><div class="category" data-category="skattar">skattar <span class="quarto-category-count">(1)</span></div><div class="category" data-category="trustworthiness">trustworthiness <span class="quarto-category-count">(1)</span></div><div class="category" data-category="tutorial">tutorial <span class="quarto-category-count">(1)</span></div><div class="category" data-category="verðlag">verðlag <span class="quarto-category-count">(1)</span></div><div class="category" data-category="vinnumarkaður">vinnumarkaður <span class="quarto-category-count">(2)</span></div><div class="category" data-category="viðtal">viðtal <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Þjóðskrá">Þjóðskrá <span class="quarto-category-count">(1)</span></div><div class="category" data-category="íslenska">íslenska <span class="quarto-category-count">(13)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
 
 
-<div class="quarto-about-trestles column-page-left">
+<div class="quarto-about-trestles column-page">
   <div class="about-entity">
     <img src="binni.png" class="about-image
   rounded " style="width: 250px;">
@@ -275,17 +260,6 @@ gtag('config', 'G-EGQ9KVCY2C', { 'anonymize_ip': true});
 <h5 class="no-anchor card-title listing-title">
 Databeers #2
 </h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('english'); return false;">
-english
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('presentation'); return false;">
-presentation
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('data literacy'); return false;">
-data literacy
-</div>
-</div>
 <div class="card-text listing-description">
 I gave a talk at the 2nd Databeers event hosted by Lucinity. There I talked about open data and helping people make sense of official or press statements by putting them…
 </div>
@@ -311,17 +285,6 @@ Sep 16, 2022
 <h5 class="no-anchor card-title listing-title">
 Viðtal á mbl.is um Landspítalafærslu
 </h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('viðtal'); return false;">
-viðtal
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('landspítali'); return false;">
-landspítali
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
 <div class="card-text listing-description">
 <p>Karlotta Líf Sumarliðadóttir tók viðtal við mig um færsluna mína þar sem ég fjallaði um starfsemisupplýsingar Landspítala. Viðtalið birtist á mbl.is 10. ágúst 2022.</p>
 </div>
@@ -347,17 +310,6 @@ Aug 10, 2022
 <h5 class="no-anchor card-title listing-title">
 Viðtal á vef HÍ
 </h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('viðtal'); return false;">
-viðtal
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('covid19'); return false;">
-covid19
-</div>
-</div>
 <div class="card-text listing-description">
 <p>Halldór Marteinsson tók viðtal við mig sem birtist á vef Háskóla Íslands 22. desember 2020.</p>
 </div>
@@ -383,17 +335,6 @@ Dec 22, 2020
 <h5 class="no-anchor card-title listing-title">
 Viðtal á mbl.is um störf COVID-19 hópsins
 </h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('viðtal'); return false;">
-viðtal
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('covid19'); return false;">
-covid19
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
 <div class="card-text listing-description">
 Alexander Kristjánsson tók viðtal fyrir mbl.is við stóran hluta hópsins sem vann að COVID-19 spálíkanagerð á vegum Háskóla Íslands, Landspítala og Landlæknis. Viðtalið…
 </div>
@@ -419,23 +360,6 @@ Aug 20, 2020
 <h5 class="no-anchor card-title listing-title">
 StanCon2020: COVID-19 Prediction Model
 </h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('english'); return false;">
-english
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('presentation'); return false;">
-presentation
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('covid19'); return false;">
-covid19
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('bayesian statistics'); return false;">
-bayesian statistics
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('trustworthiness'); return false;">
-trustworthiness
-</div>
-</div>
 <div class="card-text listing-description">
 <p>I gave a talk about the statistical methodology behind the prediction model used by the Icelandic government during the first wave of the COVID-19 pandemic.</p>
 </div>
@@ -464,7 +388,7 @@ No matching items
 <h2 data-anchor-id="færslur">Færslur</h2>
 <div id="listing-listing-blog" class="quarto-listing quarto-listing-container-default">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="skattar,efnahagur,R,íslenska" data-listing-date-sort="1662854400000" data-listing-file-modified-sort="1662894362692" data-listing-reading-time-sort="25.24">
+<div class="quarto-post image-right" data-index="0" data-categories="skattar,efnahagur,R,íslenska" data-listing-date-sort="1662854400000" data-listing-file-modified-sort="1663591328704" data-listing-reading-time-sort="24.745">
 <div class="thumbnail">
 <p><a href="./posts/skattagogn/index.html"> <img src="./posts/skattagogn/image.png" class="thumnail-image"> </a></p>
 </div>
@@ -476,22 +400,6 @@ Tekjur, skattar og kaupmáttur
 <div class="listing-subtitle">
 Hvað fær hver tekjutíund mikið af tekjum og hvað borga þær mikið af sköttum?
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('skattar'); return false;">
-skattar
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('efnahagur'); return false;">
-efnahagur
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/skattagogn/index.html">
 <div class="listing-description">
 <p>Stundum les maður að skattakerfið ýti undir ójöfnuð, eða að það séu of háir skattar á þeim efnameiru. Hvort er það? Hér nota ég skattagögn Hagstofunnar til að skoða tekjur og skatta eftir tekjutíundum. Ég get ekki sagt hvort það sé sanngjarnt, en ég get sýnt hvernig það hefur breyst með tímanum.</p>
 </div>
@@ -508,7 +416,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="efnahagur,vinnumarkaður,Hagstofa,R,íslenska" data-listing-date-sort="1662768000000" data-listing-file-modified-sort="1662836418494" data-listing-reading-time-sort="46.325">
+<div class="quarto-post image-right" data-index="1" data-categories="efnahagur,vinnumarkaður,Hagstofa,R,íslenska" data-listing-date-sort="1662768000000" data-listing-file-modified-sort="1663593483872" data-listing-reading-time-sort="43.225">
 <div class="thumbnail">
 <p><a href="./posts/vinnuafl/index.html"> <img src="./posts/vinnuafl/hlutf_opinbert.png" class="thumnail-image"> </a></p>
 </div>
@@ -520,25 +428,6 @@ Vinnumarkaður
 <div class="listing-subtitle">
 Hver er fjöldi starfandi einstaklinga og hvernig skiptast þeir á vinnumarkaði?
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('efnahagur'); return false;">
-efnahagur
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('vinnumarkaður'); return false;">
-vinnumarkaður
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Hagstofa'); return false;">
-Hagstofa
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/vinnuafl/index.html">
 <div class="listing-description">
 <p>Reglulega sjást fyrirsagnir þar sem talað er um að opinbert starfsfólk sé allt of margt og að hlutfall þess af heildarfjölda vinnandi fólks sé of hátt. Hér kryf ég reglulega nýjustu gögnin til að geta vitað hvort slíkar fullyrðingar séu teknar úr samhengi eða endurspegli raunveruleikann.</p>
 </div>
@@ -555,7 +444,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="efnahagur,verðlag,Hagstofa,R,íslenska" data-listing-date-sort="1661817600000" data-listing-file-modified-sort="1663154128021" data-listing-reading-time-sort="16.815">
+<div class="quarto-post image-right" data-index="2" data-categories="efnahagur,verðlag,Hagstofa,R,íslenska" data-listing-date-sort="1661817600000" data-listing-file-modified-sort="1663595480810" data-listing-reading-time-sort="16.68">
 <div class="thumbnail">
 <p><a href="./posts/visitala_neysluverds/index.html"> <img src="./posts/visitala_neysluverds/undirtolur.png" class="thumnail-image"> </a></p>
 </div>
@@ -567,25 +456,6 @@ Vísitala neysluverðs
 <div class="listing-subtitle">
 Vísitalan og áhrif undirtalna á heildina
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('efnahagur'); return false;">
-efnahagur
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('verðlag'); return false;">
-verðlag
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Hagstofa'); return false;">
-Hagstofa
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/visitala_neysluverds/index.html">
 <div class="listing-description">
 <p>Verðbólga er ekki alltaf það sama og verðbólga. Stundum er stór hluti af henni hækkun á húsnæðisverði, stundum ferðir og flutningar. Það er því gott að skoða undirvísitölurnar og áhrif þeirra á heildina.</p>
 </div>
@@ -602,7 +472,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="landspítali,R,íslenska" data-listing-date-sort="1661299200000" data-listing-file-modified-sort="1662894392819" data-listing-reading-time-sort="56.46">
+<div class="quarto-post image-right" data-index="3" data-categories="landspítali,R,íslenska" data-listing-date-sort="1661299200000" data-listing-file-modified-sort="1663598679634" data-listing-reading-time-sort="55.93">
 <div class="thumbnail">
 <p><a href="./posts/landspitali/index.html"> <img src="./posts/landspitali/hjukthyngd.png" class="thumnail-image"> </a></p>
 </div>
@@ -614,19 +484,6 @@ Landspítalinn
 <div class="listing-subtitle">
 Hvaða upplýsingar eru til um rekstur Landspítalans og hvar má finna þær?
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('landspítali'); return false;">
-landspítali
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/landspitali/index.html">
 <div class="listing-description">
 <p>Hvernig er nýting legurýma á Landspítala? Hvaða hlutfall launa fer í þessi margræddu millistjórnendastörf? Hér ætla ég aðeins að skoða hvaða gögn eru til um rekstur landspítalans, hvar má finna þau og hvað mætti betur fara í birtingu þeirra gagna.</p>
 </div>
@@ -655,25 +512,6 @@ Laus störf
 <div class="listing-subtitle">
 Nánari skoðun á gögnum Hagstofunnar um laus störf eftir atvinnugreinum og ársfjórðungum
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('vinnumarkaður'); return false;">
-vinnumarkaður
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('efnahagur'); return false;">
-efnahagur
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Hagstofa'); return false;">
-Hagstofa
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/lausstorf/index.html">
 <div class="listing-description">
 <p>Hagstofan birtir reglulega uppfærð gögn um fjölda og hlutfall lausra starfa eftir atvinnugreinum. Þar sem þessi gögn voru uppfærð í dag datt mér í hug að setja saman stutta samantekt á þeim sem ég get svo auðveldlega uppfært þegar gögnin sjálf eru uppfærð.</p>
 </div>
@@ -692,7 +530,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </div>
 <div class="quarto-post image-right" data-index="5" data-categories="landspítali,Hagstofa,R,íslenska" data-listing-date-sort="1660348800000" data-listing-file-modified-sort="1662310594970" data-listing-reading-time-sort="8.935">
 <div class="thumbnail">
-<p><a href="./posts/stjornsysla_heilbr/index.html"> <img src="./posts/stjornsysla_heilbr/stjornsysl.png" class="thumnail-image"> </a></p>
+<p><a href="./posts/stjornsysla_heilbr/index.html"> <img data-src="./posts/stjornsysla_heilbr/stjornsysl.png" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/stjornsysla_heilbr/index.html">
@@ -702,22 +540,6 @@ Stjórnsýsla í heilbrigðiskerfinu
 <div class="listing-subtitle">
 Hvaða hlutfall útgjalda í heilbrigðiskerfinu er merkt stjórnsýslu og fjármögnun heilbrigðiskerfa?
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('landspítali'); return false;">
-landspítali
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Hagstofa'); return false;">
-Hagstofa
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/stjornsysla_heilbr/index.html">
 <div class="listing-description">
 <p>Hér skoða ég hlutfall útgjalda heilbrigðiskerfisins sem er merkt stjórnsýslu og fjármögnun heilbrigðiskerfa. Ég teikna svo sama hlutfallið í Noregi, Svíþjóð og Danmörku til viðmiðunar.</p>
 </div>
@@ -736,7 +558,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </div>
 <div class="quarto-post image-right" data-index="6" data-categories="fasteignir,efnahagur,Þjóðskrá,R,íslenska" data-listing-date-sort="1658966400000" data-listing-file-modified-sort="1662310594827" data-listing-reading-time-sort="20.995">
 <div class="thumbnail">
-<p><a href="./posts/leigaogkaupverd/index.html"> <img src="./posts/leigaogkaupverd/leiga_hlutf_afborgun.png" class="thumnail-image"> </a></p>
+<p><a href="./posts/leigaogkaupverd/index.html"> <img data-src="./posts/leigaogkaupverd/leiga_hlutf_afborgun.png" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/leigaogkaupverd/index.html">
@@ -746,25 +568,6 @@ Leiga og kaupverð fasteigna
 <div class="listing-subtitle">
 Hvernig ber leiguverði saman við afborganir húsnæðisláns?
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('fasteignir'); return false;">
-fasteignir
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('efnahagur'); return false;">
-efnahagur
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Þjóðskrá'); return false;">
-Þjóðskrá
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/leigaogkaupverd/index.html">
 <div class="listing-description">
 <p>Stundum er talað um að leiga vaxi of hratt, eða að hún vaxi hægar en húsnæðisverð. Hérna nota ég kaupskrá, leiguskrá og vaxtatöflu Landsbanka til að bera leigu saman við afborganir á óverðtryggðu láni með jöfnum greiðslum og breytilegum vöxtum að því gefnu að kaupandi fær lán fyrir 80% af kaupverði fasteignarinnar.</p>
 </div>
@@ -783,7 +586,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </div>
 <div class="quarto-post image-right" data-index="7" data-categories="orkumál,OurWorldInData,R,íslenska" data-listing-date-sort="1657843200000" data-listing-file-modified-sort="1662310594899" data-listing-reading-time-sort="63.43">
 <div class="thumbnail">
-<p><a href="./posts/orkumal/index.html"> <img src="./posts/orkumal/throun_fossil.png" class="thumnail-image"> </a></p>
+<p><a href="./posts/orkumal/index.html"> <img data-src="./posts/orkumal/throun_fossil.png" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/orkumal/index.html">
@@ -793,22 +596,6 @@ Orkumál
 <div class="listing-subtitle">
 Hver er útblástur Íslands og hvernig er hann borið saman við önnur lönd?
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('orkumál'); return false;">
-orkumál
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('OurWorldInData'); return false;">
-OurWorldInData
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/orkumal/index.html">
 <div class="listing-description">
 <p>Til að vernda jörðina viljum við draga úr notkun jarðefnaeldsneytis, en einnig vilja þjóðir heims vaxa efnahagslega. Hér skoða ég hvað þjóðir nota margar kílówattstundir (kWh) af jarðefnaeldsneyti og eldsneyti alls per $ af landsframleiðslu. Ég skoða líka útblástur gróðurhúsaloftteguna við framleiðslu rafmagns og tengingu við landsframleiðslu.</p>
 </div>
@@ -827,7 +614,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </div>
 <div class="quarto-post image-right" data-index="8" data-categories="english,R,plots,tutorial" data-listing-date-sort="1656374400000" data-listing-file-modified-sort="1663162696625" data-listing-reading-time-sort="4.485">
 <div class="thumbnail">
-<p><a href="./posts/forest-plot-table/index.html"> <img src="./posts/forest-plot-table/featured.png" class="thumnail-image"> </a></p>
+<p><a href="./posts/forest-plot-table/index.html"> <img data-src="./posts/forest-plot-table/featured.png" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/forest-plot-table/index.html">
@@ -837,22 +624,6 @@ Forest Plots with Built-In Tables
 <div class="listing-subtitle">
 Creating forest plots with coefficient tables in ggplot2 with cowplot
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('english'); return false;">
-english
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('plots'); return false;">
-plots
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('tutorial'); return false;">
-tutorial
-</div>
-</div>
-<a href="./posts/forest-plot-table/index.html">
 <div class="listing-description">
 <p>I’ve seen this kind of figure poking around, but I didn’t really think about them until the other day I was asked about how to make one in R. Here I will walk through making one of these plots using the <code>ggplot2</code> and <code>cowplot</code> packages.</p>
 </div>
@@ -871,7 +642,7 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </div>
 <div class="quarto-post image-right" data-index="9" data-categories="R,kosningar,íslenska" data-listing-date-sort="1656201600000" data-listing-file-modified-sort="1662894379318" data-listing-reading-time-sort="98.155">
 <div class="thumbnail">
-<p><a href="./posts/kosningarannsokn/index.html"> <img src="./posts/kosningarannsokn/flokkshollusta.png" class="thumnail-image"> </a></p>
+<p><a href="./posts/kosningarannsokn/index.html"> <img data-src="./posts/kosningarannsokn/flokkshollusta.png" class="thumnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/kosningarannsokn/index.html">
@@ -881,19 +652,6 @@ Kjósendatryggð
 <div class="listing-subtitle">
 Hvert missa flokkar kjósendur sína og hvaðan sækja þeir nýja?
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('kosningar'); return false;">
-kosningar
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/kosningarannsokn/index.html">
 <div class="listing-description">
 <p>Íslenska Kosningarannsóknin er framkvæmd af Félagsvísindastofnun Háskóla Íslands, og mér finnst vinnan sem fer fram þar hreint út sagt frábær og upplýsingar um gögnin vel skipulagðar, enda eina sviðið sem ég veit að sé með eigin RStudio server innanhúss!</p>
 </div>
@@ -922,19 +680,6 @@ Dreifing húsnæðislánategunda hjá íslenskum heimilum
 <div class="listing-subtitle">
 Dæmi um notkun Quarto og RStudio til að útbúa gagnvirkar HTML skýrslur
 </div>
-</a>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('efnahagur'); return false;">
-efnahagur
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
-R
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('íslenska'); return false;">
-íslenska
-</div>
-</div>
-<a href="./posts/lanategundir/index.html">
 <div class="listing-description">
 Í nýjustu útgáfu af Fjármálastöðugleika birti Seðlabankinn tölur yfir hlutfall lánategunda hjá íslenskum heimilum. Ég hafði verið að spjalla við Ingva og Arnar hjá Pyngjunni um þessi gögn þ.a. ég útbjó snöggvast gagnvirka HTML skýrslu með Quarto í RStudio og sendi á kauðana.
 </div>

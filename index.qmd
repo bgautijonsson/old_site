@@ -4,13 +4,14 @@ listing:
         contents: posts
         sort: "date desc"
         type: default
-        categories: true
+        categories: false
         feed: true
-        page-size: 10
+        page-size: 5
     -   id: listing-talks
         contents: talks
         sort: "date desc"
         type: grid
+        categories: false
         page-size: 3
         grid-item-border: true
 page-layout: full

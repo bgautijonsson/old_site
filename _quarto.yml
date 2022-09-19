@@ -25,11 +25,9 @@ website:
     card-style: summary_large_image
     site: "@bggjonsson"
   navbar:
-    background: "#08306b"
-    foreground: "#faf9f9"
+    background: primary
+    foreground: secondary
     right:
-      - href: index.qmd
-        text: Um mig
       - href: pages/radgjof.qmd
         text: Ráðgjöf
       - href: posts.qmd
@@ -42,10 +40,6 @@ website:
               href: http://covid.rhi.hi.is/shiny/dashboard/
             - text: Eignir, skuldir og tekjur
               href: skattagogn.qmd
-      - text: Verkefni
-        menu:
-            - text: Spálíkan COVID-19
-              href: pages/covid19.qmd
       - icon: github
         href: https://github.com/bgautijonsson
       - icon: twitter
@@ -55,7 +49,6 @@ website:
 format:
   html:
     theme: theme.scss
-    css: styles.css
 
 
 
