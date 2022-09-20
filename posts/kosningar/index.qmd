@@ -1,0 +1,378 @@
+---
+title: "Alþingiskosningar"
+subtitle: ""
+author: 
+    -   name: "Brynjólfur Gauti Guðrúnar Jónsson"
+        url: "https://twitter.com/bgautijonsson"
+        affiliation: "Tölfræði, Raunvísindadeild Háskóla Íslands"
+        affiliation-url: "https://www.hi.is/tolfraedi_0"
+date: "2022/09/17"
+format: 
+    html:
+        code-fold: true
+        page-layout: full
+        smooth-scroll: true
+        link-external-newwindow: true
+execute: 
+  echo: false
+  warning: false
+  cache: false
+editor: source
+draft: true
+title-block-banner: true
+categories:
+    - stjórnmál
+    - kosningar
+    - R
+    - íslenska
+image: Figures/thingmenn_atkvaedi.png
+
+---
+
+
+```{r}
+#| include: false
+
+library(cowplot)
+library(tidyverse)
+library(scales)
+library(ggthemes)
+library(kableExtra)
+library(gganimate)
+library(lubridate)
+library(geomtextpath)
+library(ggtext)
+library(readxl)
+library(janitor)
+library(plotly)
+library(config)
+library(DBI)
+library(visitalaneysluverds)
+library(tidyverse)
+library(lubridate)
+library(ggthemes)
+library(cowplot)
+library(scales)
+library(visitalaneysluverds)
+library(feather)
+library(gganimate)
+library(metill)
+library(patchwork)
+theme_set(theme_metill())
+
+```
+
+```{r}
+usr <- config::get("postgres_user")
+con <- dbConnect(RPostgres::Postgres(), 
+                 dbname = usr$dbname, 
+                 host = usr$host,
+                 port = usr$port, 
+                 user = usr$username, 
+                 password = usr$password)
+
+isk <- function(x, scale = 1e6, suffix = " mkr") number(x / scale, suffix = suffix, big.mark = ".", decimal.mark = ",")
+hlutf <- label_percent(accuracy = 0.1, big.mark = ".", decimal.mark = ",")
+```
+
+
+```{r}
+d <- tbl(con, "arsreikningar_stjornmalaflokka") |> 
+    collect() |> 
+    mutate_all(~ ifelse(is.na(.), 0, .)) |> 
+    inner_join(
+        vnv() |> 
+            group_by(ar = year(date)) |> 
+            summarise(cpi = mean(cpi)) |> 
+            mutate(cpi = cpi / cpi[ar == max(ar)]),
+        by = "ar"
+    ) |> 
+    mutate(
+        flokkur = case_when(
+            flokkur == "Flokkur Fólksins" ~ "Flokkur fólksins",
+            flokkur == "Framsóknarflokkurinn" ~ "Framsóknarflokkur",
+            TRUE ~ flokkur
+        )
+    )
+
+xS <- "#e41a1c"
+xV <- "#00441b"
+xD <- "#377eb8"
+xP <- "#984ea3"
+xB <- "#41ab5d"
+xBF <- "#cab2d6"
+xC <- "#ff7d14"
+xM <- "#08306b"
+xFF <- "#FBB829"
+Annad <- "#e5d8bd"
+
+colours <- tibble(
+    flokkur = c(
+        "Sjálfstæðisflokkur",
+        "Framsóknarflokkur",
+        "Samfylkingin",
+        "Vinstrihreyfingin - grænt framboð",
+        "Viðreisn",
+        "Píratar",
+        "Miðflokkurinn",
+        "Flokkur fólksins"
+    ),
+    colour = c(
+        xD,
+        xB,
+        xS,
+        xV,
+        xC,
+        xP,
+        xM,
+        xFF
+    ),
+    merki = c(
+        "xD", 
+        "xB",
+        "xS",
+        "xV",
+        "xC",
+        "xP",
+        "xM",
+        "xF"
+    )
+)
+
+d <- d |> 
+    inner_join(
+        colours,
+        by = "flokkur"
+    )
+
+d <- d |> 
+    left_join(
+        tbl(con, "atkvaedi_stjornmalaflokka") |> 
+            filter(ar >= 2007) |> 
+            collect() |> 
+            mutate(ar = ifelse(ar == 2021, 2020, ar)),
+        by = c("flokkur", "ar")
+    ) |> 
+    left_join(
+        tbl(con, "thingmenn_stjornmalaflokka") |> 
+            filter(ar >= 2007) |> 
+            collect() |> 
+            mutate(ar = ifelse(ar == 2021, 2020, ar)),
+        by = c("flokkur", "ar")
+    )
+
+
+
+```
+
+# Atkvæði og þingmenn
+
+```{r}
+#| fig-asp: 0.621
+#| fig-width: 10
+#| out-width: "100%"
+#| column: page
+#| fig-cap: "Mynd 1. Hvaða flokkar fá flesta þingmenn fyrir hvert atkvæði?"
+#| fig-cap-location: margin
+
+
+plot_dat <- d |> 
+    select(ar, flokkur, merki, colour, thingmenn, atkvaedi) |> 
+    drop_na() |> 
+    group_by(ar) |> 
+    mutate(p_th = thingmenn / sum(thingmenn),
+           p_at = atkvaedi / sum(atkvaedi)) |> 
+    ungroup() |> 
+    mutate(
+        ar = ifelse(ar == 2020, 2021, ar),
+        value = p_th / p_at,
+        merki = fct_reorder(merki, value),
+        y = value,
+        y = case_when(
+            merki == "xC" ~ y * 0.997,
+            merki == "xS" ~ y * 1.006,
+            merki == "xD" ~ y * 0.999,
+            TRUE ~ y
+        )
+    )
+
+p <- plot_dat |> 
+    ggplot(aes(ar, value)) +
+    geom_hline(yintercept = 1, lty = 2, alpha = 0.4) +
+    geom_line(aes(colour = merki)) +
+    geom_point(aes(colour = merki)) +
+    geom_text(
+        data = plot_dat |> filter(ar == max(ar)),
+        aes(label = merki, colour = merki, y = y),
+        hjust = 0,
+        vjust = 0.5,
+        nudge_x = 0.1
+    ) +
+    annotate(
+        geom = "label", 
+        x = c(2008, 2008), 
+        y = c(min(plot_dat$value), max(plot_dat$value)), 
+        label = c("Færri þingmenn per atkvæði", "Fleiri þingmenn per atkvæði"),
+        size = 4,
+        vjust = c(0, 1),
+        family = "Lato",
+        colour = "#636363"
+        
+    ) +
+    scale_x_tufte(
+        breaks = unique(plot_dat$ar),
+    ) +
+    scale_y_tufte(
+        breaks = c(tufte_breaks(plot_dat$value), 1),
+        labels = label_number(accuracy = 0.01)
+    ) +
+    scale_colour_manual(
+        values = plot_dat |> arrange(merki) |> distinct(colour) |> pull(colour)
+    ) +
+    theme(legend.position = "none") +
+    labs(x = NULL,
+         y = NULL,
+         title = "Hvaða flokkar fá flesta þingmenn fyrir hvert atkvæði?",
+         subtitle = "Reiknað sem hlutfall þingmanna deilt með hlutfalli atkvæða til hvers flokks",
+         caption = "Myndrit eftir @bggjonsson byggt á niðurstöðum alþingiskosninga")
+
+ggsave(
+    plot = p + labs(caption = NULL, title = NULL, subtitle = NULL),
+    filename = "Figures/thingmenn_atkvaedi.png",
+    width = 8, height = 0.5 * 8,
+    scale = 1.3
+)
+
+ggsave(
+    plot = p,
+    filename = "Figures/thingmenn_atkvaedi_tw.png",
+    width = 8, height = 0.5 * 8,
+    scale = 1.3
+)
+
+knitr::include_graphics("Figures/thingmenn_atkvaedi.png")
+```
+
+
+```{r}
+
+```
+
+
+# Peningar
+
+Ríkisendurskoðun birtir ársreikninga stjórnmálaflokkanna. Reyndar voru bara birtir útdrættir úr ársreikningunum fram til ársins 2019, en þar eru þó nægar upplýsingar til að framkvæma ýmsar greiningar. Til dæmis getum við skoðað útgjöld stjórnmálaflokka á hverju kjörtímabili og borið það saman við fjölda atkvæða í næstu kosningum.
+
+```{r}
+#| column: screen-inset
+#| layout-nrow: 1
+#| fig-cap: "Mynd 2. Meðaltal ársútgjalda frá síðustu kosningum deilt með fjölda atkvæða í yfirstandandi kosningum."
+#| fig-cap-location: margin
+
+
+plot_dat <- d |> 
+    select(flokkur, ar, atkvaedi, gjold, afkoma, colour, merki, cpi) |> 
+    arrange(flokkur, ar) |> 
+    group_by(flokkur) |> 
+    mutate(kosningar = cumsum(!is.na(atkvaedi)) |> lag(default = 0)) |> 
+    group_by(flokkur, kosningar, colour, merki) |> 
+    filter(any(!is.na(atkvaedi))) |> 
+    summarise(
+        gjold = mean(gjold/cpi),
+        afkoma = sum(afkoma/cpi),
+        atkvaedi = na.omit(atkvaedi),
+        start_ar = min(ar),
+        end_ar = max(ar),
+        ar = max(ar),
+        .groups = "drop"
+    ) |> 
+    filter(ar > 2007) |> 
+    mutate(
+        gjold = ifelse(ar == 2020, gjold / (3/4), gjold),
+        value = gjold / atkvaedi,
+        merki = fct_reorder(merki, value),
+        ar = ifelse(ar == 2020, 2021, ar)
+    )
+
+
+
+p <- plot_dat |> 
+    group_by(ar2 = ar) |> 
+    group_map(
+        function(data, ...) {
+            
+            data <- data |> 
+                mutate(merki = fct_reorder(merki, value))
+            
+            data |> 
+                mutate(y = value + 0.02 * mean(value)) |> 
+                ggplot(aes(merki, value)) +
+                geom_col(aes(fill = merki)) +
+                geom_text(
+                    aes(
+                        label = merki, 
+                        colour = merki,
+                        y = y
+                    ),
+                    size = 5,
+                    vjust = 0,
+                    family = "serif"
+                ) +
+                scale_y_tufte(
+                    breaks = tufte_breaks(data$value),
+                    expand = expansion(mult = 0.07),
+                    labels = label_number(suffix = " kr", big.mark = ".", decimal.mark = ","),
+                    limits = c(0, max(plot_dat$value) * 1.01)
+                ) +
+                scale_colour_manual(
+                    values = data |> arrange(merki) |> distinct(colour) |> pull(colour)
+                ) + 
+                scale_fill_manual(
+                    values = data |> arrange(merki) |> distinct(colour) |> pull(colour)
+                ) + 
+                facet_wrap("ar") +
+                theme(legend.position = "none",
+                      plot.tag.position = c(0.1, 0.1),
+                      axis.line.x = element_blank(),
+                      axis.text.x = element_blank(),
+                      axis.ticks.x = element_blank(),
+                      plot.margin = margin(t = 5, r = 5, b = 0, l = 5)) +
+                labs(x = NULL, y = NULL)
+        }
+    )
+
+
+# for (plot in p) print(plot)
+
+p <- wrap_plots(p, nrow = 1) 
+
+ggsave(plot = p,
+       filename = "Figures/kr_per_atkvaedi.png",
+       width = 10, height = 0.25 * 10,
+       scale = 2,
+       dpi = 200)
+
+p <- wrap_plots(p, nrow = 1) +
+    plot_annotation(
+        title = "Hvað kosta atkvæðin?",
+        subtitle = "Meðaltal ársútgjalda frá síðustu kosningum deilt með fjölda atkvæða í yfirstandandi kosningum",
+        caption = "Myndrit frá bggj.is byggt á niðurstöðum alþingiskosninga og ársreikningum stjórnmálaflokka frá Ríkisendurskoðun",
+        theme = theme(
+            plot.caption = element_text(margin = margin(t = -10, r = 0, b = 5, l = 0), size = 10),
+            plot.title = element_text(size = 25),
+            plot.subtitle = element_text(size = 18)
+        )
+    )
+
+ggsave(plot = p,
+       filename = "Figures/kr_per_atkvaedi_tw.png",
+       width = 10, height = 0.25 * 10,
+       scale = 2,
+       dpi = 200)
+
+knitr::include_graphics("Figures/kr_per_atkvaedi.png")
+```
+
+
+
+

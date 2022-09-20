@@ -25,10 +25,8 @@ website:
     card-style: summary_large_image
     site: "@bggjonsson"
   navbar:
-    title: false
     background: primary
     foreground: secondary
-    logo: logo_dark.png
 
     right:
       - href: pages/radgjof.qmd

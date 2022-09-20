@@ -1,0 +1,14 @@
+{
+  "hash": "acd63d0987a0d2d1555af16dbde1541e",
+  "result": {
+    "markdown": "---\ntitle: \"Alþingiskosningar\"\nsubtitle: \"\"\nauthor: \n    -   name: \"Brynjólfur Gauti Guðrúnar Jónsson\"\n        url: \"https://twitter.com/bgautijonsson\"\n        affiliation: \"Tölfræði, Raunvísindadeild Háskóla Íslands\"\n        affiliation-url: \"https://www.hi.is/tolfraedi_0\"\ndate: \"2022/09/17\"\nformat: \n    html:\n        code-fold: true\n        page-layout: full\n        smooth-scroll: true\n        link-external-newwindow: true\nexecute: \n  echo: false\n  warning: false\n  cache: false\neditor: source\ndraft: true\ntitle-block-banner: true\ncategories:\n    - stjórnmál\n    - kosningar\n    - R\n    - íslenska\nimage: Figures/thingmenn_atkvaedi.png\n\n---\n\n\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n\n# Atkvæði og þingmenn\n\n\n\n::: {.cell .column-page .fig-cap-location-margin fig.asp='0.621'}\n::: {.cell-output-display}\n![Mynd 1. Hvaða flokkar fá flesta þingmenn fyrir hvert atkvæði?](Figures/thingmenn_atkvaedi.png){width=100%}\n:::\n:::\n\n\n# Peningar\n\nRíkisendurskoðun birtir ársreikninga stjórnmálaflokkanna. Reyndar voru bara birtir útdrættir úr ársreikningunum fram til ársins 2019, en þar eru þó nægar upplýsingar til að framkvæma ýmsar greiningar. Til dæmis getum við skoðað útgjöld stjórnmálaflokka á hverju kjörtímabili og borið það saman við fjölda atkvæða í næstu kosningum.\n\n\n::: {.cell .column-screen-inset .fig-cap-location-margin layout-nrow=\"1\"}\n::: {.cell-output-display}\n![Mynd 2. Meðaltal ársútgjalda frá síðustu kosningum deilt með fjölda atkvæða í yfirstandandi kosningum.](Figures/kr_per_atkvaedi.png){width=2000}\n:::\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
